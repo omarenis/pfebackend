@@ -20,6 +20,7 @@ def extract_data_with_validation(request, fields: dict):
                 output[i] = value
         else:
             return Exception(f'{i} is not an attribute for the model')
+    return output
 
 
 class ViewSet(ModelViewSet):
@@ -46,6 +47,13 @@ class ViewSet(ModelViewSet):
             else:
                 return Response(data=self.serializer_class(_object).data, status=HTTP_201_CREATED)
 
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        data = self.service.retreive(_id=pk)
+        if data is None:
+            return Response(data={'error': 'object not found'}, status=HTTP_404_NOT_FOUND)
+        else:
+            return Response(data=self.serializer_class(data).data, status=HTTP_200_OK)
+
     def update(self, request, pk=None, *args, **kwargs):
         if pk is None:
             return Response(data={'error': 'id must not be null'}, status=HTTP_400_BAD_REQUEST)
@@ -61,6 +69,12 @@ class ViewSet(ModelViewSet):
         if isinstance(deleted, Exception):
             return Response(data={'error': str(deleted)}, status=HTTP_404_NOT_FOUND)
         return Response(data={'response': True}, status=200)
+
+    @classmethod
+    def get_urls(cls):
+        return cls.as_view({'get': 'list', 'post': 'create'}), cls.as_view(
+            {'get': 'retreive', 'put': 'update', 'delete': 'delete'}
+        )
 
 
 class FormViewSet(ViewSet):
@@ -84,7 +98,7 @@ class ParentFormViewSet(FormViewSet):
     def list(self, request, *args, **kwargs):
         patient_id = request.GET.get('patient_id')
         if patient_id is not None:
-            data = self.service.filter_by({'patient__id': patient_id}).first()
+            data = self.service.filter_by({'patien__id': patient_id}).first()
             if data is None:
                 return Response(data={'error': 'data not found'}, status=HTTP_404_NOT_FOUND)
             else:

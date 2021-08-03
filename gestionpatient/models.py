@@ -3,18 +3,16 @@ from rest_framework.serializers import ModelSerializer
 
 
 class Patient(Model):
-    block = TextField(null=False)
-    parent = ForeignKey('gestionusers.Parent', on_delete=CASCADE)
-    doctor = ForeignKey('gestionusers.Doctor', on_delete=SET_DEFAULT, default=0)
-    parent_full_name: TextField = TextField(null=False)
-    parent_email: EmailField = EmailField(null=False)
-    parent_phone: TextField = TextField(null=False)
-    name: TextField = TextField(null=False, unique=True)
-    family_name = TextField(null=False, unique=False)
+    name: TextField = TextField(db_column='name', null=False)
+    familyName = TextField(db_column='family_name', null=False)
     birthdate: DateField = DateField()
+    school: TextField = TextField(null=False)
+    parent = ForeignKey('gestionusers.Parent', on_delete=CASCADE, null=True)
+    doctor = ForeignKey('gestionusers.Doctor', on_delete=SET_NULL, null=True)
 
     class Meta:
         db_table = 'patients'
+        unique_together = (('name', 'familyName'), )
 
 
 class Orientation(Model):

@@ -1,5 +1,5 @@
 from django.urls import path
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet
@@ -44,6 +44,7 @@ class PersonViewSet(ViewSet):
                 'localisation_id': {'type': 'integer', 'required': False}
             }
         super().__init__(fields=fields, serializer_class=serializer_class, service=service, **kwargs)
+        self.localisation_service = LocalisationService()
 
     def get_permissions(self):
         permission_classes = []
@@ -63,13 +64,13 @@ class PersonViewSet(ViewSet):
             return Response(data=self.serializer_class(data=user).data, status=200)
 
     def login(self, request, *args, **kwargs):
-        email = request.data.get('email')
-        if email is None:
+        cin = request.data.get('cin')
+        if cin is None:
             return Response(data={"error": "الحساب غير موجود"}, status=400)
         password = request.data.get('password')
         if password is None:
             return Response(data={"error": "كلمة المرور غير موجودة"}, status=400)
-        user = self.service.login(email, password)
+        user = self.service.login(cin, password)
         if isinstance(user, Exception):
             return Response(data={"error": str(user)}, status=500)
         token = RefreshToken.for_user(user=user)
@@ -80,7 +81,19 @@ class PersonViewSet(ViewSet):
         })
 
     def signup(self, request, *args, **kwargs):
-        user = self.service.create(request.data)
+        data = {}
+        localisation = self.localisation_service.filter_by(request.data.get('localisation'))
+        if localisation is None:
+            localisation = self.localisation_service.create(data=request.data.get('localisation'))
+        for i in self.fields:
+            data[i] = request.data.get(i)
+        data['localisation_id'] = localisation.id
+        user = self.service.filter_by({'cin': request.data.get('cin')}).first()
+        if user is not None:
+            data['is_active'] = True
+            self.service.put(_id=user.id, data=data)
+        else:
+            user = self.service.create(data)
         if isinstance(user, Exception):
             return Response(data={"error": str(user)}, status=500)
         else:
@@ -88,18 +101,14 @@ class PersonViewSet(ViewSet):
             return Response(data={
                 "access": str(token.access_token),
                 "refresh": str(token),
-                "userId": user.id
+                "userId": user.id,
+                "typeUser": user.typeUser
             })
 
 
-users_list = PersonViewSet.as_view({
-    'get': 'list',
-    'post': 'create'
-})
+users_list, user_retrieve_update_delete = PersonViewSet.get_urls()
 
-user_retrieve_update_delete = PersonViewSet.as_view({
-    'delete': 'delete'
-})
+
 login = PersonViewSet.as_view({
     'post': 'login'
 })

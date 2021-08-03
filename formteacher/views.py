@@ -9,47 +9,56 @@ from formteacher.services import BehaviorTroubleTeacherService, ExtraTroubleTeac
     HyperActivityTroubleTeacherService, ImpulsivityTroubleTeacherService, InattentionTroubleTeacherService
 
 behavior_trouble_teacher_fields = {
-    'arrogant_impolite': text_field,
-    'angry_unexpected_behavior': text_field,
-    'sensitive_criticism': text_field,
-    'pout_sulk_easily': text_field,
+    'immediatelySatisfiedNeeds': text_field,
+    'angryUnexpectedBehavior': text_field,
+    'sensitiveCriticism': text_field,
+    'poutSulkEasily': text_field,
     'moody': text_field,
     'brawler': text_field,
-    'deny_mistakes_blame_others': text_field
+    'denyMistakesBlameOthers': text_field,
+    'lessAskTeacherHelp': text_field
 }
 
 impulsivity_trouble_teacher_fields = {
-    'restless_squirms_chair': text_field,
-    'unappropriate_noices': text_field,
-    'immediately_satisfied_needs': text_field,
-    'annoy_students': text_field,
-    'go_right_left': text_field,
-    'easily_turn_on_impulsive': text_field,
-    'excessive_attention_from_teacher': text_field
-}
-
-extra_trouble_teacher = {
-    'submissive_attitude_towards_authority': text_field,
-    'less_accepted_by_group': text_field,
-    'Trouble_integrating_with_other_students': text_field,
-    'less_cooperate_with_classmates': text_field
+    'restlessSquirmsChair': text_field,
+    'inappropriateNoises': text_field,
+    'arrogantImpolite': text_field,
+    'annoyStudents': text_field,
+    'goesLeftRight': text_field,
+    'easilyTurnOnImpulsive': text_field,
+    'excessiveAttentionFromTeacher': text_field
 }
 
 inattention_trouble_teacher = {
     'distracted': text_field,
     'dreamer': text_field,
-    'be_led_by_others': text_field,
-    'Trouble_guiding_others': text_field,
+    'beLedByOthers': text_field,
+    'troubleGuidingOthers': text_field,
+    'troubleFinishingThings': text_field,
     'immature': text_field,
-    'easily_upset_make_effort': text_field
+    'upsetEasilyMakeEffort': text_field,
+    'hasLearningDifficulties': text_field
 }
 
 hyperactivity_trouble_teacher = {
-    'restless_squirms_chair': text_field,
+    'restlessSquirmsChair': text_field,
+    'angryUnexpectedBehavior': text_field,
     'distracted': text_field,
-    'annoy_students': text_field,
-    'pout_sulk_easily': text_field,
-    'moody': text_field
+    'annoyStudents': text_field,
+    'poutSulkEasily': text_field,
+    'moody': text_field,
+    'goesLeftRight': text_field,
+    'easilyTurnOnImpulsive': text_field,
+    'troubleFinishingThings': text_field,
+    'upsetEasilyMakeEffort': text_field
+}
+
+extra_trouble_teacher = {
+    'submissiveAttitudeTowardsAuthority': text_field,
+    'lessAcceptedByGroup': text_field,
+    'unacceptDefeat': text_field,
+    'troubleIntegratingWithOtherStudents': text_field,
+    'lessCooperateWithOthers': text_field
 }
 
 

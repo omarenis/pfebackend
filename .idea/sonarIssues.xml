@@ -68,6 +68,41 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/anxity.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/behavoir.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/extra.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/hyperactivity.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/impulsivity.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/learning.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/parent/somatisation.trouble.parent.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/patient.ts">
           <value>
             <set />
@@ -78,7 +113,27 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/teacher/behaviorTroubleTeacher.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/teacher/extra.trouble.teacher.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/teacher/hyperactivity.trouble.teacher.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/teacher/impulsivity.trouble.teacher.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/models/teacher/inattention.trouble.teacher.ts">
           <value>
             <set />
           </value>
@@ -89,6 +144,81 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/form-parent-first/form-parent-first.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/form-teacher-first/form-teacher-first.component.html">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/form-teacher-first/form-teacher-first.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-fifth/form-parent-fifth.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-first/form-parent-first.component.html">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-first/form-parent-first.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-forth/form-parent-forth.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-second/form-parent-second.component.html">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-second/form-parent-second.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-six/form-parent-six.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/parent/form-parent-third/form-parent-third.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/form/patient/patient.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/screens/landing/join/join.component.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/services/genericservice.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/services/message.service.ts">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/../frontendnewversion/src/app/services/patient.service.ts">
           <value>
             <set />
           </value>

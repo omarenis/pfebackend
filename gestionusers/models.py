@@ -1,33 +1,40 @@
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
-from django.db.models import CharField, EmailField, Model, TextField
+from django.db.models import BooleanField, CharField, EmailField, Model, TextField
 from rest_framework.serializers import ModelSerializer
+import string
+import random
+from common.models import create_model
 
-
-class Localisation(Model):
-    governorate: TextField = TextField(null=False)
-    delegation: TextField = TextField(null=False)
-    zip_code: TextField = TextField(null=False, max_length=4)
-
-    class Meta:
-        db_table = 'localisations'
-        unique_together = ('governorate', 'delegation', 'zip_code')
+LOCALISATION_FIELDS = {
+    'governorate': TextField(null=False),
+    'delegation': TextField(null=False),
+    'zipCode': TextField(null=False, db_column='zip_code')
+}
+Localisation = create_model(name='Localisation', type_model=Model, fields=LOCALISATION_FIELDS, options={
+    'db_table': 'localisations',
+    'unique_together': ('governorate', 'delegation', 'zipCode')
+}, app_label='gestionusers')
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, name, family_name, cin, telephone, email, password, type_user):
-        data = {'name': name, 'family_name': family_name, 'cin': cin, 'telephone': telephone,
-                'email': self.normalize_email(email), 'accountId': None}
-
+    def create(self, name, familyName, cin, telephone, email, typeUser, is_active, password=None):
+        data = {'name': name, 'familyName': familyName, 'cin': cin, 'telephone': telephone,
+                'email': self.normalize_email(email), 'accountId': None, 'is_active': is_active,
+                'password': password}
         try:
-            if type_user == 'parent':
+            if typeUser == 'parent':
                 user = Parent(**data)
-            elif type_user == 'doctor':
+            elif typeUser == 'doctor':
                 user = Doctor(**data)
             else:
                 raise AttributeError('user must be parent or doctor')
-            user.username = name + ' ' + family_name
-            user.set_password(password)
+            user.username = name + ' ' + familyName
+            if is_active:
+                user.set_password(password)
+            else:
+                randomstr = ''.join(random.choices(string.ascii_letters + string.digits, k=1258))
+                user.set_password(randomstr)
             user.save()
             return user
         except Exception as exception:
@@ -35,14 +42,16 @@ class UserManager(BaseUserManager):
 
 
 class Person(AbstractUser):
-    objects: UserManager = UserManager()
+    objects = UserManager()
     name: TextField = TextField(null=False)
-    family_name: TextField = TextField(null=False)
+    familyName: TextField = TextField(null=False, db_column='family_name')
     cin: CharField = CharField(max_length=255, null=False, unique=True)
     email: EmailField = EmailField(null=False, unique=True)
     telephone: CharField = CharField(max_length=255, null=False, unique=True)
-    password: TextField = TextField(null=False)
+    password: TextField = TextField(null=True)
     accountId: TextField = TextField(null=True, db_column='account_id')
+    is_active = BooleanField(null=False, default=False)
+    typeUser: TextField = TextField(null=False)
 
     class Meta:
         db_table = 'persons'
@@ -56,13 +65,15 @@ class PersonSerializer(ModelSerializer):
 
 
 class Parent(Person):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
+    class Meta:
+        db_table = 'parents'
 
 
 class Doctor(Person):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+
+    class Meta:
+        db_table = 'doctors'
 
 
 class LocalisationSerializer(ModelSerializer):

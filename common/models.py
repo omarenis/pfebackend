@@ -1,4 +1,4 @@
-from django.db.models import CASCADE, FloatField, ForeignKey, Model, OneToOneField
+from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
 patient_model_location = 'gestionpatient.Patient'
@@ -7,7 +7,7 @@ choices = (('never', 'never'), ('sometimes', 'sometimes'), ('usual', 'usual'), (
 text_field = {'type': 'text', 'required': True}
 
 
-def create_model(name, type_model, fields=None, app_label='', module='', options=None, admin_opts=None):
+def create_model(name, type_model, fields=None, app_label='', module='', options=None):
     class Meta:
         pass
 
@@ -40,4 +40,4 @@ def create_model_serializer(name, model, app_label='', fields='__all__'):
     if app_label:
         setattr(Meta, 'app_label', app_label)
 
-    return type(name, (ModelSerializer, ), {'Meta': Meta})
+    return type(name, (ModelSerializer,), {'Meta': Meta})

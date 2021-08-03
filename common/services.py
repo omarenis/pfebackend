@@ -25,8 +25,21 @@ class Service(object):
         return self.repository.filter_by(data=data)
 
 
+class FormService(Service):
+    def __init__(self, repository: Repository):
+        super().__init__(repository)
+
+    def create(self, data: dict):
+        try:
+            data['score'] = calculate_score(data=data, fields=list(data.keys()))
+            return super().create(data=data)
+        except Exception as exception:
+            return exception
+
+
 def calculate_score(data, fields):
     value = 0
+    print(data)
     for i in fields:
         if not data.get(i):
             raise AttributeError(f'{i} is not an attribte for the instance')

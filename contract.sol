@@ -6,20 +6,20 @@ contract PrivateData{
     struct Patient{
         uint id;
         string name;
-        string family_name;
+        string familyName;
         string birthdate;
     }
     struct Parent{
         address id;
         string name;
-        string family_name;
+        string familyName;
         string email;
         string telephone;
         string password;
         uint numberPatients;
-        mapping(uint => Patient) patients;
+        mapping(uint => uint) patients;
     }
-    mapping(address => Parent) private parents;
+    mapping(address => uint) parents;
 
     function public getParent(address _id) view returns (Parent){
         for(uint i=0; i < numberParents; i++){

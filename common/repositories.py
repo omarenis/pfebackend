@@ -27,7 +27,7 @@ class Repository(object):
         return self.model.objects.create(**data)
 
     def delete(self, _id):
-        return self.model.objects.get(_id).delete()
+        return self.model.objects.get(pk=_id).delete()
 
     def filter_by(self, data: dict):
         return self.model.objects.filter(**data)

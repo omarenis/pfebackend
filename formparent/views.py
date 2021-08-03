@@ -8,77 +8,82 @@ from formparent.models import AnxityTroubleParentSerializer, ExtraTroubleParentS
 from formparent.services import AnxityTroubleParentService, ExtraTroubleParentService, \
     HyperActivityTroubleParentService, ImpulsivityTroubleParentService, \
     LearningTroubleParentService, SomatisationTroubleParentService
-
-ANXITY_TROUBLE_PARENT_FIELDS = {
-    'afraid_environment': text_field,
-    'shy': text_field,
-    'worry_much': text_field,
-    'being_crashed_manipulated': text_field
+BEHAVIOR_TROUBLE_PARENTS = {
+    'insolentWthGrownUps': text_field,
+    'feelsAttackedDefensive': text_field,
+    'descructive': text_field,
+    'denyMistakesBlameOthers': text_field,
+    'quarrelsomeGetInvolvedFight': text_field,
+    'bullyIntimidateComrades': text_field,
+    'constantlyFight': text_field,
+    'unhappy': text_field
 }
-
-IMPULSIVITY_TROUBLE_PARENT_FIELD = {
-    'excitable_impulsif': text_field,
-    'control_everything': text_field,
-    'squirms': text_field,
-    'restless_needs_do_something': text_field
-}
-
 LEARNING_TROUBLE_PARENT_FIELDS = {
-    'has_learning_difficuties': text_field,
-    'not_complete_what_started': text_field,
-    'easily_disctracted': text_field,
-    'discouraged_when_effort_required': text_field
+    'hasLearningDifficuties': text_field,
+    'troubleFinishingThings': text_field,
+    'easilyBeingDistracted': text_field,
+    'enabilityFinishWhenDoEffort': text_field
 }
-
 SOMATISATION_TROUBLE_PARENT_FIELDS = {
     'headaches': text_field,
-    'upset_stomach': text_field,
-    'physical_aches': text_field,
-    'vomiting_nausea': text_field
+    'upsetStomach': text_field,
+    'physicalAches': text_field,
+    'vomitingNausea': text_field
 }
-
+IMPULSIVITY_TROUBLE_PARENT_FIELD = {
+    'excitableImpulsif': text_field,
+    'wantDominate': text_field,
+    'squirms': text_field,
+    'restlessNeedsDoSomething': text_field
+}
+ANXITY_TROUBLE_PARENT_FIELDS = {
+    'afraidNewThings': text_field,
+    'shy': text_field,
+    'worryMuch': text_field,
+    'beingCrashedManipulated': text_field
+}
 
 HYPERACTIVITY_TROUBLE_PARENT_FIELDS = {
-    'excitable_impulsif': text_field,
-    'cry_often_easily': text_field,
+    'excitableImpulsif': text_field,
+    'cryOftenEasily': text_field,
     'squirms': text_field,
-    'restless_needs_do_something': text_field,
+    'restlessNeedsDoSomething': text_field,
     'desctructive': text_field,
-    'not_complete_what_started': text_field,
-    'easily_distracted': text_field,
+    'troubleFinishingThings': text_field,
+    'easilyBeingDistracted': text_field,
     'moody': text_field,
-    'discouraged_when_effort_required': text_field,
-    'disrurb_other_children': text_field
+    'enabilityFinishWhenDoEffort': text_field,
+    'disrurbOtherChildren': text_field
 }
 
-
 EXTRA_TROUBLE_PARENT_FIELDS = {
-    'chewing_mibbing_things': text_field,
-    'trouble_make_keep_friends': text_field,
-    'suck_chew_things': text_field,
+    'chewMibThings': text_field,
+    'troubleMakeKeepFriends': text_field,
+    'suckChewThings': text_field,
     'dreamer': text_field,
-    'lie_made_up_stories': text_field,
-    'get_troubles_more_than_others': text_field,
-    'speak_like_baby_stutters': text_field,
-    'pout_sulk': text_field,
-    'disobey_reluctantly_obey': text_field,
-    'easily_wrinkled_easily_angry': text_field,
-    'cannot_stop_during_repetitive_activity': text_field,
+    'lieMadeUpStories': text_field,
+    'getTroublesMoreThanOthers': text_field,
+    'speakLikeBabyStutters': text_field,
+    'poutSulkEasily': text_field,
+    'stealThings': text_field,
+    'disobeyReluctantlyObey': text_field,
+    'easilyWrinkledEasilyAngry': text_field,
+    'troubleFinishRepetitiveActivity': text_field,
     'cruel': text_field,
     'immature': text_field,
-    'break_rules': text_field,
-    'not_get_along_with_brothers': text_field,
-    'feeding_problems': text_field,
-    'sleeping_problems': text_field,
-    'feel_wronged_cry_out_injustice': text_field,
-    'brags_boastful': text_field,
-    'bowel_movement_problems': text_field
+    'breakRules': text_field,
+    'notGetAlongWithBrothers': text_field,
+    'feedingProblems': text_field,
+    'sleepingProblems': text_field,
+    'feelWrongedCryOutInjustice': text_field,
+    'bragsBoastful': text_field,
+    'bowelMovementProblems': text_field
 }
 
 
 class AnxityTroubleParentViewSet(ViewSet):
     def __init__(self, fields=None, serializer_class=AnxityTroubleParentSerializer,
-                 service=AnxityTroubleParentService, **kwargs):
+                 service=AnxityTroubleParentService(), **kwargs):
         if fields is None:
             fields = ANXITY_TROUBLE_PARENT_FIELDS
         super().__init__(fields, serializer_class, service, **kwargs)
@@ -124,20 +129,15 @@ class ExtraTroubleParentViewSet(ViewSet):
         super().__init__(fields, serializer_class, service, **kwargs)
 
 
-anxity_trouble_parent_list = AnxityTroubleParentViewSet.as_view({
-    'get': 'list',
-    'post': 'create'
-})
-
-
-anxity_trouble_parent_object = AnxityTroubleParentViewSet.as_view({
-    'get': 'retreive',
-    'put': 'update',
-    'delete': 'delete'
-})
-
+anxity_trouble_parent_list, anxity_trouble_parent_object = AnxityTroubleParentViewSet.get_urls()
+impulsivity_trouble_parent_list, impulsivity_trouble_parent_object = ImpulsivityTroubleParentViewSet.get_urls()
+learning_trouble_parent_list, learning_trouble_parent_object = LearningTroubleParentViewSet.get_urls()
 
 urlpatterns = [
     path('anxity_trouble_parent_list', anxity_trouble_parent_list),
     path('anxity_trouble_parent_list/<int:id>', anxity_trouble_parent_object),
+    path('impulsivity_trouble_parent_list', impulsivity_trouble_parent_list),
+    path('impulsivity_trouble_parent_list/<int:id>', impulsivity_trouble_parent_object),
+    path('learning_trouble_parent_list', learning_trouble_parent_list),
+    path('learning_trouble_parent_list/<int:id>', learning_trouble_parent_object)
 ]
