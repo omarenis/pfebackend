@@ -5,8 +5,6 @@
 chat/apps.py,9/d/9dd3a379774721d7abe3be216fab58b2f2860fed
 C
 hopitalbackend/.env,9/2/92118ede617a98931c76cedd337b06c09ce1e7ab
-@
-requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
 >
 chat/models.py,5/1/51ab5579afc7e5980b5abd4750946b091486cfe1
 =
@@ -67,7 +65,5 @@ Z
 *static/admin/js/admin/DateTimeShortcuts.js,3/6/36349a92d2f5e131d508f0dfacbe80305e959141
 ^
 .static/angular/styles.d1374df712fd9aa94ed5.css,e/5/e50e11f5755ecd3423ac7928e25a9236d6b2e9c8
-J
-hopitalbackend/settings.py,0/8/08625f29f11276704c86a54046d258e098e885c1
 [
 +static/angular/main.b67415ba0d618548717d.js,d/f/dffb293d3dbddc77161dcd8dd3e51e993f18f648
