@@ -1,1 +1,1 @@
-web: gunicorn hopitalbackend.asgi --log-file -
+web: gunicorn hopitalbackend.wsgi --log-file -

@@ -114,7 +114,6 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'hopitalbackend.wsgi.application'
-ASGI_APPLICATION = "hopitalbackend.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
