@@ -14,11 +14,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.shortcuts import render
 from django.urls import include, path
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 
+
+def index_page(request, *args, **kwargs):
+    return render(request=request, template_name='hospitalbackend/index.html')
+
+
 urlpatterns = [
+    path('', index_page),
     path('admin/', admin.site.urls),
     path('users/', include('gestionusers.views')),
     path('messages/', include('chat.views')),

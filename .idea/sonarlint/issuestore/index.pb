@@ -23,8 +23,6 @@ K
 formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
 C
 formparent/admin.py,9/f/9f71508fd567f6bbe9d60bf300f3abbc1d2ae070
-F
-hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
 B
 common/services.py,1/3/13442ff2c318f6c4daec6494e860f32f8de076cf
 @
@@ -53,5 +51,23 @@ F
 runtime.txt,2/e/2ed4029984f4a6c70a541992efb31f76528bd80d
 H
 gestionpatient/models.py,b/c/bc17c64f42bc077b17e2207d4b4e6bf630c6a737
+F
+hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
+Y
+)static/admin/js/vendor/jquery/LICENSE.txt,7/6/76aa381c7583699177f8b7476b3303fe05bac506
+]
+-static/admin/js/admin/RelatedObjectLookups.js,6/f/6f7dce54fe3efb648f98a29a85f0c7c05af5bd66
+j
+:static/admin/js/admin/RelatedObjectLookups.b4d76b6aaf0b.js,e/a/eafc120bc5dd3af510bdad063cfc626362423384
+W
+'static/admin/js/vendor/jquery/jquery.js,5/d/5d204591ce3a48719ed92c92fe807f76be2b563d
+g
+7static/admin/js/admin/DateTimeShortcuts.5548f99471bf.js,0/6/06996f88d0e536866c88f4cf3dcfab617f8d2554
+Z
+*static/admin/js/admin/DateTimeShortcuts.js,3/6/36349a92d2f5e131d508f0dfacbe80305e959141
+^
+.static/angular/styles.d1374df712fd9aa94ed5.css,e/5/e50e11f5755ecd3423ac7928e25a9236d6b2e9c8
 J
 hopitalbackend/settings.py,0/8/08625f29f11276704c86a54046d258e098e885c1
+[
++static/angular/main.b67415ba0d618548717d.js,d/f/dffb293d3dbddc77161dcd8dd3e51e993f18f648
