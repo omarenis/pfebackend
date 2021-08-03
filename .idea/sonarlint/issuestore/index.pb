@@ -19,8 +19,6 @@ J
 formparent/repositories.py,a/b/abdcbd814f574355f9ed14b03d6dc686328aae47
 ?
 common/admin.py,7/4/746cd2e03335d642b6569d1cb44133e0fb5e2be9
-J
-hopitalbackend/settings.py,0/8/08625f29f11276704c86a54046d258e098e885c1
 K
 formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
 C
