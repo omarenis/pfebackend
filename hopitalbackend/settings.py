@@ -99,7 +99,7 @@ ROOT_URLCONF = 'hopitalbackend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -114,6 +114,7 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'hopitalbackend.wsgi.application'
+ASGI_APPLICATION = "hopitalbackend.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
