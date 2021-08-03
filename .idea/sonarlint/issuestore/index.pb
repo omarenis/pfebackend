@@ -49,8 +49,6 @@ F
 runtime.txt,2/e/2ed4029984f4a6c70a541992efb31f76528bd80d
 H
 gestionpatient/models.py,b/c/bc17c64f42bc077b17e2207d4b4e6bf630c6a737
-F
-hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
 Y
 )static/admin/js/vendor/jquery/LICENSE.txt,7/6/76aa381c7583699177f8b7476b3303fe05bac506
 ]
