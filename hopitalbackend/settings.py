@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 import os
 import dj_database_url
+from pathlib import Path
 
 PROJECT_ROOT = os.path.join(os.path.abspath(__file__))
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
@@ -25,7 +26,6 @@ STATICFILES_DIRS = (
 
 #  Add configuration for static files storage using whitenoise
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
-from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,7 +60,7 @@ SECRET_KEY = 'kAb55BSKW=ev?vu-9GzP3Lke*&*7rt8#5XzRvtvSzKVa9C#J!MPE%DJ#7=-TjYQ%^S
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["https://hospitalfront-end.herokuapp.com/", "https://hospitalback-end.herokuapp.com/"]
 
 # Application definition
 
@@ -163,7 +163,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
