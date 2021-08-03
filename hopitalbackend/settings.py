@@ -113,7 +113,7 @@ TEMPLATES = [
 ]
 
 
-WSGI_APPLICATION = 'hopitalbackend.wsgi.application'
+# WSGI_APPLICATION = 'hopitalbackend.wsgi.application'
 ASGI_APPLICATION = "hopitalbackend.asgi.application"
 
 # Database
