@@ -25,7 +25,7 @@ class LocalisationViewSet(ViewSet):
             fields = {
                 'governorate': {'type': 'text', 'required': True},
                 'delegation': {'type': 'text', 'required': True},
-                'zip_code': {'type': 'text', 'required': True}
+                'zipCode': {'type': 'text', 'required': True}
             }
         super().__init__(fields, serializer_class, service, **kwargs)
 
@@ -35,7 +35,7 @@ class PersonViewSet(ViewSet):
         if fields is None:
             fields = {
                 'name': {'type': 'text', 'required': True},
-                'family_name': {'type': 'text', 'required': True},
+                'familyName': {'type': 'text', 'required': True},
                 'cin': {'type': 'text', 'required': True},
                 'email': {'type': 'email', 'required': True},
                 'telephone': {'type': 'email', 'required': True},

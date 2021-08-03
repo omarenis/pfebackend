@@ -29,8 +29,6 @@ F
 hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
 B
 common/services.py,1/3/13442ff2c318f6c4daec6494e860f32f8de076cf
-<
-contract.sol,0/6/06bf3ea8eed9d4c2485b4c8c28e2fe1fee975307
 @
 common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
 C
@@ -43,3 +41,11 @@ F
 common/repositories.py,0/b/0bf8f17c16d32aa550fc5bcd9e35d381eef009b3
 F
 gestionusers/models.py,6/b/6b0c04f2e31233dccffa4e375d1fbb75d36820ba
+H
+gestionusers/services.py,5/e/5e0e5fe677b0d8632d6d510aff3292fc2fdbb0e1
+G
+gestionpatient/views.py,e/6/e6ad7b6eb048b6d21e1def1d112d7b7d7cd18aec
+E
+gestionusers/views.py,7/8/78a916d2af46a59c10942e0deb847e488e8422b3
+<
+contract.sol,0/6/06bf3ea8eed9d4c2485b4c8c28e2fe1fee975307
