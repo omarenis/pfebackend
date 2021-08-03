@@ -1,6 +1,10 @@
 from django.contrib import admin
+from django.shortcuts import render
 from django.urls import include, path
 
+
+def home(request, *args, **kwargs):
+    return render(request=request, template_name='index.html')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
