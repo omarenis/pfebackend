@@ -49,3 +49,16 @@ F
 hopitalbackend/asgi.py,3/7/371d6a1eea4235c7adeadb82c36ff2bc58b2e202
 P
  static/angularapp/assets/main.js,a/1/a1a4efbc831654a30b4b988f14ad9d26e2416a02
+8
+Procfile,b/c/bc3c68e880d1a01632bce79f69dd1387c7ba9c54
+F
+hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
+J
+hopitalbackend/settings.py,0/8/08625f29f11276704c86a54046d258e098e885c1
+:
+
+.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
+D
+templates/index.html,f/6/f69b8ce2e31684ae06f1b3e84821e07e3dfddb2f
+F
+hopitalbackend/wsgi.py,a/b/ab03d3f44fdf8b1931c919ce70824572871b623a

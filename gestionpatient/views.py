@@ -66,9 +66,6 @@ class PatientViewSet(ViewSet):
             fields = PATIENT_FIELDS
         super().__init__(fields, serializer_class, service, **kwargs)
 
-        self.hyper_activity_trouble_teacher_service = HyperActivityTroubleTeacherService()
-        self.impulsivity_trouble_teacher_service = ImpulsivityTroubleTeacherService()
-        self.inattention_trouble_teacher_service = InattentionTroubleTeacherService()
 
     def create(self, request, *args, **kwargs):
         if request.data.get('parent_id') is None:
@@ -127,25 +124,25 @@ class PatientViewSet(ViewSet):
             if request.data.get('extraTroubleTeacher_set'):
                 add_other_data_to_patient(
                     data=request.data.get('extraTroubleTeacher_set')[0],
-                    service=self.extra_trouble_teacher_service,
+                    service=ExtraTroubleTeacherService(),
                     _id=patient_id
                 )
             if request.data.get('hyperActivityTeacher_set'):
                 add_other_data_to_patient(
                     data=request.data.get('hyperActivityTeacher_set')[0],
-                    service=self.hyper_activity_trouble_teacher_service,
+                    service=HyperActivityTroubleTeacherService(),
                     _id=patient_id
                 )
             if request.data.get('impulsivityTroubleTeacher_set'):
                 add_other_data_to_patient(
                     data=request.data.get('impulsivityTroubleTeacher_set')[0],
-                    service=self.impulsivity_trouble_teacher_service,
+                    service=ImpulsivityTroubleTeacherService(),
                     _id=patient_id
                 )
             if request.data.get('inattentionTroubleTeacher_set'):
                 add_other_data_to_patient(
                     data=request.data.get('inattentionTroubleTeacher_set')[0],
-                    service=self.inattention_trouble_teacher_service,
+                    service=InattentionTroubleTeacherService(),
                     _id=patient_id
                 )
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
