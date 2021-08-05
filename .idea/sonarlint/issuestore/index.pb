@@ -27,8 +27,6 @@ B
 common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
 C
 formparent/views.py,1/5/15f0037355665f20764fe6a9d62a267e7846197b
-E
-formteacher/models.py,a/1/a10522a44f68e9504280b456db5fd7f3de3d75ff
 L
 gestionusers/repositories.py,1/b/1b8dca875a77cb8046e20ebe2ad0942a58f4a456
 F
@@ -37,8 +35,6 @@ F
 gestionusers/models.py,6/b/6b0c04f2e31233dccffa4e375d1fbb75d36820ba
 H
 gestionusers/services.py,5/e/5e0e5fe677b0d8632d6d510aff3292fc2fdbb0e1
-G
-gestionpatient/views.py,e/6/e6ad7b6eb048b6d21e1def1d112d7b7d7cd18aec
 E
 gestionusers/views.py,7/8/78a916d2af46a59c10942e0deb847e488e8422b3
 <

@@ -65,7 +65,7 @@ class PatientViewSet(ViewSet):
         if fields is None:
             fields = PATIENT_FIELDS
         super().__init__(fields, serializer_class, service, **kwargs)
-        self.extra_trouble_teacher_service = ExtraTroubleTeacherService()
+
         self.hyper_activity_trouble_teacher_service = HyperActivityTroubleTeacherService()
         self.impulsivity_trouble_teacher_service = ImpulsivityTroubleTeacherService()
         self.inattention_trouble_teacher_service = InattentionTroubleTeacherService()
@@ -77,7 +77,6 @@ class PatientViewSet(ViewSet):
                 return Response(data={'error': str(parent_id)}, status=HTTP_400_BAD_REQUEST)
         else:
             parent_id = request.data.get('parent_id')
-        print(parent_id)
         data = {}
         created = False
         for i in list(self.fields.keys()):

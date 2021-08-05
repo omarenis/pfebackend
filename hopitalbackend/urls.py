@@ -6,7 +6,9 @@ from django.urls import include, path
 def home(request, *args, **kwargs):
     return render(request=request, template_name='index.html')
 
+
 urlpatterns = [
+    path('', home),
     path('admin/', admin.site.urls),
     path('users/', include('gestionusers.views')),
     path('messages/', include('chat.views')),
