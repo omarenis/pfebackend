@@ -17,20 +17,12 @@ J
 formparent/repositories.py,a/b/abdcbd814f574355f9ed14b03d6dc686328aae47
 ?
 common/admin.py,7/4/746cd2e03335d642b6569d1cb44133e0fb5e2be9
-K
-formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
 C
 formparent/admin.py,9/f/9f71508fd567f6bbe9d60bf300f3abbc1d2ae070
-B
-common/services.py,1/3/13442ff2c318f6c4daec6494e860f32f8de076cf
-@
-common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
 C
 formparent/views.py,1/5/15f0037355665f20764fe6a9d62a267e7846197b
 L
 gestionusers/repositories.py,1/b/1b8dca875a77cb8046e20ebe2ad0942a58f4a456
-F
-common/repositories.py,0/b/0bf8f17c16d32aa550fc5bcd9e35d381eef009b3
 F
 gestionusers/models.py,6/b/6b0c04f2e31233dccffa4e375d1fbb75d36820ba
 H
@@ -41,8 +33,6 @@ E
 contract.sol,0/6/06bf3ea8eed9d4c2485b4c8c28e2fe1fee975307
 ;
 runtime.txt,2/e/2ed4029984f4a6c70a541992efb31f76528bd80d
-H
-gestionpatient/models.py,b/c/bc17c64f42bc077b17e2207d4b4e6bf630c6a737
 @
 requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
 F
@@ -53,12 +43,15 @@ P
 Procfile,b/c/bc3c68e880d1a01632bce79f69dd1387c7ba9c54
 F
 hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
-J
-hopitalbackend/settings.py,0/8/08625f29f11276704c86a54046d258e098e885c1
-:
-
-.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
-D
-templates/index.html,f/6/f69b8ce2e31684ae06f1b3e84821e07e3dfddb2f
+K
+formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
+@
+common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
 F
-hopitalbackend/wsgi.py,a/b/ab03d3f44fdf8b1931c919ce70824572871b623a
+common/repositories.py,0/b/0bf8f17c16d32aa550fc5bcd9e35d381eef009b3
+B
+common/services.py,1/3/13442ff2c318f6c4daec6494e860f32f8de076cf
+G
+formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936
+D
+formteacher/views.py,1/5/1586efc40f4986c11bd0006dd9b7cd0e30079e66
