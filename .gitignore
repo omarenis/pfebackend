@@ -455,7 +455,11 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+<<<<<<< HEAD
 
+=======
+*/migrations
+>>>>>>> origin/main
 # Cake - Uncomment if you are using it
 # tools/**
 # !tools/packages.config
@@ -642,3 +646,7 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+<<<<<<< HEAD
+=======
+.idea
+>>>>>>> origin/main

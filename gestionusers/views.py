@@ -1,10 +1,91 @@
 from django.urls import path
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ViewSet as RestViewSet
+from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, \
+    HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
-from common.views import ViewSet
-from gestionusers.models import LocalisationSerializer, PersonSerializer
-from gestionusers.services import LocalisationService, PersonService
+from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
+from gestionusers.models import DoctorSerializer, LocalisationSerializer, PersonSerializer, UserSerializer,State,Delegation
+from gestionusers.services import DoctorService, LocalisationService, LoginSignUpService, PersonService, UserService
+
+
+
+@csrf_exempt
+def state_names(request):
+    if request.method == 'GET':
+        states = State.objects.values_list('name', flat=True)
+        return JsonResponse({'states': list(states)})
+
+
+
+def get_delegations(request,x):
+
+    delegations = Delegation.objects.filter(state_id=x).values('id', 'name')
+    return JsonResponse(list(delegations), safe=False)
+
+
+class TokenViewSet(RestViewSet):
+    service = PersonService()
+    localisation_service = LocalisationService()
+    login_sign_up_service = LoginSignUpService()
+
+    def get_permissions(self):
+        permissions = []
+        if self.action == 'logout':
+            permissions.append(IsAuthenticated())
+        else:
+            permissions.append(AllowAny())
+        return permissions
+
+    def login(self, request, *args, **kwargs):
+        login_number = request.data.get('loginNumber')
+        if login_number is None:
+            return Response(data={"exists": False}, status=400)
+        password = request.data.get('password')
+        if password is None:
+            return Response(data={
+                "exists": "كلمة المرور غير موجودة",
+                "passwordMatches": False}, status=400)
+        user = self.login_sign_up_service.login(login_number=login_number, password=password)
+        if isinstance(user, Exception):
+            return Response(data={"error": str(user)}, status=500)
+        token = RefreshToken.for_user(user=user)
+        return Response(data={
+            "access": str(token.access_token),
+            "refresh": str(token),
+            "userId": user.id,
+            "typeUser": user.typeUser,
+            "name": user.name,
+            "familyName": user.familyName if hasattr(user, "familyName") else None,
+            "is_super": user.is_super if hasattr(user, "is_super") else None
+        })
+
+    def signup(self, request, *args, **kwargs):
+        data = {}
+        localisation = self.localisation_service.filter_by(request.data.get('localisation')).first()
+        if localisation is None:
+            localisation = self.localisation_service.create(data=request.data.get('localisation'))
+        for i in self.service.fields:
+            data[i] = request.data.get(i)
+        data['localisation_id'] = localisation.id
+        user = self.service.filter_by({'loginNumber': request.data.get('loginNumber')}).first()
+        data['is_active'] = True
+        if user is not None:
+            if user.is_active:
+                return Response(data={'created': True}, status=HTTP_401_UNAUTHORIZED)
+            self.service.put(_id=user.id, data=data)
+        else:
+            user = self.login_sign_up_service.signup(data)
+        if isinstance(user, Exception):
+            return Response(data={"error": str(user)}, status=500)
+        else:
+            return Response(data={
+                "created": True,
+            }, status=HTTP_201_CREATED)
 
 
 class LocalisationViewSet(ViewSet):
@@ -15,109 +96,116 @@ class LocalisationViewSet(ViewSet):
             permission_classes.append(AllowAny)
         else:
             permission_classes.append(IsAdminUser)
-        return [permission() for permission in permission_classes]
+        return (permission() for permission in permission_classes)
 
-    def __init__(self, fields=None,
-                 serializer_class=LocalisationSerializer,
-                 service=LocalisationService(),
-                 **kwargs):
-        if fields is None:
-            fields = {
-                'governorate': {'type': 'text', 'required': True},
-                'delegation': {'type': 'text', 'required': True},
-                'zipCode': {'type': 'text', 'required': True}
-            }
-        super().__init__(fields, serializer_class, service, **kwargs)
+    def __init__(self, fields=None, serializer_class=LocalisationSerializer, service=LocalisationService(), **kwargs):
+        super().__init__(serializer_class, service, **kwargs)
 
 
-class PersonViewSet(ViewSet):
-    def __init__(self, serializer_class=PersonSerializer, service=PersonService(), fields=None, **kwargs):
-        if fields is None:
-            fields = {
-                'name': {'type': 'text', 'required': True},
-                'familyName': {'type': 'text', 'required': True},
-                'cin': {'type': 'text', 'required': True},
-                'email': {'type': 'email', 'required': True},
-                'telephone': {'type': 'email', 'required': True},
-                'password': {'type': 'password', 'required': True},
-                'accountId': {'type': 'password', 'required': False},
-                'localisation_id': {'type': 'integer', 'required': False}
-            }
-        super().__init__(fields=fields, serializer_class=serializer_class, service=service, **kwargs)
-        self.localisation_service = LocalisationService()
+@csrf_exempt
+@api_view(http_method_names=['POST'])
+def logout(request, *args, **kwargs):
+    token = RefreshToken(request.data.get('refresh'))
+    token.blacklist()
+    return Response(status=HTTP_204_NO_CONTENT)
 
+
+class UserViewSet(ViewSet):
     def get_permissions(self):
-        permission_classes = []
-        if self.action == 'list':
-            permission_classes.append(IsAdminUser)
-        elif self.action == 'retrieve':
-            permission_classes.append(IsAuthenticated)
-        elif self.action == 'signup' or self.action == 'login':
-            permission_classes.append(AllowAny)
-        return [permission() for permission in permission_classes if permission is not None]
+        return [IsAuthenticated()]
 
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        user = self.service.retreive(pk)
-        if user is None:
-            return Response(data={"error": "لم يتم العثور على المستخدم"}, status=404)
-        else:
-            return Response(data=self.serializer_class(data=user).data, status=200)
+    def __init__(self, serializer_class=UserSerializer, service=UserService(), **kwargs):
+        super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+        self.localisation_service = LocalisationService()
+        self.permission_classes = self.get_permissions()
 
-    def login(self, request, *args, **kwargs):
-        cin = request.data.get('cin')
-        if cin is None:
-            return Response(data={"error": "الحساب غير موجود"}, status=400)
-        password = request.data.get('password')
-        if password is None:
-            return Response(data={"error": "كلمة المرور غير موجودة"}, status=400)
-        user = self.service.login(cin, password)
-        if isinstance(user, Exception):
-            return Response(data={"error": str(user)}, status=500)
-        token = RefreshToken.for_user(user=user)
-        return Response(data={
-            "access": str(token.access_token),
-            "refresh": str(token),
-            "userId": user.id
-        })
-
-    def signup(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         data = {}
-        localisation = self.localisation_service.filter_by(request.data.get('localisation'))
-        if localisation is None:
-            localisation = self.localisation_service.create(data=request.data.get('localisation'))
+        if request.user.typeUser == 'school':
+            self.service = PersonService()
+            self.serializer_class = PersonSerializer
+            if request.data.get('school_id') is None:
+                return Response(data={'error', 'school is required for teacher'}, status=HTTP_400_BAD_REQUEST)
+            data['school_id'] = request.user.id
+        elif request.user.typeUser == 'admin' and request.data.get('typeUser') == 'superdoctor':
+            self.service = DoctorService()
+            self.serializer_class = DoctorSerializer
+            data['is_super'] = True
+            data['speciality'] = ''
+        elif request.user.typeUser == 'superdoctor':
+            self.service = DoctorService()
+            self.serializer_class = DoctorSerializer
+            data['super_doctor_id'] = request.user.id
+            data['is_super'] = False
+            data['typeUser'] = 'doctor'
+        self.fields = self.service.fields
+        user = UserService().filter_by({'loginNumber': request.data.get('loginNumber')}).first()
+        if user is not None and user.is_active:
+            return Response(data={'created': True}, status=HTTP_401_UNAUTHORIZED)
         for i in self.fields:
             data[i] = request.data.get(i)
+        localisation = self.localisation_service.filter_by(request.data.get('localisation')).first()
+        if localisation is None:
+            localisation = self.localisation_service.create(data=request.data.get('localisation'))
         data['localisation_id'] = localisation.id
-        user = self.service.filter_by({'cin': request.data.get('cin')}).first()
-        if user is not None:
-            data['is_active'] = True
+        data['is_active'] = True
+        if user is not None and not user.is_active:
             self.service.put(_id=user.id, data=data)
         else:
             user = self.service.create(data)
         if isinstance(user, Exception):
             return Response(data={"error": str(user)}, status=500)
+        return Response(data=self.serializer_class(user).data, status=HTTP_201_CREATED)
+
+    def retrieve(self, request, pk=None, *args, **kwargs):
+        if request.user.typeUser != 'admin' and request.user.typeUser != 'superdoctor':
+            self.service = PersonService()
+        user = self.service.retrieve(pk)
+        if user is None:
+            return Response(data={"error": "لم يتم العثور على المستخدم"}, status=HTTP_404_NOT_FOUND)
         else:
-            token = RefreshToken.for_user(user=user)
-            return Response(data={
-                "access": str(token.access_token),
-                "refresh": str(token),
-                "userId": user.id,
-                "typeUser": user.typeUser
-            })
+            if hasattr(user, 'familyName') is True:
+                if hasattr(user, 'speciality') is True:
+                    return return_serialized_data_or_error_response(_object=user, response_code=HTTP_200_OK,
+                                                                    serializer_class=DoctorSerializer)
+                return return_serialized_data_or_error_response(_object=user, response_code=HTTP_200_OK,
+                                                                serializer_class=PersonSerializer)
+            return return_serialized_data_or_error_response(_object=user, serializer_class=UserSerializer,
+                                                            response_code=HTTP_200_OK)
+
+    def list(self, request, *args, **kwargs):
+        filter_data = {}
+        if request.user.typeUser == 'school':
+            self.serializer_class = PersonSerializer
+            self.service = PersonService()
+            filter_data['typeUser'] = 'teacher'
+            filter_data['schoolteacherids__school_id'] = request.user.id
+        elif request.user.typeUser == 'superdoctor':
+            self.serializer_class = DoctorSerializer
+            self.service = DoctorService()
+            filter_data['is_super'] = False
+            filter_data['super_doctor_id'] = request.user.id
+        for i in request.query_params:
+            if self.service.fields.get(i) is None:
+                return Response(data={'error': f'{i} is not an attribute for the user model'})
+            filter_data[i] = request.query_params.get(i)
+        _objects = self.service.filter_by(data=filter_data) if filter_data != {} else self.service.list()
+        return extract_serialized_objects_response(_objects=_objects, serializer_class=self.serializer_class)
 
 
-users_list, user_retrieve_update_delete = PersonViewSet.get_urls()
-
-
-login = PersonViewSet.as_view({
+users_list, user_retrieve_update_delete = UserViewSet.get_urls()
+login = TokenViewSet.as_view({
     'post': 'login'
 })
-signup = PersonViewSet.as_view({
+signup = TokenViewSet.as_view({
     'post': 'signup'
 })
 urlpatterns = [
     path('', users_list),
-    path('<int:user_id>', user_retrieve_update_delete),
-    path('login', login),
-    path('signup', signup),
+    path('/<int:pk>', user_retrieve_update_delete),
+    path('/login', login),
+    path('/signup', signup),
+    path('/logout', logout),
+    path('/state',state_names),
+    path('/delegation/<int:x>',get_delegations)
 ]

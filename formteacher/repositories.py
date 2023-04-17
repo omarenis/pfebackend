@@ -1,6 +1,6 @@
 from common.repositories import Repository
-from .models import BehaviorTroubleTeacher, ExtraTroubleTeacher, HyperActivityTroubleTeacher, ImpulsivityTroubleTeacher, \
-    InattentionTroubleTeacher
+from .models import BehaviorTroubleTeacher, HyperActivityTroubleTeacher, InattentionTroubleTeacher, FormAbrTeacher
+
 
 
 class BehaviorTroubleTeacherRepository(Repository):
@@ -12,17 +12,12 @@ class HyperActivityTroubleTeacherRepository(Repository):
     def __init__(self, model=HyperActivityTroubleTeacher):
         super().__init__(model)
 
-
-class ImpulsivityTroubleTeacherRepository(Repository):
-    def __init__(self, model=ImpulsivityTroubleTeacher):
-        super().__init__(model)
-
-
-class ExtraTroubleTeacherRepository(Repository):
-    def __init__(self, model=ExtraTroubleTeacher):
-        super().__init__(model)
-
-
 class InattentionTroubleTeacherRepository(Repository):
     def __init__(self, model=InattentionTroubleTeacher):
+        super().__init__(model)
+
+
+class FormAbrTeacherRepository(Repository):
+
+    def __init__(self, model=FormAbrTeacher):
         super().__init__(model)

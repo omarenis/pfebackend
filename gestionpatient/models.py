@@ -1,41 +1,109 @@
 from django.db.models import CASCADE, DateField, ForeignKey, Model, SET_NULL, TextField
-
-from common.models import create_model, create_model_serializer
+from datetime import date
+from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, ForeignKey, ManyToManyField, Model, \
+    OneToOneField, TextField, FloatField, __all__
+from rest_framework.serializers import ModelSerializer
+from common.models import create_model_serializer
+import django.utils.timezone as timezone
+from gestionusers.models import PersonSerializer
 
 app_label = 'gestionpatient'
+doctor_model = 'gestionusers.Doctor'
 
 
 class Patient(Model):
-    name: TextField = TextField(db_column='name', null=False)
-    familyName = TextField(db_column='family_name', null=False)
-    birthdate: DateField = DateField()
-    school: TextField = TextField(null=False)
-    parent = ForeignKey('gestionusers.Parent', on_delete=CASCADE, null=True)
-    doctor = ForeignKey('gestionusers.Doctor', on_delete=SET_NULL, null=True)
+    parent = ForeignKey(to='gestionusers.Parent', on_delete=CASCADE, null=True)
+    name: TextField = TextField(null=False)
+    familyName: TextField = TextField(null=False)
+    birthdate: DateField = DateField(null=False)
+    gender:TextField=TextField(null=False, default='ذكر')
+    sick: BooleanField = BooleanField(default=None, null=True)
+    scoreParent = FloatField(default=0, null=False)
+    scoreTeacher = FloatField(default=0, null=False)
+    isSupervised = BooleanField(default=False, null=False)
+
+
+    def age(self):
+        today = date.today()
+        age = today.year - self.birthdate.year - ((today.month, today.day) < (self.birthdate.month, self.birthdate.day))
+        return age
+
+    def tr_age(self):
+        age = self.age()
+        if age >= 3 and age <= 5:
+            tr_age = '1'
+        elif age >= 6 and age <= 8:
+            tr_age = '2'
+        elif age >= 9 and age <= 11:
+            tr_age = '3'
+        elif age >= 12 and age <= 14:
+            tr_age = '4'
+        elif age >= 15 and age <= 17:
+            tr_age = '5'
+        else:
+            tr_age = None
+        return tr_age
 
     class Meta:
         db_table = 'patients'
-        unique_together = (('name', 'familyName'),)
+        unique_together = (('parent_id', 'name', 'familyName', 'birthdate'),)
 
 
-class Orientation(Model):
+class Supervise(Model):
+    patient: OneToOneField = OneToOneField(to='Patient', on_delete=CASCADE, null=False)
+    doctor: ForeignKey = ForeignKey(to=doctor_model, on_delete=CASCADE, null=False)
+    accepted: BooleanField = BooleanField(null=False, default=False)
+
+    class Meta:
+        db_table = 'supervises'
+
+
+class Consultation(Model):
+    doctor: ForeignKey = ForeignKey(to=doctor_model, on_delete=CASCADE, null=False)
+    parent: ForeignKey = ForeignKey(to='gestionusers.Parent', on_delete=CASCADE, null=False)
+    date: DateTimeField = DateTimeField(null=False, default=timezone.now)
+    accepted: BooleanField = BooleanField(null=False, default=False)
+
+    class Meta:
+        db_table = 'consultations'
+
+
+class Diagnostic(Model):
+    consultation: OneToOneField = OneToOneField(to='Consultation', on_delete=CASCADE)
     patient: ForeignKey = ForeignKey(to='Patient', on_delete=CASCADE, null=False)
-    doctor: ForeignKey = ForeignKey(to='gestionusers.Doctor', on_delete=SET_NULL, null=True)
     diagnostic: TextField = TextField(null=False)
 
     class Meta:
-        db_table = 'orientations'
+        db_table = 'diagnostics'
 
 
-Teacher = create_model(name='Teacher', type_model=Model, fields={
-    'name': TextField(), 'familyName': TextField(), 'cin': TextField(null=False, unique=True),
-    'telephone': TextField()
-}, app_label='gestionpatient', options={
-    'db_table': 'teacher'
+# SuperviseSerializer = create_model_serializer(model=Supervise, app_label=app_label, name='SuperviseSerializer')
+class SuperviseSerializer(ModelSerializer):
+
+    class Meta:
+        model = Supervise
+        fields = "__all__"
+
+
+PatientGetSerializer = create_model_serializer(model=Patient, name='PatientGetSerializer', app_label=app_label,
+                                               options={
+                                                   'fields': "__all__"
+                                               })
+PatientSerializer = create_model_serializer(model=Patient, name='PatientSerializer', app_label=app_label, options={
+    'fields': ['id', 'name', 'familyName', 'birthdate', 'parent', 'behaviortroubleparent',
+               'impulsivitytroubleparent', 'learningtroubleparent', 'anxitytroubleparent',
+               'somatisationtroubleparent', 'hyperactivitytroubleparent', 'extratroubleparent', 'supervise', 'sick',
+               'scoreParent', 'scoreTeacher', 'isSupervised'],
+    'depth': 1
+}, fields={
+    'supervise': SuperviseSerializer(read_only=True)
 })
+DiagnosticSerializer = create_model_serializer(model=Diagnostic, name='DiagnosticSerializer', app_label=app_label)
 
-OrientationSerializer = create_model_serializer(model=Orientation, name='orientationSerializer')
-
-PatientSerializer = create_model_serializer(model=Patient, name='PatientSerializer', app_label=app_label)
-
-TeacherSerializer = create_model_serializer(model=Teacher, name='TeacherSerializer', app_label='gestionpatient')
+ConsultationSerializer = create_model_serializer(model=Consultation, name='ConsultationSerializer', fields={
+    'parent': PersonSerializer(read_only=True),
+    'doctor': PersonSerializer(read_only=True),
+    'diagnostic': PersonSerializer(read_only=True)
+}, options={
+    'fields': ['parent_id', 'doctor_id', 'parent', 'doctor', 'date', 'accepted', 'diagnostic', 'id']
+}, app_label=app_label)

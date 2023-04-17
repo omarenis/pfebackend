@@ -1,15 +1,10 @@
 from common.repositories import Repository
-from formparent.models import AnxityTroubleParent, BehaviorTroubleParent, ExtraTroubleParent,\
-    ImpulsivityTroubleParent, HyperActivityTroubleParent, LearningTroubleParent, SomatisationTroubleParent
+from formparent.models import BehaviorTroubleParent, LearningTroubleParent, \
+    SomatisationTroubleParent, HyperActivityTroubleParent, AnxityTroubleParent, FormAbrParent
 
 
-class AnxityTroubleParentRepository(Repository):
-    def __init__(self, model=AnxityTroubleParent):
-        super().__init__(model)
-
-
-class ImpulsivityTroubleParentRepository(Repository):
-    def __init__(self, model=ImpulsivityTroubleParent):
+class BehaviorTroubleParentRepository(Repository):
+    def __init__(self, model=BehaviorTroubleParent):
         super().__init__(model)
 
 
@@ -28,11 +23,11 @@ class HyperActivityTroubleParentRepository(Repository):
         super().__init__(model)
 
 
-class BehaviorTroubleParentRepository(Repository):
-    def __init__(self, model=BehaviorTroubleParent):
+class AnxityTroubleParentRepository(Repository):
+    def __init__(self, model=AnxityTroubleParent):
         super().__init__(model)
 
 
-class ExtraTroubleParentRepository(Repository):
-    def __init__(self, model=ExtraTroubleParent):
+class FormAbrParentRepository(Repository):
+    def __init__(self, model=FormAbrParent):
         super().__init__(model)
