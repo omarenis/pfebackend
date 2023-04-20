@@ -29,15 +29,6 @@ def create_model(name, type_model, fields=None, app_label='', module='', options
     model = type(name, (type_model,), attrs)
     return model
 
-
-<<<<<<< HEAD
-def create_model_serializer(name, model, app_label='', fields='__all__'):
-    class Meta:
-        pass
-
-    setattr(Meta, 'model', model)
-    setattr(Meta, 'fields', fields)
-=======
 def create_model_serializer(name, model, module='', app_label='', fields=None, options=None):
     class Meta:
         pass
@@ -52,8 +43,6 @@ def create_model_serializer(name, model, module='', app_label='', fields=None, o
             setattr(Meta, key, value)
     else:
         setattr(Meta, 'fields', '__all__')
->>>>>>> origin/main
-
     if app_label:
         setattr(Meta, 'app_label', app_label)
 

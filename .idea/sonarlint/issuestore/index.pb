@@ -1,16 +1,8 @@
 
-9
-	manage.py,3/1/3156ad13e4d695cd526bbb7b031016ecba842270
 <
 chat/apps.py,9/d/9dd3a379774721d7abe3be216fab58b2f2860fed
 C
 hopitalbackend/.env,9/2/92118ede617a98931c76cedd337b06c09ce1e7ab
->
-chat/models.py,5/1/51ab5579afc7e5980b5abd4750946b091486cfe1
-=
-chat/views.py,a/7/a7d0890be122c99c3980d8ef6e008a4a819e6f33
-7
-test.py,a/3/a36e355ddb203d7d4133221f339dc406cb9f480f
 C
 formparent/tests.py,0/3/03f2fdb2d423209778623c06aa9e02d946960e9c
 J
@@ -45,13 +37,7 @@ F
 hopitalbackend/urls.py,8/8/88b69dfaf4b5f4f39cd30a08d27790e3556ed131
 K
 formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
-@
-common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
-F
-common/repositories.py,0/b/0bf8f17c16d32aa550fc5bcd9e35d381eef009b3
-B
-common/services.py,1/3/13442ff2c318f6c4daec6494e860f32f8de076cf
 G
-formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936
-D
-formteacher/views.py,1/5/1586efc40f4986c11bd0006dd9b7cd0e30079e66
+gestionpatient/views.py,e/6/e6ad7b6eb048b6d21e1def1d112d7b7d7cd18aec
+I
+gestionpatient/service.py,3/d/3dd3198c381b587b9c7dcdb4e360a28151db3608

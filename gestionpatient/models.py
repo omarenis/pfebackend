@@ -18,9 +18,9 @@ class Patient(Model):
     birthdate: DateField = DateField(null=False)
     gender:TextField=TextField(null=False, default='ذكر')
     sick: BooleanField = BooleanField(default=None, null=True)
-    scoreParent = FloatField(default=0, null=False)
-    scoreTeacher = FloatField(default=0, null=False)
-    isSupervised = BooleanField(default=False, null=False)
+    score_parent = FloatField(default=0, null=False)
+    score_teacher = FloatField(default=0, null=False)
+    is_supervised = BooleanField(default=False, null=False)
 
 
     def age(self):
@@ -29,21 +29,7 @@ class Patient(Model):
         return age
 
     def tr_age(self):
-        age = self.age()
-        if age >= 3 and age <= 5:
-            tr_age = '1'
-        elif age >= 6 and age <= 8:
-            tr_age = '2'
-        elif age >= 9 and age <= 11:
-            tr_age = '3'
-        elif age >= 12 and age <= 14:
-            tr_age = '4'
-        elif age >= 15 and age <= 17:
-            tr_age = '5'
-        else:
-            tr_age = None
-        return tr_age
-
+        return self.age() // 3
     class Meta:
         db_table = 'patients'
         unique_together = (('parent_id', 'name', 'familyName', 'birthdate'),)
@@ -85,25 +71,22 @@ class SuperviseSerializer(ModelSerializer):
         fields = "__all__"
 
 
-PatientGetSerializer = create_model_serializer(model=Patient, name='PatientGetSerializer', app_label=app_label,
-                                               options={
-                                                   'fields': "__all__"
-                                               })
-PatientSerializer = create_model_serializer(model=Patient, name='PatientSerializer', app_label=app_label, options={
-    'fields': ['id', 'name', 'familyName', 'birthdate', 'parent', 'behaviortroubleparent',
-               'impulsivitytroubleparent', 'learningtroubleparent', 'anxitytroubleparent',
-               'somatisationtroubleparent', 'hyperactivitytroubleparent', 'extratroubleparent', 'supervise', 'sick',
-               'scoreParent', 'scoreTeacher', 'isSupervised'],
-    'depth': 1
-}, fields={
-    'supervise': SuperviseSerializer(read_only=True)
-})
-DiagnosticSerializer = create_model_serializer(model=Diagnostic, name='DiagnosticSerializer', app_label=app_label)
+class PatientSerializer(ModelSerializer):
 
-ConsultationSerializer = create_model_serializer(model=Consultation, name='ConsultationSerializer', fields={
-    'parent': PersonSerializer(read_only=True),
-    'doctor': PersonSerializer(read_only=True),
-    'diagnostic': PersonSerializer(read_only=True)
-}, options={
-    'fields': ['parent_id', 'doctor_id', 'parent', 'doctor', 'date', 'accepted', 'diagnostic', 'id']
-}, app_label=app_label)
+    class Meta:
+        model = Patient
+        fields = '__all__'
+
+
+class DiagnosticSerializer(ModelSerializer):
+
+    class Meta:
+        model = Diagnostic
+        fields = '__all__'
+
+
+class ConsultationSerializer(ModelSerializer):
+
+    class Meta:
+        model = Diagnostic
+        fields = '__all__'
