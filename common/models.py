@@ -29,6 +29,7 @@ def create_model(name, type_model, fields=None, app_label='', module='', options
     model = type(name, (type_model,), attrs)
     return model
 
+
 def create_model_serializer(name, model, module='', app_label='', fields=None, options=None):
     class Meta:
         pass

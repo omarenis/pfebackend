@@ -14,14 +14,13 @@ doctor_model = 'gestionusers.Doctor'
 class Patient(Model):
     parent = ForeignKey(to='gestionusers.Parent', on_delete=CASCADE, null=True)
     name: TextField = TextField(null=False)
-    familyName: TextField = TextField(null=False)
+    school: TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
-    gender:TextField=TextField(null=False, default='ذكر')
+    gender: TextField = TextField(null=False, default='ذكر')
     sick: BooleanField = BooleanField(default=None, null=True)
     score_parent = FloatField(default=0, null=False)
     score_teacher = FloatField(default=0, null=False)
     is_supervised = BooleanField(default=False, null=False)
-
 
     def age(self):
         today = date.today()
@@ -30,9 +29,10 @@ class Patient(Model):
 
     def tr_age(self):
         return self.age() // 3
+
     class Meta:
         db_table = 'patients'
-        unique_together = (('parent_id', 'name', 'familyName', 'birthdate'),)
+        unique_together = (('parent', 'name', 'school', 'birthdate'),)
 
 
 class Supervise(Model):
@@ -65,28 +65,24 @@ class Diagnostic(Model):
 
 # SuperviseSerializer = create_model_serializer(model=Supervise, app_label=app_label, name='SuperviseSerializer')
 class SuperviseSerializer(ModelSerializer):
-
     class Meta:
         model = Supervise
         fields = "__all__"
 
 
 class PatientSerializer(ModelSerializer):
-
     class Meta:
         model = Patient
         fields = '__all__'
 
 
 class DiagnosticSerializer(ModelSerializer):
-
     class Meta:
         model = Diagnostic
         fields = '__all__'
 
 
 class ConsultationSerializer(ModelSerializer):
-
     class Meta:
         model = Diagnostic
         fields = '__all__'

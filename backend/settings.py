@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     'gestionpatient',
     'formparent',
     'formteacher',
-    'chat'
 ]
 
 MIDDLEWARE = [

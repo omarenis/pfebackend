@@ -5,52 +5,52 @@ from .repositories import BehaviorTroubleParentRepository, LearningTroubleParent
     HyperActivityTroubleParentRepository, AnxityTroubleParentRepository, FormAbrParentRepository
 
 BEHAVIOR_TROUBLE_PARENTS = {
-    'insolentWithGrownUps': text_field,
-    'feelsAttackedDefensive': text_field,
+    'insolent_with_grown_ups': text_field,
+    'feels_attacked_defensive': text_field,
     'destructive': text_field,
-    'denyMistakesBlameOthers': text_field,
-    'quarrelsomeGetInvolvedFight': text_field,
-    'bullyIntimidateComrades': text_field,
-    'constantlyFight': text_field,
+    'deny_mistakes_blame_others': text_field,
+    'quarrelsome_get_involved_fight': text_field,
+    'bully_intimidate_comrades': text_field,
+    'constantly_fight': text_field,
     'unhappy': text_field
 }
 LEARNING_TROUBLE_PARENT_FIELDS = {
-    'hasLearningDifficulties': text_field,
-    'troubleFinishingThings': text_field,
-    'easilyBeingDistracted': text_field,
-    'enabilityFinishWhenDoEffort': text_field
+    'has_learning_difficulties': text_field,
+    'trouble_finishing_things': text_field,
+    'easily_being_distracted': text_field,
+    'enability_finish_when_do_effort': text_field
 }
 SOMATISATION_TROUBLE_PARENT_FIELDS = {
     'headaches': text_field,
-    'upsetStomach': text_field,
-    'physicalAches': text_field,
-    'vomitingNausea': text_field
+    'upset_stomach': text_field,
+    'physical_aches': text_field,
+    'vomiting_nausea': text_field
 }
 
 HYPERACTIVITY_TROUBLE_PARENT_FIELDS = {
-    'excitableImpulsive': text_field,
-    'wantDominate': text_field,
+    'excitable_impulsive': text_field,
+    'want_dominate': text_field,
     'squirms': text_field,
-    'restlessNeedsDoSomething': text_field}
+    'restless_needs_do_something': text_field}
 
 ANXITY_TROUBLE_PARENT_FIELDS = {
-    'afraidNewThings': text_field,
+    'afraid_new_things': text_field,
     'shy': text_field,
-    'worryMuch': text_field,
-    'beingCrashedManipulated': text_field
+    'worry_much': text_field,
+    'being_crashed_manipulated': text_field
 }
 
 FORM_ABR_PARENT_FIELDS = {
-    'excitableImpulsive': text_field,
-    'cryOftenEasily': text_field,
+    'excitable_impulsive': text_field,
+    'cry_often_easily': text_field,
     'squirms': text_field,
-    'restlessNeedsDoSomething': text_field,
+    'restless_needs_do_something': text_field,
     'destructive': text_field,
-    'troubleFinishingThings': text_field,
-    'easilyBeingDistracted': text_field,
+    'trouble_finishing_things': text_field,
+    'easily_being_distracted': text_field,
     'moody': text_field,
-    'enabilityFinishWhenDoEffort': text_field,
-    'disturbOtherChildren': text_field
+    'enability_finish_when_do_effort': text_field,
+    'disturb_other_children': text_field
 }
 
 

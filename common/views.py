@@ -1,4 +1,3 @@
-from requests import Response
 from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, \
     HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREATED, HTTP_200_OK
 from rest_framework.viewsets import ModelViewSet
@@ -25,10 +24,10 @@ def extract_data_with_validation(request, fields: dict) -> dict or Exception:
     output = {}
     for i in data:
         if fields.get(i) is None:
-            return Exception(f'{i} is not an attribute for the model')
+            raise AttributeError(f'{i} is not an attribute for the model')
         value = data.get(i)
         if value is None and fields[i]['required']:
-            return Exception(f'{i} is required')
+            raise AttributeError(f'{i} is required')
         else:
             output[i] = value
     return output
@@ -125,35 +124,3 @@ class ViewSet(ModelViewSet):
         return cls.as_view({'get': 'list', 'post': 'create'}), cls.as_view(
             {'get': 'retrieve', 'put': 'update', 'delete': 'delete'}
         )
-
-
-class FormViewSet(ViewSet):
-    def __init__(self, fields: dict, serializer_class, service, **kwargs):
-        super().__init__(serializer_class, service, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        fields = list(self.fields.keys())
-        return super().create(request=request, *args, **kwargs)
-
-
-class ParentFormViewSet(FormViewSet):
-    def __init__(self, fields: dict, serializer_class, service, **kwargs):
-        super().__init__(fields, serializer_class, service, **kwargs)
-
-    def list(self, request, *args, **kwargs):
-        patient_id = request.GET.get('patient_id')
-        if patient_id is not None:
-            data = self.service.filter_by({'patien__id': patient_id}).first()
-            if data is None:
-                return Response(data={'error': 'data not found'}, status=HTTP_404_NOT_FOUND)
-            else:
-                return Response(data=self.serializer_class(data).data, status=HTTP_200_OK)
-        else:
-            return super().create(request=request, *args, **kwargs)
-
-        if isinstance(score_index, Exception):
-            return Response(data={'error': str(score_index)}, status=HTTP_400_BAD_REQUEST)
-        request.data['score'] = score_index
-        return super().create(request=request, *args, **kwargs)
-

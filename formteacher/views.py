@@ -1,31 +1,31 @@
 from django.urls import path
 
-from common.views import FormViewSet, ViewSet
+from common.views import ViewSet
 from formteacher.models import BehaviorTroubleTeacherSerializer, \
     HyperActivityTroubleTeacherSerializer, InattentionTroubleTeacherSerializer, FormAbrSerializer
 from formteacher.services import BehaviorTroubleTeacherService, \
     HyperActivityTroubleTeacherService, InattentionTroubleTeacherService, FormAbrTeacherService
 
 
-class BehaviorTroubleTeacherViewSet(FormViewSet):
+class BehaviorTroubleTeacherViewSet(ViewSet):
     def __init__(self, serializer_class=BehaviorTroubleTeacherSerializer, service=BehaviorTroubleTeacherService(),
                  **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class HyperActivityTroubleTeacherViewSet(FormViewSet):
+class HyperActivityTroubleTeacherViewSet(ViewSet):
     def __init__(self, serializer_class=HyperActivityTroubleTeacherSerializer,
                  service=HyperActivityTroubleTeacherService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class InattentionTroubleTeacherViewSet(FormViewSet):
+class InattentionTroubleTeacherViewSet(ViewSet):
     def __init__(self, serializer_class=InattentionTroubleTeacherSerializer,
                  service=InattentionTroubleTeacherService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class FormAbrTeacherViewSet(FormViewSet):
+class FormAbrTeacherViewSet(ViewSet):
     def __init__(self, serializer_class=FormAbrSerializer, service=FormAbrTeacherService(), **kwargs):
         super().__init__(serializer_class, service, **kwargs)
 

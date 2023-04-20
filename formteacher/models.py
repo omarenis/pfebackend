@@ -1,12 +1,12 @@
-from django.db.models import CASCADE, ForeignKey, Model
-from django.db.models.fields import FloatField, TextField
+from django.db.models import CASCADE, ForeignKey, Model, OneToOneField
+from django.db.models.fields import FloatField, TextField, DateTimeField
 from rest_framework.serializers import ModelSerializer
 from common.models import create_model_serializer, patient_model_location
-from gestionusers.models import Teacher
+
+TEACHER_MODEL = 'gestionusers.Teacher'
 
 
 class BehaviorTroubleTeacher(Model):
-    # 4-5-6-10-11-12-23-27
     arrogant_impolite = TextField(null=False, db_column='arrogant_impolite')
     angry_unexpected_behavior = TextField(null=False, db_column='angry_unexpected_behavior')
     sensitive_criticism = TextField(null=False, db_column='sensitive_criticism')
@@ -14,11 +14,10 @@ class BehaviorTroubleTeacher(Model):
     moody = TextField(null=False, db_column='moody')
     brawler = TextField(null=False, db_column='brawler')
     deny_mistakes_blame_others = TextField(null=False, db_column='deny_mistakes_blame_others')
-    # question 27 :
     few_relations_school = TextField(null=False, db_column='few_relations_school')
     patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to='gestionusers.Teacher')
+    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
 
     class Meta:
         db_table = 'behavior_trouble_teacher'
@@ -35,7 +34,7 @@ class HyperActivityTroubleTeacher(Model):
     excessive_attention_from_teacher = TextField(null=False, db_column='excessive_attention_from_teacher')
     patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to='gestionusers.Teacher')
+    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
 
     class Meta:
         db_table = 'hyperactivity_trouble_teacher'
@@ -52,10 +51,11 @@ class InattentionTroubleTeacher(Model):
     has_learning_difficulties = TextField(null=False, db_column='has_learning_difficulties')
     patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to='gestionusers.Teacher')
+    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
 
     class Meta:
         db_table = 'inattention_form_teacher'
+
 
 class FormAbrTeacher(Model):
     restless_squirms_chair = TextField(null=False, db_column="restless_squirms_chair")
@@ -70,8 +70,8 @@ class FormAbrTeacher(Model):
     upset_easily_make_effort = TextField(null=False, db_column="upset_easily_make_effort")
     patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to='gestionusers.Teacher')
-    date = DateTime(auto_now_add=True)
+    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
+    date = DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'form_abr_teacher'

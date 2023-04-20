@@ -13,8 +13,7 @@ class BehaviorTroubleParent(Model):
     bully_intimidate_comrades = TextField(null=False, db_column="bully_intimidate_comrades")
     constantly_fight = TextField(null=False, db_column="constantly_fight")
     unhappy = TextField(null=False, db_column="unhappy")
-
-    patient = ForeignKey(null=False, on_delete=CASCADE, to=patient_model_location)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
 
     class Meta:
@@ -27,8 +26,7 @@ class LearningTroubleParent(Model):
     trouble_finishing_things = TextField(null=False, db_column="trouble_finishing_things")
     easily_being_distracted = TextField(null=False, db_column="easily_being_distracted")
     enability_finish_when_do_effort = TextField(null=False, db_column="enability_finish_when_do_effort")
-
-    patient = ForeignKey(null=False, on_delete=CASCADE, to=patient_model_location)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
 
     class Meta:
@@ -42,7 +40,7 @@ class SomatisationTroubleParent(Model):
     physical_aches = TextField(null=False, db_column="physical_aches")
     vomiting_nausea = TextField(null=False, db_column="vomiting_nausea")
 
-    patient = ForeignKey(null=False, on_delete=CASCADE, to=patient_model_location)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
 
     class Meta:
@@ -56,7 +54,7 @@ class HyperActivityTroubleParent(Model):
     squirms = TextField(null=False, db_column="squirms")
     restless_needs_do_something = TextField(null=False, db_column="restless_needs_do_something")
 
-    patient = ForeignKey(null=False, on_delete=CASCADE, to=patient_model_location)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
 
     class Meta:
@@ -70,7 +68,7 @@ class AnxityTroubleParent(Model):
     worry_much = TextField(null=False, db_column="worry_much")
     being_crashed_manipulated = TextField(null=False, db_column="being_crashed_manipulated")
 
-    patient = ForeignKey(null=False, on_delete=CASCADE, to=patient_model_location)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
 
     class Meta:
@@ -90,7 +88,7 @@ class FormAbrParent(Model):
     enability_finish_when_do_effort = TextField(null=False, db_column="enability_finish_when_do_effort")
     disturb_other_children = TextField(null=False, db_column="disturb_other_children")
 
-    patient = ForeignKey(null=False, on_delete=CASCADE, to=patient_model_location)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
     score = FloatField(null=False)
 
     class Meta:

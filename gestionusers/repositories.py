@@ -1,9 +1,11 @@
+from typing import Union
+
 from common.repositories import Repository
-from .models import Person, Localisation
+from .models import Localisation, Parent, Teacher
 
 
 class UserRepository(Repository):
-    def __init__(self, model=Person):
+    def __init__(self, model=Union[Parent, Teacher]):
         super().__init__(model)
 
 

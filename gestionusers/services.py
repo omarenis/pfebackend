@@ -1,45 +1,40 @@
+from typing import Union
+
 from django.contrib.auth.models import AnonymousUser
 from common.repositories import Repository
 from common.services import Service
-from .models import Doctor, Localisation, Person, SchoolTeacherIds, Teacher, User
-from cryptography.fernet import Fernet
-from base64 import b64encode
-from hashlib import pbkdf2_hmac
+from .models import Doctor, Localisation, Teacher, User, Parent
 
 
 URL = "http://localhost:5000/"
 
-FERNET = Fernet(
-    b64encode(pbkdf2_hmac("sha256", "hEq52fRbu1WGrU2TIsZ3vtFf7xJp2SMOEC4-olvJ3hA=".encode("ascii"),
-                          "hEq52fRbu1WGrU2TIsZ3vtFf7xJp2SMOEC4".encode("ascii"),
-                          1000))
-)
 
 LOCALISATION_FIELDS = {
     'governorate': {'type': 'text', 'required': True},
     'delegation': {'type': 'text', 'required': True},
-    'zipCode': {'type': 'text', 'required': True}
+    'zip_code': {'type': 'text', 'required': True}
 }
 
 USER_FIELDS = {
     'name': {'type': 'text', 'required': True},
-    'loginNumber': {'type': 'text', 'required': True},
+    'login_number': {'type': 'text', 'required': True},
     'email': {'type': 'email', 'required': False},
     'telephone': {'type': 'email', 'required': True},
     'password': {'type': 'password', 'required': True},
-    'typeUser': {'type': 'text', 'required': True}
+    'type_user': {'type': 'text', 'required': True}
 }
 
 PERSON_FIELDS = {
     **USER_FIELDS,
     'localisation_id': {'type': 'integer', 'required': False},
-    'familyName': {'type': 'text', 'required': True}
+    'family_name': {'type': 'text', 'required': True}
 }
 
 DOCTOR_FIELDS = {
     **PERSON_FIELDS,
     'speciality': {'type': 'text', 'required': False},
-    'is_super': {'type': 'bool', 'required': False}
+    'is_super': {'type': 'bool', 'required': False},
+    'super_doctor': {'type': 'foreign_key', 'required': False},
 }
 
 
@@ -49,7 +44,7 @@ class UserService(Service):
 
     def retrieve(self, _id: int):
         user = super().retrieve(_id)
-        if user.typeUser == 'doctor':
+        if user.type_user == 'doctor':
             return DoctorService().retrieve(_id=_id)
         return user
 
@@ -60,13 +55,13 @@ class LoginSignUpService(object):
         self.person_service = PersonService()
 
     def login(self, login_number: str, password: str):
-        user = self.user_service.filter_by({'loginNumber': login_number}).first()
+        user = self.user_service.filter_by({'login_number': login_number}).first()
         if user is not None and user.is_active:
-            if user.check_password(password) and (user.localisation_id is not None or user.typeUser == 'admin' or
-                                                  user.typeUser == 'superdoctor' or user.typeUser == 'doctor'):
-                if user.typeUser == 'doctor' or user.typeUser == 'superdoctor':
+            if user.check_password(password) and (user.localisation_id is not None or user.type_user == 'admin' or
+                                                  user.type_user == 'superdoctor' or user.type_user == 'doctor'):
+                if user.type_user == 'doctor' or user.type_user == 'superdoctor':
                     return DoctorService().retrieve(user.id)
-                if user.typeUser == 'parent' or user.typeUser == 'teacher':
+                if user.type_user == 'parent' or user.type_user == 'teacher':
                     return PersonService().retrieve(user.id)
                 return user
             elif not user.is_active:
@@ -88,12 +83,12 @@ class LoginSignUpService(object):
             localisation_id = localisation.id
         data['is_active'] = True
         data['localisation_id'] = localisation_id
-        data['typeUser'] = 'parent'
+        data['type_user'] = 'parent'
         return self.person_service.create(data)
 
 
 class PersonService(Service):
-    def __init__(self, repository=Repository(model=Person)):
+    def __init__(self, repository=Repository(model=Union[Parent, Teacher])):
         super().__init__(repository, fields=PERSON_FIELDS)
 
     def reset_password(self, _id: int, password):
@@ -104,18 +99,8 @@ class PersonService(Service):
             user.set_password(password)
         return user
 
-    def create(self, data: dict):
-        if data.get('school_id') is not None:
-            school_id = data.pop('school_id')
-            user = super().create(data)
-            if isinstance(user, Exception):
-                return user
-            SchoolTeacherIds.objects.create(school_id=school_id, teacher_id=user.id)
-            return user
-        return super().create(data)
-
     def filter_by(self, data: dict):
-        if data.get('typeUser') == 'teacher':
+        if data.get('type_user') == 'teacher':
             self.repository = Repository(model=Teacher)
         return self.repository.filter_by(data=data)
 

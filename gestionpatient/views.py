@@ -9,11 +9,11 @@ from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREAT
 
 from common.views import ViewSet, extract_data_with_validation
 from formparent.services import AnxityTroubleParentService, BehaviorTroubleParentService, \
-    HyperActivityTroubleParentService, LearningTroubleParentService , FormAbrParentService , \
+    HyperActivityTroubleParentService, LearningTroubleParentService, FormAbrParentService, \
     SomatisationTroubleParentService
 
 from formteacher.services import BehaviorTroubleTeacherService, \
-    HyperActivityTroubleTeacherService,  InattentionTroubleTeacherService,FormAbrTeacherService
+    HyperActivityTroubleTeacherService, InattentionTroubleTeacherService, FormAbrTeacherService
 from gestionusers.services import PersonService, UserService
 from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer
 from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
@@ -56,20 +56,6 @@ def add_other_data_to_patient(data: dict, service, patient_id, teacher_id=None):
 
 
 class PatientViewSet(ViewSet):
-    serviceParent = {'behaviortroubleparent': BehaviorTroubleParentService(),
-                     'formabrparent': FormAbrParentService(),
-                     'learningtroubleparent': LearningTroubleParentService(),
-                     'anxitytroubleparent': AnxityTroubleParentService(),
-                     'somatisationtroubleparent': SomatisationTroubleParentService(),
-                     'hyperactivitytroubleparent': HyperActivityTroubleParentService()}
-
-    servicesTeacher = {'behaviorTroubleTeacher': BehaviorTroubleTeacherService(),
-                       'hyperActivityTroubleTeacher': HyperActivityTroubleTeacherService(),
-                       'formAbrTeacher':FormAbrTeacherService(),
-                       'inattentionTroubleTeacher': InattentionTroubleTeacherService(),
-
-                       }
-
     def __init__(self, serializer_class=PatientSerializer, service=PatientService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
@@ -115,33 +101,22 @@ class PatientViewSet(ViewSet):
                         status=HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        required_data = {'name': request.data.get('name'), 'familyName': request.data.get('familyName'),
-                         'birthdate': request.data.get('birthdate'), }
-        if request.user.typeUser == 'parent':
-            required_data['parent_id'] = request.user.id
-        else:
-            parent_cin = request.data.pop('parentCin')
-            parent = UserService().filter_by({'loginNumber': parent_cin}).first()
-            if parent is None:
-                parent = UserService().create(
-                    {'loginNumber': parent_cin, 'name': '', 'familyName': '', 'typeUser': 'parent', 'telephone': '',
-                     'password': ''})
-            required_data['parent_id'] = parent.id
         data = extract_data_with_validation(request=request, fields=self.fields)
-        data['parent_id'] = required_data['parent_id']
-        if isinstance(data, Exception):
-            return Response(data={'error': str(data)}, status=HTTP_400_BAD_REQUEST)
-        created = False
-        patient_id = None
-        try:
-            patient_object = self.service.filter_by(required_data).first()
-            if patient_object is None:
-                patient_object = self.service.create(required_data)
-            if isinstance(patient_object, Exception):
-                raise patient_object
+        if request.user.is_authenticated:
+            if request.user.typeUser == 'parent':
+                data['parent_id'] = request.user.id
             else:
-                created = True
-            patient_id = patient_object.id
+                data['school'] = request.user.parent_school.name
+        try:
+            patient_object = self.service.filter_by({
+                'name': request.data.get('name'),
+                'family_name': request.data.get('family_name'),
+                'school': data['school']
+            }).first()
+
+            if patient_object is None:
+                patient_object = self.service.create(data, type_user = request.data.get('type_user'))
+
             if request.user.typeUser == 'teacher':
                 for i in self.servicesTeacher:
                     patient_object.scoreTeacher += add_other_data_to_patient(data=data.get(i),

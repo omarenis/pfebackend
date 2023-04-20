@@ -12,7 +12,7 @@ BEHAVIOR_TROUBLE_TEACHER_FIELDS = {
     'moody': text_field,
     'brawler': text_field,
     'deny_mistakes_blameOthers': text_field,
-    'fewRelationSchool': text_field,
+    'few_relation_school': text_field,
 }
 
 HYPER_ACTIVITY_TROUBLE_Teacher = {
@@ -47,9 +47,9 @@ FORM_ABR_Teacher = {
     'pout_sulk_easily': text_field,
     'moody': text_field,
     'goes_left_right': text_field,
-    'easilyTurnOnImpulsive': text_field,
-    'troubleFinishingThings': text_field,
-    'upsetEasilyMakeEffort': text_field
+    'easily_turn_on_impulsive': text_field,
+    'trouble_finishing_things': text_field,
+    'upset_easily_make_effort': text_field
 }
 
 
@@ -66,6 +66,7 @@ class HyperActivityTroubleTeacherService(FormService):
 class InattentionTroubleTeacherService(FormService):
     def __init__(self, repository=InattentionTroubleTeacherRepository()):
         super().__init__(repository, fields=INATTENTION_Trouble_TEACHER)
+
 
 class FormAbrTeacherService(FormService):
 

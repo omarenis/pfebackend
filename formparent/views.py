@@ -1,7 +1,7 @@
 from django.urls import path
 
 from common.models import text_field
-from common.views import FormViewSet
+from common.views import ViewSet
 from formparent.models import BehaviorTroubleParentSerializer, LearningTroubleParentSerializer, \
     SomatisationTroubleParentSerializer, HyperActivityTroubleParentSerializer, AnxityTroubleParentSerializer, \
     FormAbrParentSerializer
@@ -11,37 +11,37 @@ from formparent.services import BehaviorTroubleParentService, LearningTroublePar
     FormAbrParentService
 
 
-class BehaviorTroubleParentViewSet(FormViewSet):
+class BehaviorTroubleParentViewSet(ViewSet):
     def __init__(self, serializer_class=BehaviorTroubleParentSerializer, service=BehaviorTroubleParentService(),
                  **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class LearningTroubleParentViewSet(FormViewSet):
+class LearningTroubleParentViewSet(ViewSet):
     def __init__(self, serializer_class=LearningTroubleParentSerializer,
                  service=LearningTroubleParentService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class SomatisationTroubleParentViewSet(FormViewSet):
+class SomatisationTroubleParentViewSet(ViewSet):
     def __init__(self, serializer_class=SomatisationTroubleParentSerializer,
                  service=SomatisationTroubleParentService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class HyperActivityTroubleParentViewSet(FormViewSet):
+class HyperActivityTroubleParentViewSet(ViewSet):
     def __init__(self, serializer_class=HyperActivityTroubleParentSerializer,
                  service=HyperActivityTroubleParentService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class AnxityTroubleParentViewSet(FormViewSet):
+class AnxityTroubleParentViewSet(ViewSet):
     def __init__(self, serializer_class=AnxityTroubleParentSerializer,
                  service=AnxityTroubleParentService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
 
-class FormAbrParentViewSet(FormViewSet):
+class FormAbrParentViewSet(ViewSet):
     def __init__(self, serializer_class=FormAbrParentSerializer,
                  service=FormAbrParentService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)

@@ -9,23 +9,8 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_40
     HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
-from gestionusers.models import DoctorSerializer, LocalisationSerializer, PersonSerializer, UserSerializer,State,Delegation
+from gestionusers.models import DoctorSerializer, LocalisationSerializer, PersonSerializer, UserSerializer
 from gestionusers.services import DoctorService, LocalisationService, LoginSignUpService, PersonService, UserService
-
-
-
-@csrf_exempt
-def state_names(request):
-    if request.method == 'GET':
-        states = State.objects.values_list('name', flat=True)
-        return JsonResponse({'states': list(states)})
-
-
-
-def get_delegations(request,x):
-
-    delegations = Delegation.objects.filter(state_id=x).values('id', 'name')
-    return JsonResponse(list(delegations), safe=False)
 
 
 class TokenViewSet(RestViewSet):
@@ -206,6 +191,4 @@ urlpatterns = [
     path('/login', login),
     path('/signup', signup),
     path('/logout', logout),
-    path('/state',state_names),
-    path('/delegation/<int:x>',get_delegations)
 ]
