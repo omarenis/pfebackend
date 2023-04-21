@@ -51,21 +51,3 @@ def calculate_score(data, fields):
             value += 3
 
     return value
-
-
-class FormService(Service):
-    def __init__(self, repository: Repository, fields):
-        super().__init__(repository, fields)
-
-    def create(self, data: dict):
-        try:
-            patient = data['patient']
-            user = User.objects.get(id=patient.user_id)
-            gender = patient.gender
-            tr_age = patient.tr_age
-
-            a = matrix(gender, User.typeUser, tr_age)
-            # data['score'] = a[__name__][calculate_score(data=data, fields=list(data.keys()))]
-            return super().create(data=data)
-        except Exception as exception:
-            return exception

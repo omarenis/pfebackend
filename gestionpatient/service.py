@@ -3,10 +3,12 @@ from common.services import Service, calculate_score
 from formparent.models import BehaviorTroubleParent, LearningTroubleParent, SomatisationTroubleParent, \
     HyperActivityTroubleParent, AnxityTroubleParent, FormAbrParent
 
-from formteacher.models import BehaviorTroubleTeacher,HyperActivityTroubleTeacher,InattentionTroubleTeacher,FormAbrTeacher
+from formteacher.models import BehaviorTroubleTeacher, HyperActivityTroubleTeacher, InattentionTroubleTeacher, \
+    FormAbrTeacher
 from .matrices import matrix
 from .models import Consultation, Diagnostic, Patient, Supervise
 from datetime import datetime
+
 URL = "http://localhost:5000/"
 APPLICATION_TYPE = "application/json"
 
@@ -52,8 +54,9 @@ def get_age(birthdate):
 
 
 def get_score(data, class_name, type_user):
-    return  matrix(gender=data.get('gender'), type_user=type_user, tranche=get_age(data.get('birthdate')) // 3)[class_name][calculate_score(data, fields=list(data.keys()))]
-
+    return \
+        matrix(gender=data.get('gender'), type_user=type_user, tranche=get_age(data.get('birthdate')) // 3)[class_name][
+            calculate_score(data, fields=list(data.keys()))]
 
 
 class PatientService(Service):
@@ -62,60 +65,53 @@ class PatientService(Service):
 
     def create(self, data: dict, type_user=None):
         if type_user is None:
-            raise Exception('type_user must not be   null')
+            raise ValueError('type_user must not be null')
         patient = self.repository.model()
         patient.name = data.get('name')
         patient.is_supervised = False
         patient.birthdate = data.get('birthdate')
         if type_user == 'parent':
-            data['behaviortroubleparent'] = BehaviorTroubleParent(score=get_score(
+            patient.behaviortroubleparent = BehaviorTroubleParent(score=get_score(
                 data=data['behaviortroubleparent'], class_name='BehaviorTroubleParent', type_user=type_user),
                 **data['behaviortroubleparent'])
-
-            data['learningtroubleparent'] = LearningTroubleParent(score=get_score(
+            patient.learningtroubleparent = LearningTroubleParent(score=get_score(
                 data=data['learningtroubleparent'], class_name='LearningTroubleParent', type_user=type_user),
                 **data['learningtroubleparent'])
-
-
-            data['somatisationtroubleparent'] = SomatisationTroubleParent(score=get_score(
+            patient.somatisationtroubleparent = SomatisationTroubleParent(score=get_score(
                 data=data['somatisationtroubleparent'], class_name='SomatisationTroubleParent', type_user=type_user),
                 **data['somatisationtroubleparent'])
 
-
-            data['hyperactivitytroubleparent'] = HyperActivityTroubleParent(score=get_score(
+            patient.hyperactivitytroubleparent = HyperActivityTroubleParent(score=get_score(
                 data=data['hyperactivitytroubleparent'], class_name='HyperActivityTroubleParent', type_user=type_user),
                 **data['hyperactivitytroubleparent'])
 
-
-            data['anxitytroubleparent'] = AnxityTroubleParent(score=get_score(
+            patient.anxitytroubleparent = AnxityTroubleParent(score=get_score(
                 data=data['anxitytroubleparent'], class_name='AnxityTroubleParent', type_user=type_user),
                 **data['anxitytroubleparent'])
 
-
-            data['formabrparent'] = FormAbrParent(score=get_score(
+            patient.formabrparent = FormAbrParent(score=get_score(
                 data=data['formabrparent'], class_name='FormAbrParent', type_user=type_user),
                 **data['formabrparent'])
-        
-        if type_user=='teacher':
 
-            data['behaviortroubleteacher'] = BehaviorTroubleTeacher(score=get_score(
+        if type_user == 'teacher':
+            patient.behaviortroubleteacher = BehaviorTroubleTeacher(score=get_score(
                 data=data['behaviortroubleteacher'], class_name='BehaviorTroubleTeacher', type_user=type_user),
                 **data['behaviortroubleteacher'])
 
-
-            data['hyperactivitytroubleteacher'] = HyperActivityTroubleTeacher(score=get_score(
-                data=data['hyperactivitytroubleteacher'], class_name='HyperActivityTroubleTeacher', type_user=type_user),
+            patient.hyperactivitytroubleteacher = HyperActivityTroubleTeacher(score=get_score(
+                data=data['hyperactivitytroubleteacher'], class_name='HyperActivityTroubleTeacher',
+                type_user=type_user),
                 **data['hyperactivitytroubleteacher'])
 
-
-            data['inattentiontroubleteacher'] = InattentionTroubleTeacher(score=get_score(
+            patient.inattentiontroubleteacher = InattentionTroubleTeacher(score=get_score(
                 data=data['inattentiontroubleteacher'], class_name='InattentionTroubleTeacher', type_user=type_user),
                 **data['inattentiontroubleteacher'])
 
-            data['formabrteacher'] = FormAbrTeacher(score=get_score(
+            patient.formabrteacher = FormAbrTeacher(score=get_score(
                 data=data['formabrteacher'], class_name='FormAbrTeacher', type_user=type_user),
                 **data['formabrteacher'])
-
+        patient.save()
+        return patient
 
 
 class SuperviseService(Service):
