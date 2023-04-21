@@ -1,5 +1,5 @@
 from common.models import text_field
-from common.services import FormService
+from common.services import Service
 from .repositories import BehaviorTroubleParentRepository, LearningTroubleParentRepository, \
     SomatisationTroubleParentRepository, \
     HyperActivityTroubleParentRepository, AnxityTroubleParentRepository, FormAbrParentRepository
@@ -54,31 +54,31 @@ FORM_ABR_PARENT_FIELDS = {
 }
 
 
-class BehaviorTroubleParentService(FormService):
+class BehaviorTroubleParentService(Service):
     def __init__(self, repository=BehaviorTroubleParentRepository()):
         super().__init__(repository, fields=BEHAVIOR_TROUBLE_PARENTS)
 
 
-class LearningTroubleParentService(FormService):
+class LearningTroubleParentService(Service):
     def __init__(self, repository=LearningTroubleParentRepository()):
         super().__init__(repository, fields=LEARNING_TROUBLE_PARENT_FIELDS)
 
 
-class SomatisationTroubleParentService(FormService):
+class SomatisationTroubleParentService(Service):
     def __init__(self, repository=SomatisationTroubleParentRepository()):
         super().__init__(repository, fields=SOMATISATION_TROUBLE_PARENT_FIELDS)
 
 
-class HyperActivityTroubleParentService(FormService):
+class HyperActivityTroubleParentService(Service):
     def __init__(self, repository=HyperActivityTroubleParentRepository()):
         super().__init__(repository, fields=HYPERACTIVITY_TROUBLE_PARENT_FIELDS)
 
 
-class AnxityTroubleParentService(FormService):
+class AnxityTroubleParentService(Service):
     def __init__(self, repository=AnxityTroubleParentRepository()):
         super().__init__(repository, fields=ANXITY_TROUBLE_PARENT_FIELDS)
 
 
-class FormAbrParentService(FormService):
+class FormAbrParentService(Service):
     def __init__(self, repository=FormAbrParentRepository()):
         super().__init__(repository, fields=FORM_ABR_PARENT_FIELDS)

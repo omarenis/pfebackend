@@ -1,5 +1,5 @@
 from common.models import text_field
-from common.services import FormService
+from common.services import Service
 from .repositories import BehaviorTroubleTeacherRepository, HyperActivityTroubleTeacherRepository, \
     InattentionTroubleTeacherRepository, FormAbrTeacherRepository
 
@@ -53,22 +53,22 @@ FORM_ABR_Teacher = {
 }
 
 
-class BehaviorTroubleTeacherService(FormService):
+class BehaviorTroubleTeacherService(Service):
     def __init__(self, repository=BehaviorTroubleTeacherRepository()):
         super().__init__(repository, fields=BEHAVIOR_TROUBLE_TEACHER_FIELDS)
 
 
-class HyperActivityTroubleTeacherService(FormService):
+class HyperActivityTroubleTeacherService(Service):
     def __init__(self, repository=HyperActivityTroubleTeacherRepository()):
         super().__init__(repository, fields=HYPER_ACTIVITY_TROUBLE_Teacher)
 
 
-class InattentionTroubleTeacherService(FormService):
+class InattentionTroubleTeacherService(Service):
     def __init__(self, repository=InattentionTroubleTeacherRepository()):
         super().__init__(repository, fields=INATTENTION_Trouble_TEACHER)
 
 
-class FormAbrTeacherService(FormService):
+class FormAbrTeacherService(Service):
 
     def __init__(self, repository=FormAbrTeacherRepository()):
         super().__init__(repository, fields=FORM_ABR_Teacher)

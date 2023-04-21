@@ -6,9 +6,6 @@ from common.services import calculate_score
 from gestionpatient.models import Patient
 from gestionusers.models import User
 
-from matrices import matrix
-
-
 def return_serialized_data_or_error_response(_object, serializer_class, response_code) -> Response:
     try:
         return Response(data=serializer_class(_object).data, status=response_code)
