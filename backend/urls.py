@@ -54,7 +54,6 @@ def home(request):
 urlpatterns = [
     # path('api/delete_data', clear_data),
     path('api/', home),
-    path('admin/', admin.site.urls),
     path('api/persons', include('gestionusers.views')),
     path('api/patients', include('gestionpatient.views')),
     path('api/patient', include('formparent.views')),

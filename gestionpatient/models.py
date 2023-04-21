@@ -12,7 +12,7 @@ class Patient(Model):
     parent = ForeignKey(to='gestionusers.Parent', on_delete=CASCADE, null=True)
     name: TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
-    gender: TextField = TextField(null=False, default='ذكر')
+    gender: TextField = TextField(null=False, default='M')
     sick: BooleanField = BooleanField(default=None, null=True)
     score_parent = FloatField(default=0, null=False)
     score_teacher = FloatField(default=0, null=False)
@@ -20,7 +20,7 @@ class Patient(Model):
 
     class Meta:
         db_table = 'patients'
-        unique_together = (('parent', 'name', 'school', 'birthdate'),)
+        unique_together = (('parent', 'name', 'birthdate'),)
 
 
 class Supervise(Model):

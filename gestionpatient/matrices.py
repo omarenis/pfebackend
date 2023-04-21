@@ -220,6 +220,7 @@ teacher_female5 = {
 
 
 def matrix(gender, type_user, tranche):
+    dynamic_dict = []
     if gender == 'M':
         if type_user == 'teacher':
             if tranche == 1:

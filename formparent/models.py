@@ -5,7 +5,7 @@ from rest_framework.serializers import ModelSerializer
 
 class BehaviorTroubleParent(Model):
     # 2-8-14-19-20-27-35-39
-    insolent_wth_grown_ups = TextField(null=False, db_column="insolent_wth_grown_ups")
+    insolent_with_grown_ups = TextField(null=False, db_column="insolent_wth_grown_ups")
     feels_attacked_defensive = TextField(null=False, db_column="feels_attacked_defensive")
     destructive = TextField(null=False, db_column="destructive")
     deny_mistakes_blame_others = TextField(null=False, db_column="deny_mistakes_blame_others")

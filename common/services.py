@@ -1,7 +1,4 @@
 from .repositories import Repository
-from gestionpatient.models import Patient
-from gestionusers.models import User
-from matrices import matrix
 
 
 class Service(object):
@@ -38,12 +35,10 @@ class Service(object):
         return self.repository.filter_by(data=filter_params)
 
 
-def calculate_score(data, fields):
+def calculate_score(data):
     value = 0
-    for i in fields:
-        if not data.get(i):
-            raise AttributeError(f'{i} is not an attribte for the instance')
-        elif data.get(i) == 'sometimes':
+    for i in data:
+        if data.get(i) == 'sometimes':
             value += 1
         elif data.get(i) == 'usual':
             value += 2
