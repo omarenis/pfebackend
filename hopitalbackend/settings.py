@@ -69,9 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'channels',
     'common',
-    'chat',
     'gestionusers',
     'gestionpatient',
     'formparent',
@@ -113,8 +111,8 @@ TEMPLATES = [
 ]
 
 
-# WSGI_APPLICATION = 'hopitalbackend.wsgi.application'
-ASGI_APPLICATION = "hopitalbackend.asgi.application"
+WSGI_APPLICATION = 'hopitalbackend.wsgi.application'
+# ASGI_APPLICATION = "hopitalbackend.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -168,4 +166,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-
