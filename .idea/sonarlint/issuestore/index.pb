@@ -30,8 +30,6 @@ L
 .github/workflows/django.yml,a/e/aeadebe44c28a011fc03333fc8fd026fb11dc4e4
 ?
 common/views.py,a/2/a2027c4c3af278934dafdb4a641e3f65e648e9d1
-G
-gestionpatient/views.py,e/6/e6ad7b6eb048b6d21e1def1d112d7b7d7cd18aec
 D
 formteacher/views.py,1/5/1586efc40f4986c11bd0006dd9b7cd0e30079e66
 U

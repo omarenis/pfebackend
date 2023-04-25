@@ -102,43 +102,11 @@ class PatientViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-        if request.user.is_authenticated:
-            if request.user.typeUser == 'parent':
-                data['parent_id'] = request.user.id
-            else:
-                data['school'] = request.user.parent_school.name
+        data['teacher_id'] = request.user.id if request.user.typeUser == 'teacher' else None
         try:
-            patient_object = self.service.filter_by({
-                'name': request.data.get('name'),
-                'family_name': request.data.get('family_name'),
-                'school': data['school']
-            }).first()
-
-            if patient_object is None:
-                patient_object = self.service.create(data, type_user = request.data.get('type_user'))
-
-            if request.user.typeUser == 'teacher':
-                for i in self.servicesTeacher:
-                    patient_object.scoreTeacher += add_other_data_to_patient(data=data.get(i),
-                                                                             service=self.servicesTeacher[i],
-                                                                             patient_id=patient_id,
-                                                                             teacher_id=request.user.id).score
-                patient_object.scoreTeacher /= 10
-            else:
-                for i in self.serviceParent:
-                    patient_object.scoreParent = add_other_data_to_patient(data=data.get(i),
-                                                                           service=self.serviceParent[i],
-                                                                           patient_id=patient_id, teacher_id=None).score
-                patient_object.scoreParent /= 10
-            if patient_object.scoreTeacher > 0 and patient_object.scoreParent > 0:
-                patient_object.sick = patient_object.scoreParent > 1.5 and patient_object.scoreTeacher > 1.5
-            else:
-                patient_object.sick = None
-            patient_object.save()
+            patient_object = self.service.create(data)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
-            if created:
-                self.service.delete(_id=patient_id)
             return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request, pk=None, *args, **kwargs):

@@ -28,17 +28,14 @@
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
     <connection id="8bdc8aac-cc09-4745-9d55-1612fc62c1f8">
-      <console name="Connection" type="STANDARD" schema="" session="Main" />
+      <console name="Connection" type="STANDARD" schema="" session="Main"><![CDATA[select * from patients]]></console>
     </connection>
   </component>
   <component name="DBNavigator.Project.DatabaseEditorStateManager">
     <last-used-providers />
   </component>
   <component name="DBNavigator.Project.DatabaseFileManager">
-    <open-files>
-      <object connection-id="8bdc8aac-cc09-4745-9d55-1612fc62c1f8" object-ref="schemas/main/tables/anxiety_trouble_parent" />
-      <object connection-id="8bdc8aac-cc09-4745-9d55-1612fc62c1f8" object-ref="schemas/main/tables/patients" />
-    </open-files>
+    <open-files />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
     <filter-actions connection-id="8bdc8aac-cc09-4745-9d55-1612fc62c1f8" dataset="main.anxiety_trouble_parent" active-filter-id="EMPTY_FILTER" />
