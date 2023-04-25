@@ -1,4 +1,4 @@
-from django.db.models import CASCADE, ForeignKey, Model, OneToOneField
+from django.db.models import CASCADE, ForeignKey, Model, OneToOneField, SET_NULL
 from django.db.models.fields import FloatField, TextField, DateTimeField
 from rest_framework.serializers import ModelSerializer
 from common.models import create_model_serializer, patient_model_location
@@ -6,7 +6,17 @@ from common.models import create_model_serializer, patient_model_location
 TEACHER_MODEL = 'gestionusers.Teacher'
 
 
-class BehaviorTroubleTeacher(Model):
+class FormTeacher(Model):
+    date = DateTimeField(auto_now_add=True)
+    teacher = ForeignKey(to=TEACHER_MODEL, on_delete=SET_NULL, null=True)
+    score = FloatField(default=0, null=False)
+    patient = ForeignKey(to='gestionpatient.Patient', on_delete=CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class BehaviorTroubleTeacher(FormTeacher):
     arrogant_impolite = TextField(null=False, db_column='arrogant_impolite')
     angry_unexpected_behavior = TextField(null=False, db_column='angry_unexpected_behavior')
     sensitive_criticism = TextField(null=False, db_column='sensitive_criticism')
@@ -15,15 +25,12 @@ class BehaviorTroubleTeacher(Model):
     brawler = TextField(null=False, db_column='brawler')
     deny_mistakes_blame_others = TextField(null=False, db_column='deny_mistakes_blame_others')
     few_relations_school = TextField(null=False, db_column='few_relations_school')
-    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
-    score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
 
     class Meta:
         db_table = 'behavior_trouble_teacher'
 
 
-class HyperActivityTroubleTeacher(Model):
+class HyperActivityTroubleTeacher(FormTeacher):
     #  1,  2,  3, 8, 14, 15, 16
     restless_squirms_chair = TextField(db_column='restless_squirms_chair', null=False)
     inappropriate_noises = TextField(null=False, db_column='inappropriate_noises')
@@ -32,15 +39,12 @@ class HyperActivityTroubleTeacher(Model):
     goes_left_right = TextField(null=False, db_column='goes_left_right')
     easily_turn_on_impulsive = TextField(null=False, db_column='easily_turn_on_impulsive')
     excessive_attention_from_teacher = TextField(null=False, db_column='excessive_attention_from_teacher')
-    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
-    score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
 
     class Meta:
         db_table = 'hyperactivity_trouble_teacher'
 
 
-class InattentionTroubleTeacher(Model):
+class InattentionTroubleTeacher(FormTeacher):
     distracted = TextField(null=False, db_column='distracted')
     dreamer = TextField(null=False, db_column='dreamer')
     led_by_others = TextField(null=False, db_column="led_by_others")
@@ -49,15 +53,12 @@ class InattentionTroubleTeacher(Model):
     immature = TextField(null=False, db_column='immature')
     upset_easily_make_effort = TextField(null=False, db_column='upset_easily_make_eff')
     has_learning_difficulties = TextField(null=False, db_column='has_learning_difficulties')
-    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
-    score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
 
     class Meta:
         db_table = 'inattention_form_teacher'
 
 
-class FormAbrTeacher(Model):
+class FormAbrTeacher(FormTeacher):
     restless_squirms_chair = TextField(null=False, db_column="restless_squirms_chair")
     angry_unexpected_behavior = TextField(null=False, db_column="angry_unexpected_behavior")
     distracted = TextField(null=False, db_column="distracted")
@@ -68,10 +69,6 @@ class FormAbrTeacher(Model):
     easily_turn_on_impulsive = TextField(null=False, db_column="easily_turn_on_impulsive")
     trouble_finishing_things = TextField(null=False, db_column="trouble_finishing_things")
     upset_easily_make_effort = TextField(null=False, db_column="upset_easily_make_effort")
-    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
-    score = FloatField(null=False)
-    teacher = OneToOneField(null=False, on_delete=CASCADE, to=TEACHER_MODEL)
-    date = DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'form_abr_teacher'

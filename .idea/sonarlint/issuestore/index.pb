@@ -24,8 +24,6 @@ H
 Procfile,b/c/bc3c68e880d1a01632bce79f69dd1387c7ba9c54
 @
 common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
-E
-formteacher/models.py,a/1/a10522a44f68e9504280b456db5fd7f3de3d75ff
 @
 requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
 L
@@ -38,8 +36,6 @@ D
 formteacher/views.py,1/5/1586efc40f4986c11bd0006dd9b7cd0e30079e66
 U
 %gestionpatient/migrations/__init__.py,0/e/0e71c05fa58dd7eafb100c4148b43879a8a3784e
-G
-formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936
 F
 gestionusers/models.py,6/b/6b0c04f2e31233dccffa4e375d1fbb75d36820ba
 F

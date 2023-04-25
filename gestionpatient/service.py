@@ -70,66 +70,76 @@ class PatientService(Service):
         patient.is_supervised = False
         patient.birthdate = datetime.fromisoformat(data.get('birthdate'))
         if type_user == 'parent':
-            patient.behaviortroubleparent = BehaviorTroubleParent(score=get_score(
+            behaviortroubleparent = BehaviorTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 data=data['behaviortroubleparent'], birthdate=patient.birthdate, class_name='BehaviorTroubleParent',
                 type_user=type_user),
-                **data['behaviortroubleparent'])
-            patient.learningtroubleparent = LearningTroubleParent(score=get_score(
+                **data['behaviortroubleparent'],
+            patient=patient)
+
+            learningtroubleparent = LearningTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['learningtroubleparent'], class_name='LearningTroubleParent', type_user=type_user),
-                **data['learningtroubleparent'])
+                **data['learningtroubleparent'],
+            patient=patient)
             patient.somatisationtroubleparent = SomatisationTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['somatisationtroubleparent'], class_name='SomatisationTroubleParent', type_user=type_user),
-                **data['somatisationtroubleparent'])
+                **data['somatisationtroubleparent'],
+            patient=patient)
 
-            patient.hyperactivitytroubleparent = HyperActivityTroubleParent(score=get_score(
+            hyperactivitytroubleparent = HyperActivityTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['hyperactivitytroubleparent'], class_name='HyperActivityTroubleParent', type_user=type_user),
-                **data['hyperactivitytroubleparent'])
+                **data['hyperactivitytroubleparent'],
+            patient=patient)
 
             patient.anxitytroubleparent = AnxityTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['anxitytroubleparent'], class_name='AnxityTroubleParent', type_user=type_user),
-                **data['anxitytroubleparent'])
+                **data['anxitytroubleparent'],
+            patient=patient)
 
-            patient.formabrparent = FormAbrParent(score=get_score(
+            formabrparent = FormAbrParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['formabrparent'], class_name='FormAbrParent', type_user=type_user),
-                **data['formabrparent'])
+                **data['formabrparent'],
+            patient=patient)
 
         if type_user == 'teacher':
-            patient.behaviortroubleteacher = BehaviorTroubleTeacher(score=get_score(
+            data = BehaviorTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['behaviortroubleteacher'], class_name='BehaviorTroubleTeacher', type_user=type_user),
-                **data['behaviortroubleteacher'])
+                **data['behaviortroubleteacher'],
+                patient=patient)
 
-            patient.hyperactivitytroubleteacher = HyperActivityTroubleTeacher(score=get_score(
+            HyperActivityTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['hyperactivitytroubleteacher'], class_name='HyperActivityTroubleTeacher',
                 type_user=type_user),
-                **data['hyperactivitytroubleteacher'])
+                **data['hyperactivitytroubleteacher'],
+            patient=patient)
 
-            patient.inattentiontroubleteacher = InattentionTroubleTeacher(score=get_score(
+            InattentionTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['inattentiontroubleteacher'], class_name='InattentionTroubleTeacher', type_user=type_user),
                 **data['inattentiontroubleteacher'])
 
-            patient.formabrteacher = FormAbrTeacher(score=get_score(
+            FormAbrTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['formabrteacher'], class_name='FormAbrTeacher', type_user=type_user),
                 **data['formabrteacher'])
         patient.save()
+        print(data.id)
         return patient
 
 
