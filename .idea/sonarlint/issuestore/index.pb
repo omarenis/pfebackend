@@ -9,9 +9,6 @@ K
 formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
 <
 contract.sol,0/6/06bf3ea8eed9d4c2485b4c8c28e2fe1fee975307
-:
-
-.gitignore,a/5/a5cc2925ca8258af241be7e5b0381edf30266302
 ;
 runtime.txt,2/e/2ed4029984f4a6c70a541992efb31f76528bd80d
 8

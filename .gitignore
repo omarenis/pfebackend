@@ -4,6 +4,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 .idea
+*/migrations/*.py
+!*/migrations/__init__.py
+data.db
 # C extensions
 *.so
 # Distribution / packaging
