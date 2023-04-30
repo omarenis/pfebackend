@@ -74,7 +74,7 @@ class User(AbstractUser):
     address = TextField(null=True, default=None)
     type_user = TextField(null=False, db_column='type_user')
     localisation = ForeignKey(null=True, to='Localisation', on_delete=SET_NULL)
-    profile = OneToOneField(to='PersonProfile', on_delete=CASCADE)
+    profile = OneToOneField(to='PersonProfile', on_delete=CASCADE, null=True)
 
     class Meta:
         db_table = 'users'

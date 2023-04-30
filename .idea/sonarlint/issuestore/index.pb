@@ -48,3 +48,9 @@ C
 backend/settings.py,e/3/e3b66993770b8bd17727389114408abe2710d4f6
 G
 formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936
+G
+gestionpatient/tests.py,4/f/4fd2206a1f392709c4c49faba4d6c856617087d7
+D
+formteacher/tests.py,8/6/86fd21f70b49ca3f0a16b1153fdf5307465d5b0a
+J
+gestionpatient/matrices.py,8/a/8a55b76f81b98e3d9cf4dd041beac82ec0aa98bd
