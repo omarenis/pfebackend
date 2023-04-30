@@ -14,7 +14,7 @@ from formparent.services import AnxityTroubleParentService, BehaviorTroubleParen
 
 from formteacher.services import BehaviorTroubleTeacherService, \
     HyperActivityTroubleTeacherService, InattentionTroubleTeacherService, FormAbrTeacherService
-from gestionusers.services import PersonService, UserService
+from gestionusers.services import UserService
 from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer
 from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
 
@@ -28,9 +28,9 @@ class Quantify(enum.Enum):
 
 def add_person(data: dict, type_user: str):
     if data is not None:
-        person = PersonService().filter_by({'loginNumber': data.get('cin'), 'typeUser': type_user}).first()
+        person = UserService().filter_by({'loginNumber': data.get('cin'), 'typeUser': type_user}).first()
         if person is None:
-            person = PersonService().create(data)
+            person = UserService().create(data)
             if isinstance(person, Exception):
                 raise person
         return person.id

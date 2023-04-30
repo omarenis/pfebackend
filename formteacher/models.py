@@ -3,7 +3,7 @@ from django.db.models.fields import FloatField, TextField, DateTimeField
 from rest_framework.serializers import ModelSerializer
 from common.models import create_model_serializer, patient_model_location
 
-TEACHER_MODEL = 'gestionusers.Teacher'
+TEACHER_MODEL = 'gestionusers.PersonProfile'
 
 
 class FormTeacher(Model):
@@ -13,10 +13,11 @@ class FormTeacher(Model):
     patient = ForeignKey(to='gestionpatient.Patient', on_delete=CASCADE)
 
     class Meta:
-        abstract = True
+        db_table = 'form_teachers'
 
 
-class BehaviorTroubleTeacher(FormTeacher):
+class BehaviorTroubleTeacher(Model):
+    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
     arrogant_impolite = TextField(null=False, db_column='arrogant_impolite')
     angry_unexpected_behavior = TextField(null=False, db_column='angry_unexpected_behavior')
     sensitive_criticism = TextField(null=False, db_column='sensitive_criticism')
@@ -30,8 +31,9 @@ class BehaviorTroubleTeacher(FormTeacher):
         db_table = 'behavior_trouble_teacher'
 
 
-class HyperActivityTroubleTeacher(FormTeacher):
+class HyperActivityTroubleTeacher(Model):
     #  1,  2,  3, 8, 14, 15, 16
+    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
     restless_squirms_chair = TextField(db_column='restless_squirms_chair', null=False)
     inappropriate_noises = TextField(null=False, db_column='inappropriate_noises')
     immediately_satisfied_needs = TextField(null=False, db_column='immediately_satisfied_needs')
@@ -44,7 +46,8 @@ class HyperActivityTroubleTeacher(FormTeacher):
         db_table = 'hyperactivity_trouble_teacher'
 
 
-class InattentionTroubleTeacher(FormTeacher):
+class InattentionTroubleTeacher(Model):
+    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
     distracted = TextField(null=False, db_column='distracted')
     dreamer = TextField(null=False, db_column='dreamer')
     led_by_others = TextField(null=False, db_column="led_by_others")
@@ -58,7 +61,8 @@ class InattentionTroubleTeacher(FormTeacher):
         db_table = 'inattention_form_teacher'
 
 
-class FormAbrTeacher(FormTeacher):
+class FormAbrTeacher(Model):
+    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
     restless_squirms_chair = TextField(null=False, db_column="restless_squirms_chair")
     angry_unexpected_behavior = TextField(null=False, db_column="angry_unexpected_behavior")
     distracted = TextField(null=False, db_column="distracted")

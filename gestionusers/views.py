@@ -9,14 +9,14 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_40
     HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
-from gestionusers.models import DoctorSerializer, LocalisationSerializer, PersonSerializer, UserSerializer
-from gestionusers.services import DoctorService, LocalisationService, LoginSignUpService, PersonService, UserService
+from gestionusers.models import LocalisationSerializer, UserSerializer
+from gestionusers.services import LocalisationService, LoginSignUpService, UserService
 
 
 class TokenViewSet(RestViewSet):
-    service = PersonService()
     localisation_service = LocalisationService()
     login_sign_up_service = LoginSignUpService()
+    service = UserService()
 
     def get_permissions(self):
         permissions = []
@@ -106,79 +106,6 @@ class UserViewSet(ViewSet):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
         self.localisation_service = LocalisationService()
         self.permission_classes = self.get_permissions()
-
-    def create(self, request, *args, **kwargs):
-        data = {}
-        if request.user.typeUser == 'school':
-            self.service = PersonService()
-            self.serializer_class = PersonSerializer
-            if request.data.get('school_id') is None:
-                return Response(data={'error', 'school is required for teacher'}, status=HTTP_400_BAD_REQUEST)
-            data['school_id'] = request.user.id
-        elif request.user.typeUser == 'admin' and request.data.get('typeUser') == 'superdoctor':
-            self.service = DoctorService()
-            self.serializer_class = DoctorSerializer
-            data['is_super'] = True
-            data['speciality'] = ''
-        elif request.user.typeUser == 'superdoctor':
-            self.service = DoctorService()
-            self.serializer_class = DoctorSerializer
-            data['super_doctor_id'] = request.user.id
-            data['is_super'] = False
-            data['typeUser'] = 'doctor'
-        self.fields = self.service.fields
-        user = UserService().filter_by({'loginNumber': request.data.get('loginNumber')}).first()
-        if user is not None and user.is_active:
-            return Response(data={'created': True}, status=HTTP_401_UNAUTHORIZED)
-        for i in self.fields:
-            data[i] = request.data.get(i)
-        localisation = self.localisation_service.filter_by(request.data.get('localisation')).first()
-        if localisation is None:
-            localisation = self.localisation_service.create(data=request.data.get('localisation'))
-        data['localisation_id'] = localisation.id
-        data['is_active'] = True
-        if user is not None and not user.is_active:
-            self.service.put(_id=user.id, data=data)
-        else:
-            user = self.service.create(data)
-        if isinstance(user, Exception):
-            return Response(data={"error": str(user)}, status=500)
-        return Response(data=self.serializer_class(user).data, status=HTTP_201_CREATED)
-
-    def retrieve(self, request, pk=None, *args, **kwargs):
-        if request.user.typeUser != 'admin' and request.user.typeUser != 'superdoctor':
-            self.service = PersonService()
-        user = self.service.retrieve(pk)
-        if user is None:
-            return Response(data={"error": "لم يتم العثور على المستخدم"}, status=HTTP_404_NOT_FOUND)
-        else:
-            if hasattr(user, 'familyName') is True:
-                if hasattr(user, 'speciality') is True:
-                    return return_serialized_data_or_error_response(_object=user, response_code=HTTP_200_OK,
-                                                                    serializer_class=DoctorSerializer)
-                return return_serialized_data_or_error_response(_object=user, response_code=HTTP_200_OK,
-                                                                serializer_class=PersonSerializer)
-            return return_serialized_data_or_error_response(_object=user, serializer_class=UserSerializer,
-                                                            response_code=HTTP_200_OK)
-
-    def list(self, request, *args, **kwargs):
-        filter_data = {}
-        if request.user.typeUser == 'school':
-            self.serializer_class = PersonSerializer
-            self.service = PersonService()
-            filter_data['typeUser'] = 'teacher'
-            filter_data['schoolteacherids__school_id'] = request.user.id
-        elif request.user.typeUser == 'superdoctor':
-            self.serializer_class = DoctorSerializer
-            self.service = DoctorService()
-            filter_data['is_super'] = False
-            filter_data['super_doctor_id'] = request.user.id
-        for i in request.query_params:
-            if self.service.fields.get(i) is None:
-                return Response(data={'error': f'{i} is not an attribute for the user model'})
-            filter_data[i] = request.query_params.get(i)
-        _objects = self.service.filter_by(data=filter_data) if filter_data != {} else self.service.list()
-        return extract_serialized_objects_response(_objects=_objects, serializer_class=self.serializer_class)
 
 
 users_list, user_retrieve_update_delete = UserViewSet.get_urls()

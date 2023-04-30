@@ -5,8 +5,6 @@ C
 formparent/admin.py,9/f/9f71508fd567f6bbe9d60bf300f3abbc1d2ae070
 C
 formparent/views.py,1/5/15f0037355665f20764fe6a9d62a267e7846197b
-L
-gestionusers/repositories.py,1/b/1b8dca875a77cb8046e20ebe2ad0942a58f4a456
 K
 formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
 <
@@ -30,12 +28,6 @@ D
 formteacher/views.py,1/5/1586efc40f4986c11bd0006dd9b7cd0e30079e66
 U
 %gestionpatient/migrations/__init__.py,0/e/0e71c05fa58dd7eafb100c4148b43879a8a3784e
-F
-gestionusers/models.py,6/b/6b0c04f2e31233dccffa4e375d1fbb75d36820ba
-F
-formparent/services.py,1/d/1d5426960dce036777f2c15d589bbff26ece586d
-J
-gestionpatient/matrices.py,8/a/8a55b76f81b98e3d9cf4dd041beac82ec0aa98bd
 D
 formparent/models.py,7/d/7d1578a3027b6a5921063076c674eef4d34ebbf4
 F
@@ -54,7 +46,5 @@ Q
 backend/urls.py,e/8/e86ee5a9c15adf9e0f1eef0379032fc6cd65bd41
 C
 backend/settings.py,e/3/e3b66993770b8bd17727389114408abe2710d4f6
-E
-formteacher/models.py,a/1/a10522a44f68e9504280b456db5fd7f3de3d75ff
 G
 formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936

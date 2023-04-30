@@ -31,21 +31,21 @@ PATIENT_FIELDS = {
 }
 
 SUPERVICE_FIELDS = {
-    'patient_id': {'type': 'int', 'required': True},
-    'doctor_id': {'type': 'int', 'required': True},
+    'patient': {'type': 'foreign_key', 'required': True},
+    'doctor': {'type': 'foriegn_key', 'required': True},
     'accepted': {'type': 'bool', 'required': True}
 }
 
 CONSULTATION_FIELDS = {
-    'doctor_id': {'type': 'int', 'required': True},
-    'parent_id': {'type': 'int', 'required': True},
+    'doctor': {'type': 'foreign_key', 'required': True},
+    'parent': {'type': 'foreign_key', 'required': True},
     'date': {'type': 'int', 'required': True},
     'accepted': {'type': 'bool', 'required': True}
 }
 DIAGNOSTIC_FIELDS = {
-    'patient_id': {'type': 'int', 'required': True},
+    'patient': {'type': 'foreign_key', 'required': True},
     'diagnostic': {'type': 'str', 'required': True},
-    'consultation_id': {'type': 'int', 'required': True}
+    'consultation': {'type': 'foreign_key', 'required': True}
 }
 
 
@@ -157,7 +157,6 @@ class PatientService(Service):
         self.save_instance_form(hyperactivity_trouble)
         self.save_instance_form(form_abr)
         self.save_instance_form(inattention_trouble)
-        print(behavior_trouble.score)
         return patient
 
 
@@ -170,7 +169,7 @@ class SuperviseService(Service):
         if isinstance(supervise, Exception):
             return supervise
         try:
-            patient = Patient.objects.get(id=data['patient_id'])
+            patient = Patient.objects.get(id=data['patient'])
             patient.isSupervised = True
             patient.save()
         except Exception as exception:
