@@ -17,8 +17,6 @@ K
 common/models.py,2/2/2253d0b87a379991f4a9dfb42b6c1d4d930c2644
 @
 requirements.txt,1/9/19359a61ae2446b51b549167b014da2fcf265768
-L
-.github/workflows/django.yml,a/e/aeadebe44c28a011fc03333fc8fd026fb11dc4e4
 ?
 common/views.py,a/2/a2027c4c3af278934dafdb4a641e3f65e648e9d1
 D
