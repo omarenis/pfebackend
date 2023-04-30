@@ -64,6 +64,4 @@ class CalculateScoreServiceTest(TestCase):
         }
         type_user = 'parent'
         patient = self.service.create(data=data_form_parent, type_user=type_user)
-        print(       get_age(birthdate=patient.birthdate))
-        print(patient.anxitytroubleparent.score)
         self.assertIsInstance(patient, Patient)

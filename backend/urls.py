@@ -16,12 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import include, path
-from rest_framework.decorators import permission_classes, api_view
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
-from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_204_NO_CONTENT
-from gestionusers.models import Doctor, School, Parent, User, Teacher, Localisation
-from gestionpatient.models import Patient
 
 
 def home(request):

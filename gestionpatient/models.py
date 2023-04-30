@@ -5,11 +5,11 @@ from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
 app_label = 'gestionpatient'
-doctor_model = 'gestionusers.Doctor'
+person_profile_model = 'gestionusers.PersonProfile'
 
 
 class Patient(Model):
-    parent = ForeignKey(to='gestionusers.Parent', on_delete=CASCADE, null=True)
+    parent = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=True)
     name: TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
     gender: TextField = TextField(null=False, default='M')
@@ -25,7 +25,7 @@ class Patient(Model):
 
 class Supervise(Model):
     patient: OneToOneField = OneToOneField(to='Patient', on_delete=CASCADE, null=False)
-    doctor: ForeignKey = ForeignKey(to=doctor_model, on_delete=CASCADE, null=False)
+    doctor: ForeignKey = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=False)
     accepted: BooleanField = BooleanField(null=False, default=False)
 
     class Meta:
@@ -33,8 +33,8 @@ class Supervise(Model):
 
 
 class Consultation(Model):
-    doctor: ForeignKey = ForeignKey(to=doctor_model, on_delete=CASCADE, null=False)
-    parent: ForeignKey = ForeignKey(to='gestionusers.Parent', on_delete=CASCADE, null=False)
+    doctor: ForeignKey = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=False, related_name='doctor_id')
+    parent: ForeignKey = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=False, related_name='parent_id')
     date: DateTimeField = DateTimeField(null=False, default=timezone.now)
     accepted: BooleanField = BooleanField(null=False, default=False)
 
