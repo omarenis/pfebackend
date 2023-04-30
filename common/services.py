@@ -15,7 +15,7 @@ class Service(object):
 
     def get_by(self, data: dict):
         try:
-            return self.repository.model.get(**data)
+            return self.repository.model.objects.get(**data)
         except self.repository.model.DoesNotExist:
             return None
 
