@@ -7,12 +7,8 @@ C
 formparent/views.py,1/5/15f0037355665f20764fe6a9d62a267e7846197b
 L
 gestionusers/repositories.py,1/b/1b8dca875a77cb8046e20ebe2ad0942a58f4a456
-E
-gestionusers/views.py,7/8/78a916d2af46a59c10942e0deb847e488e8422b3
 K
 formteacher/repositories.py,a/2/a236c22703eeda61fc7984309a5c1c5397ea79e0
-H
-gestionusers/services.py,5/e/5e0e5fe677b0d8632d6d510aff3292fc2fdbb0e1
 <
 contract.sol,0/6/06bf3ea8eed9d4c2485b4c8c28e2fe1fee975307
 :
@@ -50,3 +46,15 @@ F
 backend/asgi.py,4/4/4478d6830699ea0c1de99244f8901754709bd438
 A
 BasePermission.py,7/4/74587f81cf26072755dffa29b1821dd124bdb267
+Q
+!formparent/migrations/__init__.py,9/7/977d6bd041d583ebc2352570c86f84fb295461d6
+9
+	manage.py,3/1/3156ad13e4d695cd526bbb7b031016ecba842270
+?
+backend/urls.py,e/8/e86ee5a9c15adf9e0f1eef0379032fc6cd65bd41
+C
+backend/settings.py,e/3/e3b66993770b8bd17727389114408abe2710d4f6
+E
+formteacher/models.py,a/1/a10522a44f68e9504280b456db5fd7f3de3d75ff
+G
+formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936

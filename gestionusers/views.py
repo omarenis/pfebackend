@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet as RestViewSet
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, \
-    HTTP_200_OK, HTTP_400_BAD_REQUEST
+    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
 from gestionusers.models import DoctorSerializer, LocalisationSerializer, PersonSerializer, UserSerializer
@@ -27,27 +27,30 @@ class TokenViewSet(RestViewSet):
         return permissions
 
     def login(self, request, *args, **kwargs):
-        login_number = request.data.get('loginNumber')
-        if login_number is None:
-            return Response(data={"exists": False}, status=400)
-        password = request.data.get('password')
-        if password is None:
+        try:
+
+            user = self.login_sign_up_service.login(login_number=request.data.get('login_number'),
+                                                    password=request.data.get('password'))
+            if isinstance(user, Exception):
+                return Response(data={"error": str(user)}, status=500)
+            token = RefreshToken.for_user(user=user)
             return Response(data={
-                "exists": "كلمة المرور غير موجودة",
-                "passwordMatches": False}, status=400)
-        user = self.login_sign_up_service.login(login_number=login_number, password=password)
-        if isinstance(user, Exception):
-            return Response(data={"error": str(user)}, status=500)
-        token = RefreshToken.for_user(user=user)
-        return Response(data={
-            "access": str(token.access_token),
-            "refresh": str(token),
-            "userId": user.id,
-            "typeUser": user.typeUser,
-            "name": user.name,
-            "familyName": user.familyName if hasattr(user, "familyName") else None,
-            "is_super": user.is_super if hasattr(user, "is_super") else None
-        })
+                "access": str(token.access_token),
+                "refresh": str(token),
+                "userId": user.id,
+                "typeUser": user.typeUser,
+                "name": user.name,
+                "familyName": user.familyName if hasattr(user, "familyName") else None,
+                "is_super": user.is_super if hasattr(user, "is_super") else None
+            })
+        except Exception as exception:
+            if isinstance(exception, PermissionError):
+                status = HTTP_403_FORBIDDEN
+            elif isinstance(exception, ValueError):
+                status = HTTP_401_UNAUTHORIZED
+            else:
+                status = HTTP_404_NOT_FOUND
+            return Response(data={'message': str(exception)}, status=status)
 
     def signup(self, request, *args, **kwargs):
         data = {}
@@ -57,7 +60,7 @@ class TokenViewSet(RestViewSet):
         for i in self.service.fields:
             data[i] = request.data.get(i)
         data['localisation_id'] = localisation.id
-        user = self.service.filter_by({'loginNumber': request.data.get('loginNumber')}).first()
+        user = self.service.filter_by({'login_number': request.data.get('login_number')}).first()
         data['is_active'] = True
         if user is not None:
             if user.is_active:

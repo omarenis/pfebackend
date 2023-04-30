@@ -55,21 +55,16 @@ class LoginSignUpService(object):
         self.person_service = PersonService()
 
     def login(self, login_number: str, password: str):
-        user = self.user_service.filter_by({'login_number': login_number}).first()
+        user = self.user_service.get_by({'login_number': login_number})
         if user is not None and user.is_active:
-            if user.check_password(password) and (user.localisation_id is not None or user.type_user == 'admin' or
-                                                  user.type_user == 'superdoctor' or user.type_user == 'doctor'):
-                if user.type_user == 'doctor' or user.type_user == 'superdoctor':
-                    return DoctorService().retrieve(user.id)
-                if user.type_user == 'parent' or user.type_user == 'teacher':
-                    return PersonService().retrieve(user.id)
+            if user.check_password(password):
                 return user
             elif not user.is_active:
-                return Exception('الحساب غير مفعّل')
+                raise PermissionError('الحساب غير مفعّل')
             else:
-                return Exception('كلمة السر غير صحيحة')
+                raise ValueError('كلمة السر غير صحيحة')
         else:
-            return Exception('الحساب غير موجود')
+            raise User.DoesNotExist('الحساب غير موجود')
 
     def signup(self, data: dict):
         localisation_id = data.get('localisation_id')

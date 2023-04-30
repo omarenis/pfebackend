@@ -13,6 +13,12 @@ class Service(object):
     def retrieve(self, _id: int):
         return self.repository.retrieve(_id=_id)
 
+    def get_by(self, data: dict):
+        try:
+            return self.repository.model.get(**data)
+        except self.repository.model.DoesNotExist:
+            return None
+
     def create(self, data: dict):
         print(data)
         for i in self.fields:
