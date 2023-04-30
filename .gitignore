@@ -6,7 +6,7 @@ __pycache__/*
 .idea/*
 */migrations/*.py
 !*/migrations/__init__.py
-data.db
+*.db
 # C extensions
 *.so
 # Distribution / packaging
