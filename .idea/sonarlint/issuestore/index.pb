@@ -46,10 +46,6 @@ Q
 backend/urls.py,e/8/e86ee5a9c15adf9e0f1eef0379032fc6cd65bd41
 C
 backend/settings.py,e/3/e3b66993770b8bd17727389114408abe2710d4f6
-G
-formteacher/services.py,1/7/173722aba9ed6e28b37218f93c0fc9038dc46936
-G
-gestionpatient/tests.py,4/f/4fd2206a1f392709c4c49faba4d6c856617087d7
 D
 formteacher/tests.py,8/6/86fd21f70b49ca3f0a16b1153fdf5307465d5b0a
 J

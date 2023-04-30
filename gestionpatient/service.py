@@ -4,7 +4,7 @@ from formparent.models import BehaviorTroubleParent, LearningTroubleParent, Soma
     HyperActivityTroubleParent, AnxityTroubleParent, FormAbrParent
 
 from formteacher.models import BehaviorTroubleTeacher, HyperActivityTroubleTeacher, InattentionTroubleTeacher, \
-    FormAbrTeacher
+    FormAbrTeacher, FormTeacher
 from .matrices import matrix
 from .models import Consultation, Diagnostic, Patient, Supervise
 from datetime import datetime
@@ -80,13 +80,14 @@ class PatientService(Service):
         inattention_trouble = None
         anxity_trouble = None
         form_abr = None
+        form = None
         if type_user == 'parent':
             behavior_trouble = BehaviorTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 data=data['behaviortroubleparent'], birthdate=patient.birthdate, class_name='BehaviorTroubleParent',
                 type_user=type_user),
                 **data['behaviortroubleparent'],
-            patient=patient)
+                patient=patient)
 
             learning_trouble = LearningTroubleParent(score=get_score(
                 gender=data.get('gender'),
@@ -123,12 +124,16 @@ class PatientService(Service):
                 patient=patient)
 
         if type_user == 'teacher':
+            form = FormTeacher()
+            form.patient = patient
+            form.teacher_id = data['teacher']
+
             behavior_trouble = BehaviorTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['behaviortroubleteacher'], class_name='BehaviorTroubleTeacher', type_user=type_user),
                 **data['behaviortroubleteacher'],
-                patient=patient)
+                form=form)
 
             hyperactivity_trouble = HyperActivityTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
@@ -136,20 +141,24 @@ class PatientService(Service):
                 data=data['hyperactivitytroubleteacher'], class_name='HyperActivityTroubleTeacher',
                 type_user=type_user),
                 **data['hyperactivitytroubleteacher'],
-                patient=patient)
+                form=form)
 
             inattention_trouble = InattentionTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['inattentiontroubleteacher'], class_name='InattentionTroubleTeacher', type_user=type_user),
-                **data['inattentiontroubleteacher'])
+                **data['inattentiontroubleteacher'],
+                form=form)
 
             form_abr = FormAbrTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['formabrteacher'], class_name='FormAbrTeacher', type_user=type_user),
-                **data['formabrteacher'])
+                **data['formabrteacher'],
+                form=form)
         patient.save()
+        if form is not None:
+            form.save()
         self.save_instance_form(behavior_trouble)
         self.save_instance_form(anxity_trouble)
         self.save_instance_form(learning_trouble)

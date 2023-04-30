@@ -9,7 +9,6 @@ TEACHER_MODEL = 'gestionusers.PersonProfile'
 class FormTeacher(Model):
     date = DateTimeField(auto_now_add=True)
     teacher = ForeignKey(to=TEACHER_MODEL, on_delete=SET_NULL, null=True)
-    score = FloatField(default=0, null=False)
     patient = ForeignKey(to='gestionpatient.Patient', on_delete=CASCADE)
 
     class Meta:
@@ -26,6 +25,7 @@ class BehaviorTroubleTeacher(Model):
     brawler = TextField(null=False, db_column='brawler')
     deny_mistakes_blame_others = TextField(null=False, db_column='deny_mistakes_blame_others')
     few_relations_school = TextField(null=False, db_column='few_relations_school')
+    score = FloatField(default=0, null=False)
 
     class Meta:
         db_table = 'behavior_trouble_teacher'
@@ -41,6 +41,7 @@ class HyperActivityTroubleTeacher(Model):
     goes_left_right = TextField(null=False, db_column='goes_left_right')
     easily_turn_on_impulsive = TextField(null=False, db_column='easily_turn_on_impulsive')
     excessive_attention_from_teacher = TextField(null=False, db_column='excessive_attention_from_teacher')
+    score = FloatField(default=0, null=False)
 
     class Meta:
         db_table = 'hyperactivity_trouble_teacher'
@@ -56,6 +57,7 @@ class InattentionTroubleTeacher(Model):
     immature = TextField(null=False, db_column='immature')
     upset_easily_make_effort = TextField(null=False, db_column='upset_easily_make_eff')
     has_learning_difficulties = TextField(null=False, db_column='has_learning_difficulties')
+    score = FloatField(default=0, null=False)
 
     class Meta:
         db_table = 'inattention_form_teacher'
@@ -73,6 +75,7 @@ class FormAbrTeacher(Model):
     easily_turn_on_impulsive = TextField(null=False, db_column="easily_turn_on_impulsive")
     trouble_finishing_things = TextField(null=False, db_column="trouble_finishing_things")
     upset_easily_make_effort = TextField(null=False, db_column="upset_easily_make_effort")
+    score = FloatField(default=0, null=False)
 
     class Meta:
         db_table = 'form_abr_teacher'
