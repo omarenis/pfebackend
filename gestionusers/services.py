@@ -1,6 +1,3 @@
-from typing import Union
-
-from django.contrib.auth.models import AnonymousUser
 from common.repositories import Repository
 from common.services import Service
 from .models import Localisation, User, PersonProfile
@@ -37,61 +34,60 @@ class UserService(Service):
         super().__init__(repository, fields=USER_FIELDS)
 
     def create(self, data: dict):
-        if (data.get('type_user') != 'admin' or data.get('type_user') != 'school') and data.get('profile').get(
-                'family_name') is None:
+        if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('family_name must be not null')
-
-        if data.get('type_suer') == 'teacher' and data.get('profile').get('school') is None:
-            raise ValueError('school must be not null')
-
-        if data.get('type_user') == 'doctor':
-            if data.get('profile').get('is_super_doctor') is False:
-                if data.get('profile').get('speciality') is None:
-                    raise ValueError('doctor must have a speciality')
-                if data.get('profile').get('super_doctor') is None:
-                    raise ValueError('super_doctor must have a super doctor')
-
         profile = data.pop('profile')
-
         user = User(**data)
-        if profile is not None:
-            profile['school_id'] = profile.pop('school')
-            profile['super_doctor_id'] = profile.pop('super_doctor')
-            user.profile = PersonProfile(**profile)
+
+        if data.get('type_user') == 'teacher':
+            if profile.get('school') is None:
+                raise ValueError('school must be not null')
+            else:
+                profile['school_id'] = profile.get('school')
+
+        elif data.get('type_user') == 'doctor':
+            if profile.get('is_super_doctor') is False:
+                if profile.get('speciality') is None:
+                    raise ValueError('doctor must have a speciality')
+                elif profile.get('super_doctor') is None:
+                    raise ValueError('super_doctor must have a super doctor')
+                profile['super_doctor_id'] = profile.pop('super_doctor')
+
+        user.profile = PersonProfile(**profile)
         user.save()
         return user
 
 
-class LoginSignUpService(object):
-    def __init__(self):
-        self.user_service = UserService()
+user_service = UserService()
 
-    def login(self, login_number: str, password: str):
-        user = self.user_service.get_by({'login_number': login_number})
-        if user is not None and user.is_active:
-            if user.check_password(password):
-                return user
-            elif not user.is_active:
-                raise PermissionError('الحساب غير مفعّل')
-            else:
-                raise ValueError('كلمة السر غير صحيحة')
+
+def login(login_number: str, password: str):
+    user = user_service.get_by({'login_number': login_number})
+    if user is not None and user.is_active:
+        if user.check_password(password):
+            return user
+        elif not user.is_active:
+            raise PermissionError('الحساب غير مفعّل')
         else:
-            raise User.DoesNotExist('الحساب غير موجود')
+            raise ValueError('كلمة السر غير صحيحة')
+    else:
+        raise User.DoesNotExist('الحساب غير موجود')
 
-    def signup(self, data: dict):
-        localisation_id = data.get('localisation_id')
-        if data.get('localisation_id') is None:
-            localisation_service = LocalisationService()
-            localisation = localisation_service.filter_by(data.get('localisation')).first()
-            if localisation is None:
-                localisation = localisation_service.create(data=data.get('localisation'))
-            if isinstance(localisation, Exception):
-                return localisation
-            localisation_id = localisation.id
-        data['is_active'] = True
-        data['localisation_id'] = localisation_id
-        data['type_user'] = 'parent'
-        return self.user_service.create(data)
+
+def signup(data: dict):
+    localisation_id = data.get('localisation_id')
+    if data.get('localisation_id') is None:
+        localisation_service = LocalisationService()
+        localisation = localisation_service.filter_by(data.get('localisation')).first()
+        if localisation is None:
+            localisation = localisation_service.create(data=data.get('localisation'))
+        if isinstance(localisation, Exception):
+            return localisation
+        localisation_id = localisation.id
+    data['is_active'] = True
+    data['localisation_id'] = localisation_id
+    data['type_user'] = 'parent'
+    return user_service.create(data)
 
 
 class LocalisationService(Service):
