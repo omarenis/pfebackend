@@ -34,16 +34,17 @@ class UserService(Service):
         super().__init__(repository, fields=USER_FIELDS)
 
     def create(self, data: dict):
+        data['username'] = data.get('login_number')
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('family_name must be not null')
-        profile = data.pop('profile')
+        profile = data.pop('profile') if data.get('profile') is not None else None
         user = User(**data)
 
         if data.get('type_user') == 'teacher':
             if profile.get('school') is None:
                 raise ValueError('school must be not null')
             else:
-                profile['school_id'] = profile.get('school')
+                profile['school_id'] = profile.pop('school')
 
         elif data.get('type_user') == 'doctor':
             if profile.get('is_super_doctor') is False:
@@ -53,7 +54,9 @@ class UserService(Service):
                     raise ValueError('super_doctor must have a super doctor')
                 profile['super_doctor_id'] = profile.pop('super_doctor')
 
-        user.profile = PersonProfile(**profile)
+        if profile is not None:
+            user.profile = PersonProfile(**profile)
+            user.profile.save()
         user.save()
         return user
 
