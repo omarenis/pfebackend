@@ -1,6 +1,7 @@
 from django.test import TestCase
 from gestionpatient.models import Patient
 from gestionpatient.service import PatientService, calculate_score, get_age
+from gestionusers.models import PersonProfile
 
 
 class CalculateScoreServiceTest(TestCase):
@@ -62,17 +63,16 @@ class CalculateScoreServiceTest(TestCase):
                 'disturb_other_children': "never"
             }
         }
-
-        data_form_teacher={
+        data_form_teacher = {
             'name': 'John',
             'parent': None,
             'teacher': 3,
             'birthdate': '2014-02-01',
             'gender': 'M',
             'sick': None,
-            
-            'behaviortroubleteacher':{  
-                
+
+            'behaviortroubleteacher': {
+
                 'arrogant_impolite': "never",
                 'angry_unexpected_behavior': "never",
                 'sensitive_criticism': "never",
@@ -81,11 +81,11 @@ class CalculateScoreServiceTest(TestCase):
                 'brawler': "never",
                 'deny_mistakes_blame_others': "never",
                 'few_relations_school': "never"
-                 },
+            },
 
-            'hyperactivitytroubleteacher':{
-                
-                'restless_squirms_chair': "never", 
+            'hyperactivitytroubleteacher': {
+
+                'restless_squirms_chair': "never",
                 'inappropriate_noises': "never",
                 'immediately_satisfied_needs': "never",
                 'annoy_students': "never",
@@ -93,8 +93,8 @@ class CalculateScoreServiceTest(TestCase):
                 'easily_turn_on_impulsive': "never",
                 'excessive_attention_from_teacher': "never"
             },
-            'inattentiontroubleteacher':{
-                
+            'inattentiontroubleteacher': {
+
                 'distracted': "never",
                 'dreamer': "never",
                 'led_by_others': "never",
@@ -105,9 +105,9 @@ class CalculateScoreServiceTest(TestCase):
                 'has_learning_difficulties': "never"
 
             },
-            'formabrteacher':{
-                'restless_squirms_chair': "never", 
-                'angry_unexpected_behavior' : "never",
+            'formabrteacher': {
+                'restless_squirms_chair': "never",
+                'angry_unexpected_behavior': "never",
                 'distracted': "never",
                 'annoy_students': "never",
                 'pout_sulk_easily': "never",
