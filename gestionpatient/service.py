@@ -5,6 +5,7 @@ from formparent.models import BehaviorTroubleParent, LearningTroubleParent, Soma
 
 from formteacher.models import BehaviorTroubleTeacher, HyperActivityTroubleTeacher, InattentionTroubleTeacher, \
     FormAbrTeacher, FormTeacher
+from gestionusers.models import PersonProfile,User
 from .matrices import matrix
 from .models import Consultation, Diagnostic, Patient, Supervise
 from datetime import datetime
@@ -88,7 +89,7 @@ class PatientService(Service):
                 type_user=type_user),
                 **data['behaviortroubleparent'],
                 patient=patient)
-
+            print(User.objects.all())
             learning_trouble = LearningTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
@@ -122,12 +123,13 @@ class PatientService(Service):
                 data=data['formabrparent'], class_name='FormAbrParent', type_user=type_user),
                 **data['formabrparent'],
                 patient=patient)
-
+            patient.score_parent=max(form_abr.score,anxity_trouble.score,hyperactivity_trouble.score,somatisation_trouble.score,learning_trouble.score,behavior_trouble.score)
         if type_user == 'teacher':
             form = FormTeacher()
             form.patient = patient
-            form.teacher_id = data['teacher']
-
+            form.teacher =PersonProfile.objects.first()
+            print(User.objects.all())
+            
             behavior_trouble = BehaviorTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
@@ -142,7 +144,7 @@ class PatientService(Service):
                 type_user=type_user),
                 **data['hyperactivitytroubleteacher'],
                 form=form)
-
+            print(hyperactivity_trouble.score)
             inattention_trouble = InattentionTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
@@ -156,6 +158,8 @@ class PatientService(Service):
                 data=data['formabrteacher'], class_name='FormAbrTeacher', type_user=type_user),
                 **data['formabrteacher'],
                 form=form)
+            patient.score_teacher=max(behavior_trouble.score,hyperactivity_trouble.score,inattention_trouble.score,form_abr.score)
+        
         patient.save()
         if form is not None:
             form.save()
@@ -178,7 +182,10 @@ class SuperviseService(Service):
         if isinstance(supervise, Exception):
             return supervise
         try:
-            patient = Patient.objects.get(id=data['patient'])
+            patient= Patient.objects.get(id=data['patient'])
+            
+            supervise.patient = patient
+            supervise.save()
             patient.isSupervised = True
             patient.save()
         except Exception as exception:

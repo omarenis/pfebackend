@@ -1,11 +1,12 @@
 from common.repositories import Repository
 from common.services import Service
 from .models import Localisation, User, PersonProfile
+from django.db import transaction
 
 URL = "http://localhost:5000/"
 
 LOCALISATION_FIELDS = {
-    'governorate': {'type': 'text', 'required': True},
+    'state': {'type': 'text', 'required': True},
     'delegation': {'type': 'text', 'required': True},
     'zip_code': {'type': 'text', 'required': True}
 }
@@ -52,9 +53,14 @@ class UserService(Service):
                 elif profile.get('super_doctor') is None:
                     raise ValueError('super_doctor must have a super doctor')
                 profile['super_doctor_id'] = profile.pop('super_doctor')
-
-        user.profile = PersonProfile(**profile)
-        user.save()
+        
+        with transaction.atomic():
+            user.username=data.get("login_number")
+            user.set_password(data.get("password"))
+            
+            user.profile = PersonProfile(**profile, user=user)
+            user.profile.save()
+            user.save()
         return user
 
 

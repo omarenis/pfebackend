@@ -65,13 +65,13 @@ class PatientViewSet(ViewSet):
     def list(self, request, *args, **kwargs):
         try:
             filter_dictionary = {}
-            if request.user.typeUser == 'teacher':
+            if request.user.type_user == 'teacher':
                 filter_dictionary['form__teacher_id'] = request.user.id
-            elif request.user.typeUser == 'school':
+            elif request.user.type_user == 'school':
                 filter_dictionary['form__teacher__schoolteacherids__school_id'] = request.user.id
-            elif request.user.typeUser == 'parent':
-                filter_dictionary['parent_id'] = request.user.id
-            elif request.user.typeUser == 'doctor':
+            elif request.user.type_user == 'parent':
+                filter_dictionary['parent_id'] = request.user.profile_id
+            elif request.user.profile.is_super_doctor==False :
                 filter_dictionary['supervise__doctor_id'] = request.user.id
                 filter_dictionary['supervise__accepted'] = True
             for i in request.query_params:
@@ -102,7 +102,11 @@ class PatientViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-        data['teacher_id'] = request.user.id if request.user.typeUser == 'teacher' else None
+        data['teacher_id'] = request.user.id if request.user.type_user == 'teacher' else None
+        if request.user.type_user=='parent':
+            data['parent_id']=request.user.id
+        else:
+            data['parent_id']=request.data.get('parent')
         try:
             patient_object = self.service.create(data)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
@@ -118,7 +122,7 @@ class PatientViewSet(ViewSet):
 
 class RenderVousViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.typeUser == 'doctor':
+        if self.request.user.profile.is_super_doctor == False:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=ConsultationSerializer, service=ConsultationService(), **kwargs):
@@ -127,7 +131,7 @@ class RenderVousViewSet(ViewSet):
 
 class SuperviseViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.typeUser == 'doctor' or self.request.user.typeUser == 'superdoctor':
+        if self.request.user.profile.is_super_doctor is True:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
