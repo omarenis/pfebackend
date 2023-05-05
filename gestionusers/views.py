@@ -27,9 +27,11 @@ def login_controller(request, *args, **kwargs):
             "access": str(token.access_token),
             "refresh": str(token),
             "userId": user.id,
-            "typeUser": user.type_user,
+            "type_user": user.type_user,
             "name": user.name,
-            "familyName": user.profile.family_name if user.profile is not None else None,
+            "is_super_doctor":user.profile.is_super_doctor if user.profile is not None else None,
+            "super_doctor_id":user.profile.super_doctor_id if user.profile is not None else None , 
+            "family_name": user.profile.family_name if user.profile is not None else None,
             "is_superuser": user.is_superuser
         })
     except Exception as exception:

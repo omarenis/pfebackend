@@ -72,7 +72,7 @@ class PatientViewSet(ViewSet):
             elif request.user.type_user == 'parent':
                 filter_dictionary['parent_id'] = request.user.profile_id
             elif request.user.profile.is_super_doctor==False :
-                filter_dictionary['supervise__doctor_id'] = request.user.id
+                filter_dictionary['supervise__doctor_id'] = request.user.profile_id
                 filter_dictionary['supervise__accepted'] = True
             for i in request.query_params:
                 filter_dictionary[i] = request.query_params.get(i)
@@ -140,7 +140,8 @@ class SuperviseViewSet(ViewSet):
 
 class DiagnosticViewSet(ViewSet):
     def get_permissions(self):
-        return [IsAuthenticated()]
+                if self.request.user.profile.is_super_doctor == False:
+                     return [IsAuthenticated()]
 
     def __init__(self, serializer_class=DiagnosticSerializer, service=DiagnosticService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)

@@ -58,6 +58,7 @@ class UserService(Service):
         if profile is not None:
             user.profile = PersonProfile(**profile)
             user.profile.save()
+        user.set_password(data.get("password"))
         user.save()
         return user
 
