@@ -102,14 +102,13 @@ class PatientViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-        data['type_user'] = request.user.type_user
         if request.user.type_user == 'parent':
             data['parent_id'] = request.user.id
         if request.user.type_user == 'teacher':
             data['parent_id'] = request.data.get('parent')
             data['teacher_id'] = request.user.id
         try:
-            patient_object = self.service.create(data)
+            patient_object = self.service.create(data=data, type_user=request.user.type_user)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
             return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)

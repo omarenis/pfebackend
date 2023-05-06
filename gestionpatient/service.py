@@ -8,7 +8,7 @@ from formteacher.models import BehaviorTroubleTeacher, HyperActivityTroubleTeach
 from gestionusers.models import PersonProfile, User
 from .matrices import matrix
 from .models import Consultation, Diagnostic, Patient, Supervise
-from datetime import datetime
+from datetime import date
 
 URL = "http://localhost:5000/"
 APPLICATION_TYPE = "application/json"
@@ -22,11 +22,9 @@ PATIENT_FIELDS = {
     'family_name': {'type': 'text', 'required': True},
     'birthdate': {'type': 'date', 'required': True},
     'gender': {'type': 'text', 'required': True},
-
     'parent': {'type': 'foreign_key', 'required': False},
     'teacher': {'type': 'foreign_key', 'required': False},
     'sick': {'type': 'bool', 'required': False},
-
     'behaviortroubleparent': {'type': 'BehaviorTroubleParent', 'required': False},
     'learningtroubleparent': {'type': 'LearningTroubleParent', 'required': False},
     'somatisationtroubleparent': {'type': 'SomatisationTroubleParent', 'required': False},
@@ -105,7 +103,8 @@ def get_fields(type_user):
 
 
 def get_age(birthdate):
-    return (datetime.utcnow() - birthdate).total_seconds() // (3600 * 24 * 365)
+    print(date.today())
+    return (date.today() - birthdate).total_seconds() // (3600 * 24 * 365)
 
 
 def get_score(gender, data, birthdate, class_name, type_user):
@@ -169,7 +168,7 @@ class PatientService(Service):
         patient = self.repository.model()
         patient.name = data.get('name')
         patient.is_supervised = False
-        patient.birthdate = datetime.fromisoformat(data.get('birthdate'))
+        patient.birthdate = date.fromisoformat(data.get('birthdate'))
         print(data)
         patient.parent_id = data.get('parent')
 
