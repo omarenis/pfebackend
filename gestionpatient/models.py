@@ -1,6 +1,6 @@
 import django.utils.timezone as timezone
 from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, ForeignKey, Model, \
-    OneToOneField, TextField, FloatField
+    OneToOneField, TextField, FloatField ,SET_NULL
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
@@ -9,7 +9,8 @@ person_profile_model = 'gestionusers.PersonProfile'
 
 
 class Patient(Model):
-    parent = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=True)
+    teacher = ForeignKey(to=person_profile_model, on_delete=SET_NULL, null=True, related_name='patient_teacher')
+    parent = ForeignKey(to='gestionusers.PersonProfile', on_delete=CASCADE, null=False, related_name='patient_parent')
     name: TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
     gender: TextField = TextField(null=False, default='M')

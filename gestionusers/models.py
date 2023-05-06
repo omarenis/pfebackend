@@ -12,51 +12,6 @@ app_label = 'gestionusers'
 
 
 # create the user manager and the person manager
-class UserManager(BaseUserManager):
-    def create(self, name: str, login_number: str, telephone: str, password: str, type_user: str, localisation_id=None,
-               email=None):
-        data = {
-            'name': name,
-            'loginNumber': login_number,
-            'telephone': telephone,
-            'type_user': type_user,
-            'localisation_id': localisation_id,
-            'email': self.normalize_email(email) if email is not None else None,
-            'username': login_number
-        }
-        if type_user == 'admin':
-            data['is_active'] = True
-            data['is_superuser'] = True
-            data['is_staff'] = True
-        user = self.model(**data)
-        user.set_password(password)
-        user.save()
-        return user
-
-
-class PersonManager(BaseUserManager):
-    def create(self, name: str, login_number: str, telephone: str, type_user: str, family_name: str,
-               localisation_id, address=None, email=None, is_active=False, password=None):
-        data = {
-            'name': name,
-            'family_name': family_name,
-            'login_number': login_number,
-            'telephone': telephone,
-            'type_user': type_user,
-            'address': address,
-            'is_active': is_active,
-            'is_superuser': False,
-            'email': self.normalize_email(email) if email is not None else email,
-            'localisation_id': localisation_id,
-            'username': login_number
-        }
-        user = self.model(**data)
-        random_str = ''.join(choices(string.ascii_letters + string.digits, k=1258)) if not is_active else \
-            password
-        user.set_password(random_str)
-        user.save()
-        return user
-
 
 class Localisation(Model):
     state = CharField(max_length=100, verbose_name='state')
