@@ -1,18 +1,20 @@
 from django.test import TestCase
 from gestionpatient.models import Patient
 from gestionpatient.service import PatientService, calculate_score, get_age
-from gestionusers.models import PersonProfile
+from gestionusers.models import PersonProfile, User
 
 
 class CalculateScoreServiceTest(TestCase):
 
     def setUp(self) -> None:
         self.service = PatientService()
+        self.parent = PersonProfile(family_name='triki')
+        self.parent.save()
 
     def test_create_patient(self):
         data_form_parent = {
             "name": "John",
-            "parent": None,
+            "parent": self.parent.id,
             "birthdate": "2014-02-01",
             "gender": "M",
             "sick": None,
@@ -65,7 +67,7 @@ class CalculateScoreServiceTest(TestCase):
         }
         data_form_teacher = {
             "name": "John",
-            "parent": None,
+            "parent": self.parent.id,
             "teacher": None,
             "birthdate": "2014-02-01",
             "gender": "M",
@@ -112,7 +114,7 @@ class CalculateScoreServiceTest(TestCase):
                 "annoy_students": "never",
                 "pout_sulk_easily": "never",
                 "moody": "never",
-                "goes_left_right": "never", 
+                "goes_left_right": "never",
                 "easily_turn_on_impulsive": "never",
                 "trouble_finishing_things" : "never",
                 "upset_easily_make_effort" : "never"
@@ -122,15 +124,4 @@ class CalculateScoreServiceTest(TestCase):
         }
         type_user = "teacher"
         patient = self.service.create(data=data_form_teacher, type_user=type_user)
-        #print("behavior trouble:  ",patient.behaviortroubleparent.score)
-        #print("learning trouble :",patient.learningtroubleparent.score)
-        #print("somatisation trouble :",patient.somatisationtroubleparent.score)
-        #print("hyperactivity trouble :",patient.hyperactivitytroubleparent.score)
-        #print("anxity trouble :",patient.anxitytroubleparent.score)
-        #print("form abr :",patient.formabrparent.score)
-        
         self.assertIsInstance(patient, Patient)
-
-
-
-

@@ -6,17 +6,8 @@ from common.models import create_model_serializer, patient_model_location
 TEACHER_MODEL = 'gestionusers.PersonProfile'
 
 
-class FormTeacher(Model):
-    date = DateTimeField(auto_now_add=True)
-    teacher = ForeignKey(to=TEACHER_MODEL, on_delete=SET_NULL, null=True)
-    patient = ForeignKey(to='gestionpatient.Patient', on_delete=CASCADE)
-
-    class Meta:
-        db_table = 'form_teachers'
-
-
 class BehaviorTroubleTeacher(Model):
-    
+
     arrogant_impolite = TextField(null=False, db_column='arrogant_impolite')
     angry_unexpected_behavior = TextField(null=False, db_column='angry_unexpected_behavior')
     sensitive_criticism = TextField(null=False, db_column='sensitive_criticism')
@@ -34,7 +25,7 @@ class BehaviorTroubleTeacher(Model):
 
 class HyperActivityTroubleTeacher(Model):
     #  1,  2,  3, 8, 14, 15, 16
-    
+
     restless_squirms_chair = TextField(db_column='restless_squirms_chair', null=False)
     inappropriate_noises = TextField(null=False, db_column='inappropriate_noises')
     immediately_satisfied_needs = TextField(null=False, db_column='immediately_satisfied_needs')
@@ -50,7 +41,7 @@ class HyperActivityTroubleTeacher(Model):
 
 
 class InattentionTroubleTeacher(Model):
-    
+
     distracted = TextField(null=False, db_column='distracted')
     dreamer = TextField(null=False, db_column='dreamer')
     led_by_others = TextField(null=False, db_column="led_by_others")
@@ -67,7 +58,7 @@ class InattentionTroubleTeacher(Model):
 
 
 class FormAbrTeacher(Model):
-    
+
     restless_squirms_chair = TextField(null=False, db_column="restless_squirms_chair")
     angry_unexpected_behavior = TextField(null=False, db_column="angry_unexpected_behavior")
     distracted = TextField(null=False, db_column="distracted")

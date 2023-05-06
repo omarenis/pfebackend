@@ -71,7 +71,7 @@ class PatientViewSet(ViewSet):
                 filter_dictionary['form__teacher__schoolteacherids__school_id'] = request.user.id
             elif request.user.type_user == 'parent':
                 filter_dictionary['parent_id'] = request.user.profile_id
-            elif request.user.profile.is_super_doctor==False :
+            elif not request.user.profile.is_super_doctor:
                 filter_dictionary['supervise__doctor_id'] = request.user.profile_id
                 filter_dictionary['supervise__accepted'] = True
             for i in request.query_params:
@@ -102,11 +102,11 @@ class PatientViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-         
+        data['type_user'] = request.user.type_user
         if request.user.type_user == 'parent':
             data['parent_id'] = request.user.id
         if request.user.type_user == 'teacher':
-            data['parent_id'] = request.data.get('parent_id')
+            data['parent_id'] = request.data.get('parent')
             data['teacher_id'] = request.user.id
         try:
             patient_object = self.service.create(data)
