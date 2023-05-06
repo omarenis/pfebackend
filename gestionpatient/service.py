@@ -15,20 +15,24 @@ APPLICATION_TYPE = "application/json"
 
 PATIENT_FIELDS = {
     'name': {'type': 'text', 'required': True},
-    'familyName': {'type': 'text', 'required': True},
+    'family_name': {'type': 'text', 'required': True},
     'birthdate': {'type': 'date', 'required': True},
+    'gender': {'type': 'text', 'required': True},
+    
     'parent_id': {'type': 'foreign_key', 'required': False},
+    'teacher_id': {'type': 'foreign_key', 'required': False},
     'sick': {'type': 'bool', 'required': False},
+    
     'behaviortroubleparent': {'type': 'BehaviorTroubleParent', 'required': False},
     'learningtroubleparent': {'type': 'LearningTroubleParent', 'required': False},
     'somatisationtroubleparent': {'type': 'SomatisationTroubleParent', 'required': False},
     'hyperactivitytroubleparent': {'type': 'HyperActivityTroubleParent', 'required': False},
     'anxitytroubleparent': {'type': 'AnxityTroubleParent', 'required': False},
     'formabrparent': {'type': 'FormAbrParent', 'required': False},
-    'behaviortroubleteacher': {'type': 'behaviorTroubleTeacher', 'required': False},
-    'hyperactivitytroubleteacher': {'type': 'hyperActivityTroubleTeacher', 'required': False},
-    'inattentiontroubleteacher': {'type': 'inattentionTroubleTeacher', 'required': False},
-    'formabrteacher': {'type': 'formAbrTeacher', 'required': False}
+    'behaviortroubleteacher': {'type': 'BehaviorTroubleTeacher', 'required': False},
+    'hyperactivitytroubleteacher': {'type': 'HyperActivityTroubleTeacher', 'required': False},
+    'inattentiontroubleteacher': {'type': 'InattentionTroubleTeacher', 'required': False},
+    'formabrteacher': {'type': 'FormAbrTeacher', 'required': False}
 }
 
 SUPERVICE_FIELDS = {
@@ -74,104 +78,219 @@ class PatientService(Service):
         patient.name = data.get('name')
         patient.is_supervised = False
         patient.birthdate = datetime.fromisoformat(data.get('birthdate'))
-        behavior_trouble = None
-        learning_trouble = None
-        somatisation_trouble = None
-        hyperactivity_trouble = None
-        inattention_trouble = None
-        anxity_trouble = None
-        form_abr = None
-        form = None
+
+#in this case we r creating all the classes since the creation of the patient,and we'll specify which one to edit when we fill the 2nd form
+        behavior_trouble_parent = None
+        learning_trouble_parent = None
+        somatisation_trouble_parent = None
+        hyperactivity_trouble_parent = None
+        anxity_trouble_parent = None
+        form_abr_parent = None
+        
+
+        behavior_trouble_teacher=None
+        hyperactivity_trouble_teacher = None
+        inattention_trouble_teacher = None
+        form_abr_teacher = None
+
         if type_user == 'parent':
-            behavior_trouble = BehaviorTroubleParent(score=get_score(
+            behavior_trouble_parent = BehaviorTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 data=data['behaviortroubleparent'], birthdate=patient.birthdate, class_name='BehaviorTroubleParent',
                 type_user=type_user),
                 **data['behaviortroubleparent'],
-                patient=patient)
-            print(User.objects.all())
-            learning_trouble = LearningTroubleParent(score=get_score(
+                )
+            
+            learning_trouble_parent = LearningTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['learningtroubleparent'], class_name='LearningTroubleParent', type_user=type_user),
                 **data['learningtroubleparent'],
-                patient=patient)
-            somatisation_trouble = SomatisationTroubleParent(score=get_score(
+                )
+            somatisation_trouble_parent = SomatisationTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['somatisationtroubleparent'], class_name='SomatisationTroubleParent', type_user=type_user),
                 **data['somatisationtroubleparent'],
-                patient=patient)
+                )
 
-            hyperactivity_trouble = HyperActivityTroubleParent(score=get_score(
+            hyperactivity_trouble_parent = HyperActivityTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['hyperactivitytroubleparent'], class_name='HyperActivityTroubleParent', type_user=type_user),
                 **data['hyperactivitytroubleparent'],
-                patient=patient)
+                )
 
-            anxity_trouble = AnxityTroubleParent(score=get_score(
+            anxity_trouble_parent = AnxityTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['anxitytroubleparent'], class_name='AnxityTroubleParent', type_user=type_user),
                 **data['anxitytroubleparent'],
-                patient=patient)
+                )
 
-            form_abr = FormAbrParent(score=get_score(
+            form_abr_parent = FormAbrParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['formabrparent'], class_name='FormAbrParent', type_user=type_user),
                 **data['formabrparent'],
                 patient=patient)
-            patient.score_parent=max(form_abr.score,anxity_trouble.score,hyperactivity_trouble.score,somatisation_trouble.score,learning_trouble.score,behavior_trouble.score)
-        if type_user == 'teacher':
-            form = FormTeacher()
-            form.patient = patient
-            form.teacher =PersonProfile.objects.first()
-            print(User.objects.all())
+            patient.score_parent=max(form_abr_parent.score,anxity_trouble_parent.score,hyperactivity_trouble_parent.score,somatisation_trouble_parent.score,learning_trouble_parent.score,behavior_trouble_parent.score)
             
-            behavior_trouble = BehaviorTroubleTeacher(score=get_score(
+        
+        if type_user == 'teacher':
+            behavior_trouble_teacher = BehaviorTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['behaviortroubleteacher'], class_name='BehaviorTroubleTeacher', type_user=type_user),
-                **data['behaviortroubleteacher'],
-                form=form)
+                **data['behaviortroubleteacher'],patient=patient
+                )
 
-            hyperactivity_trouble = HyperActivityTroubleTeacher(score=get_score(
+            hyperactivity_trouble_teacher = HyperActivityTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['hyperactivitytroubleteacher'], class_name='HyperActivityTroubleTeacher',
                 type_user=type_user),
-                **data['hyperactivitytroubleteacher'],
-                form=form)
-            print(hyperactivity_trouble.score)
-            inattention_trouble = InattentionTroubleTeacher(score=get_score(
+                **data['hyperactivitytroubleteacher'],patient=patient
+                )
+            
+            inattention_trouble_teacher = InattentionTroubleTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['inattentiontroubleteacher'], class_name='InattentionTroubleTeacher', type_user=type_user),
-                **data['inattentiontroubleteacher'],
-                form=form)
-
-            form_abr = FormAbrTeacher(score=get_score(
+                **data['inattentiontroubleteacher'],patient=patient
+            )
+            form_abr_teacher = FormAbrTeacher(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['formabrteacher'], class_name='FormAbrTeacher', type_user=type_user),
-                **data['formabrteacher'],
-                form=form)
-            patient.score_teacher=max(behavior_trouble.score,hyperactivity_trouble.score,inattention_trouble.score,form_abr.score)
-        
+                **data['formabrteacher'],patient=patient
+                )
+            patient.score_teacher=max(behavior_trouble_teacher.score,hyperactivity_trouble_teacher.score,inattention_trouble_teacher.score,form_abr_teacher.score)
+            
         patient.save()
-        if form is not None:
-            form.save()
-        self.save_instance_form(behavior_trouble)
-        self.save_instance_form(anxity_trouble)
-        self.save_instance_form(learning_trouble)
-        self.save_instance_form(somatisation_trouble)
-        self.save_instance_form(hyperactivity_trouble)
-        self.save_instance_form(form_abr)
-        self.save_instance_form(inattention_trouble)
+        
+        self.save_instance_form(behavior_trouble_parent)
+        self.save_instance_form(anxity_trouble_parent)
+        self.save_instance_form(learning_trouble_parent)
+        self.save_instance_form(somatisation_trouble_parent)
+        self.save_instance_form(hyperactivity_trouble_parent)
+        self.save_instance_form(form_abr_parent)
+
+
+        self.save_instance_form(behavior_trouble_teacher)
+        self.save_instance_form(hyperactivity_trouble_teacher)
+        self.save_instance_form(inattention_trouble_teacher)
+        self.save_instance_form(form_abr_teacher)
+        print(form_abr_teacher.score)
         return patient
 
+
+
+
+
+    def edit(self,data:dict,patient: Patient,type_user=None):
+        if type_user is None:
+            raise ValueError('type_user must not be null')
+
+           
+        if type_user == 'parent':    
+            behavior_trouble_parent = BehaviorTroubleParent(score=get_score(
+                gender=patient.gender,
+                data=data['behaviortroubleparent'], birthdate=patient.birthdate, class_name='BehaviorTroubleParent',
+                type_user=type_user),
+                **data['behaviortroubleparent'],patient=patient
+                )
+            
+            learning_trouble_parent = LearningTroubleParent(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['learningtroubleparent'], class_name='LearningTroubleParent', type_user=type_user),
+                **data['learningtroubleparent'],patient=patient
+                )
+            somatisation_trouble_parent = SomatisationTroubleParent(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['somatisationtroubleparent'], class_name='SomatisationTroubleParent', type_user=type_user),
+                **data['somatisationtroubleparent'],patient=patient
+                )
+
+            hyperactivity_trouble_parent = HyperActivityTroubleParent(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['hyperactivitytroubleparent'], class_name='HyperActivityTroubleParent', type_user=type_user),
+                **data['hyperactivitytroubleparent'],patient=patient
+                )
+
+            anxity_trouble_parent = AnxityTroubleParent(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['anxitytroubleparent'], class_name='AnxityTroubleParent', type_user=type_user),
+                **data['anxitytroubleparent'],patient=patient
+                )
+
+            form_abr_parent = FormAbrParent(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['formabrparent'], class_name='FormAbrParent', type_user=type_user),
+                **data['formabrparent'],
+                patient=patient)
+            patient.score_parent=max(form_abr_parent.score,anxity_trouble_parent.score,hyperactivity_trouble_parent.score,somatisation_trouble_parent.score,learning_trouble_parent.score,behavior_trouble_parent.score)
+            self.save_instance_form(behavior_trouble_parent)
+            self.save_instance_form(anxity_trouble_parent)
+            self.save_instance_form(learning_trouble_parent)
+            self.save_instance_form(somatisation_trouble_parent)
+            self.save_instance_form(hyperactivity_trouble_parent)
+            self.save_instance_form(form_abr_parent)
+
+
+        if type_user == 'teacher':
+            behavior_trouble_teacher = BehaviorTroubleTeacher(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['behaviortroubleteacher'], class_name='BehaviorTroubleTeacher', type_user=type_user),
+                **data['behaviortroubleteacher'],patient=patient
+                )
+
+            hyperactivity_trouble_teacher = HyperActivityTroubleTeacher(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['hyperactivitytroubleteacher'], class_name='HyperActivityTroubleTeacher',
+                type_user=type_user),
+                **data['hyperactivitytroubleteacher'],patient=patient
+                )
+            
+            inattention_trouble_teacher = InattentionTroubleTeacher(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['inattentiontroubleteacher'], class_name='InattentionTroubleTeacher', type_user=type_user),
+                **data['inattentiontroubleteacher'],patient=patient
+            )
+            form_abr_teacher = FormAbrTeacher(score=get_score(
+                gender=patient.gender,
+                birthdate=patient.birthdate,
+                data=data['formabrteacher'], class_name='FormAbrTeacher', type_user=type_user),
+                **data['formabrteacher'],patient=patient
+                )
+            
+            patient.score_teacher=max(behavior_trouble_teacher.score,hyperactivity_trouble_teacher.score,inattention_trouble_teacher.score,form_abr_teacher.score)
+            
+
+        self.save_instance_form(behavior_trouble_parent)
+        self.save_instance_form(anxity_trouble_parent)
+        self.save_instance_form(learning_trouble_parent)
+        self.save_instance_form(somatisation_trouble_parent)
+        self.save_instance_form(hyperactivity_trouble_parent)           
+        self.save_instance_form(form_abr_parent)    
+
+
+        self.save_instance_form(behavior_trouble_teacher)
+        self.save_instance_form(hyperactivity_trouble_teacher)
+        self.save_instance_form(inattention_trouble_teacher)
+        self.save_instance_form(form_abr_teacher)
+
+
+        patient.save()
+        
 
 class SuperviseService(Service):
     def __init__(self, repository=Repository(model=Supervise)):
@@ -193,6 +312,7 @@ class SuperviseService(Service):
             return supervise
 
         try:
+            patient.accepted=False
             patient.is_supervised = True
             patient.save()
         except Exception as exception:

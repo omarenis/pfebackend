@@ -38,7 +38,14 @@ class UserService(Service):
         data['username'] = data.get('login_number')
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('family_name must be not null')
-        profile = data.pop('profile') if data.get('profile') is not None else None
+
+        # Initialize the profile dictionary to an empty dictionary if it is None
+        profile = data.pop('profile') if data.get('profile') is not None else {}
+
+        # Set the is_super_doctor attribute to None if the user type is not a doctor
+        if data.get('type_user') != 'doctor':
+            profile['is_super_doctor'] = None
+
         user = User(**data)
 
         if data.get('type_user') == 'teacher':
@@ -55,7 +62,7 @@ class UserService(Service):
                     raise ValueError('super_doctor must have a super doctor')
                 profile['super_doctor_id'] = profile.pop('super_doctor')
 
-        if profile is not None:
+        if profile:
             user.profile = PersonProfile(**profile)
             user.profile.save()
         user.set_password(data.get("password"))

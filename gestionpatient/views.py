@@ -102,11 +102,12 @@ class PatientViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-        data['teacher_id'] = request.user.id if request.user.type_user == 'teacher' else None
-        if request.user.type_user=='parent':
-            data['parent_id']=request.user.id
-        else:
-            data['parent_id']=request.data.get('parent')
+         
+        if request.user.type_user == 'parent':
+            data['parent_id'] = request.user.id
+        if request.user.type_user == 'teacher':
+            data['parent_id'] = request.data.get('parent_id')
+            data['teacher_id'] = request.user.id
         try:
             patient_object = self.service.create(data)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)

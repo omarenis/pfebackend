@@ -16,7 +16,7 @@ class FormTeacher(Model):
 
 
 class BehaviorTroubleTeacher(Model):
-    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
+    
     arrogant_impolite = TextField(null=False, db_column='arrogant_impolite')
     angry_unexpected_behavior = TextField(null=False, db_column='angry_unexpected_behavior')
     sensitive_criticism = TextField(null=False, db_column='sensitive_criticism')
@@ -26,6 +26,7 @@ class BehaviorTroubleTeacher(Model):
     deny_mistakes_blame_others = TextField(null=False, db_column='deny_mistakes_blame_others')
     few_relations_school = TextField(null=False, db_column='few_relations_school')
     score = FloatField(default=0, null=False)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
 
     class Meta:
         db_table = 'behavior_trouble_teacher'
@@ -33,7 +34,7 @@ class BehaviorTroubleTeacher(Model):
 
 class HyperActivityTroubleTeacher(Model):
     #  1,  2,  3, 8, 14, 15, 16
-    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
+    
     restless_squirms_chair = TextField(db_column='restless_squirms_chair', null=False)
     inappropriate_noises = TextField(null=False, db_column='inappropriate_noises')
     immediately_satisfied_needs = TextField(null=False, db_column='immediately_satisfied_needs')
@@ -42,13 +43,14 @@ class HyperActivityTroubleTeacher(Model):
     easily_turn_on_impulsive = TextField(null=False, db_column='easily_turn_on_impulsive')
     excessive_attention_from_teacher = TextField(null=False, db_column='excessive_attention_from_teacher')
     score = FloatField(default=0, null=False)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
 
     class Meta:
         db_table = 'hyperactivity_trouble_teacher'
 
 
 class InattentionTroubleTeacher(Model):
-    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
+    
     distracted = TextField(null=False, db_column='distracted')
     dreamer = TextField(null=False, db_column='dreamer')
     led_by_others = TextField(null=False, db_column="led_by_others")
@@ -58,13 +60,14 @@ class InattentionTroubleTeacher(Model):
     upset_easily_make_effort = TextField(null=False, db_column='upset_easily_make_eff')
     has_learning_difficulties = TextField(null=False, db_column='has_learning_difficulties')
     score = FloatField(default=0, null=False)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
 
     class Meta:
         db_table = 'inattention_form_teacher'
 
 
 class FormAbrTeacher(Model):
-    form = OneToOneField(to='FormTeacher', on_delete=CASCADE)
+    
     restless_squirms_chair = TextField(null=False, db_column="restless_squirms_chair")
     angry_unexpected_behavior = TextField(null=False, db_column="angry_unexpected_behavior")
     distracted = TextField(null=False, db_column="distracted")
@@ -76,6 +79,7 @@ class FormAbrTeacher(Model):
     trouble_finishing_things = TextField(null=False, db_column="trouble_finishing_things")
     upset_easily_make_effort = TextField(null=False, db_column="upset_easily_make_effort")
     score = FloatField(default=0, null=False)
+    patient = OneToOneField(null=False, on_delete=CASCADE, to=patient_model_location)
 
     class Meta:
         db_table = 'form_abr_teacher'
