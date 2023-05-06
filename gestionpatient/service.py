@@ -19,8 +19,8 @@ PATIENT_FIELDS = {
     'birthdate': {'type': 'date', 'required': True},
     'gender': {'type': 'text', 'required': True},
     
-    'parent_id': {'type': 'foreign_key', 'required': False},
-    'teacher_id': {'type': 'foreign_key', 'required': False},
+    'parent': {'type': 'foreign_key', 'required': False},
+    'teacher': {'type': 'foreign_key', 'required': False},
     'sick': {'type': 'bool', 'required': False},
     
     'behaviortroubleparent': {'type': 'BehaviorTroubleParent', 'required': False},
@@ -98,34 +98,34 @@ class PatientService(Service):
                 gender=data.get('gender'),
                 data=data['behaviortroubleparent'], birthdate=patient.birthdate, class_name='BehaviorTroubleParent',
                 type_user=type_user),
-                **data['behaviortroubleparent'],
+                **data['behaviortroubleparent'],patient=patient
                 )
             
             learning_trouble_parent = LearningTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['learningtroubleparent'], class_name='LearningTroubleParent', type_user=type_user),
-                **data['learningtroubleparent'],
+                **data['learningtroubleparent'],patient=patient
                 )
             somatisation_trouble_parent = SomatisationTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['somatisationtroubleparent'], class_name='SomatisationTroubleParent', type_user=type_user),
-                **data['somatisationtroubleparent'],
+                **data['somatisationtroubleparent'],patient=patient
                 )
 
             hyperactivity_trouble_parent = HyperActivityTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['hyperactivitytroubleparent'], class_name='HyperActivityTroubleParent', type_user=type_user),
-                **data['hyperactivitytroubleparent'],
+                **data['hyperactivitytroubleparent'],patient=patient
                 )
 
             anxity_trouble_parent = AnxityTroubleParent(score=get_score(
                 gender=data.get('gender'),
                 birthdate=patient.birthdate,
                 data=data['anxitytroubleparent'], class_name='AnxityTroubleParent', type_user=type_user),
-                **data['anxitytroubleparent'],
+                **data['anxitytroubleparent'],patient=patient
                 )
 
             form_abr_parent = FormAbrParent(score=get_score(
@@ -135,7 +135,7 @@ class PatientService(Service):
                 **data['formabrparent'],
                 patient=patient)
             patient.score_parent=max(form_abr_parent.score,anxity_trouble_parent.score,hyperactivity_trouble_parent.score,somatisation_trouble_parent.score,learning_trouble_parent.score,behavior_trouble_parent.score)
-            
+            print(patient.score_parent)
         
         if type_user == 'teacher':
             behavior_trouble_teacher = BehaviorTroubleTeacher(score=get_score(
@@ -166,7 +166,7 @@ class PatientService(Service):
                 **data['formabrteacher'],patient=patient
                 )
             patient.score_teacher=max(behavior_trouble_teacher.score,hyperactivity_trouble_teacher.score,inattention_trouble_teacher.score,form_abr_teacher.score)
-            
+            print(patient.score_teacher)
         patient.save()
         
         self.save_instance_form(behavior_trouble_parent)
@@ -181,7 +181,7 @@ class PatientService(Service):
         self.save_instance_form(hyperactivity_trouble_teacher)
         self.save_instance_form(inattention_trouble_teacher)
         self.save_instance_form(form_abr_teacher)
-        print(form_abr_teacher.score)
+        
         return patient
 
 

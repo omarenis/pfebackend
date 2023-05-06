@@ -9,8 +9,8 @@ person_profile_model = 'gestionusers.PersonProfile'
 
 
 class Patient(Model):
-    teacher = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=True, related_name='teacher_patients')
-    parent = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=True, related_name='parent_patients')
+    teacher = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=True, related_name='patient_teacher')
+    parent = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=True, related_name='patient_parent')
     name: TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
     gender: TextField = TextField(null=False, default='M')
