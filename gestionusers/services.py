@@ -39,11 +39,9 @@ class UserService(Service):
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('family_name must be not null')
 
-        # Initialize the profile dictionary to an empty dictionary if it is None
-        profile = data.pop('profile') if data.get('profile') is not None else {}
+        profile = data.pop('profile') if data.get('profile') is not None else None
 
-        # Set the is_super_doctor attribute to None if the user type is not a doctor
-        if data.get('type_user') != 'doctor':
+        if profile is not None and data.get('type_user') != 'doctor':
             profile['is_super_doctor'] = None
 
         user = User(**data)

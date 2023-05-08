@@ -9,7 +9,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_40
     HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
-from gestionusers.models import LocalisationSerializer, UserSerializer
+from gestionusers.models import LocalisationSerializer, UserSerializer,PersonProfileSerializer,User
 from gestionusers.services import LocalisationService, UserService, signup, login
 
 localisation_service = LocalisationService()
@@ -35,6 +35,7 @@ def login_controller(request, *args, **kwargs):
     try:
         user = login(login_number=request.data.get('login_number'), password=request.data.get('password'))
         token = RefreshToken.for_user(user=user)
+        serializer = PersonProfileSerializer(user.profile)
         return Response(data={
             "access": str(token.access_token),
             "refresh": str(token),
@@ -44,7 +45,8 @@ def login_controller(request, *args, **kwargs):
             "is_super_doctor":user.profile.is_super_doctor if user.profile is not None else None,
             "super_doctor_id":user.profile.super_doctor_id if user.profile is not None else None , 
             "family_name": user.profile.family_name if user.profile is not None else None,
-            "is_superuser": user.is_superuser
+            "is_superuser": user.is_superuser,
+            "profile":serializer.data
         })
     except Exception as exception:
         if isinstance(exception, PermissionError):
@@ -108,7 +110,7 @@ def logout(request, *args, **kwargs):
 class UserViewSet(ViewSet):
     def get_permissions(self):
         return [IsAuthenticated()]
-
+        
     def __init__(self, serializer_class=UserSerializer, service=UserService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
         self.localisation_service = LocalisationService()
