@@ -15,6 +15,18 @@ from gestionusers.services import LocalisationService, UserService, signup, logi
 localisation_service = LocalisationService()
 user_service = UserService()
 
+@api_view(['GET'])
+def find(request):
+    login_number = request.data.get('login_number')
+    user = user_service.get_by({'login_number': login_number})
+    if user:
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    else:
+        return Response({'message': 'User not found'}, status=HTTP_404_NOT_FOUND)
+
+
+
 
 @permission_classes([AllowAny])
 @api_view(['POST'])
@@ -110,4 +122,5 @@ urlpatterns = [
     path('/login', login_controller),
     path('/signup', signup_controller),
     path('/logout', logout),
+    path('/find',find)
 ]

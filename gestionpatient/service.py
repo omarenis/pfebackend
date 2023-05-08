@@ -162,7 +162,7 @@ class PatientService(Service):
     def __init__(self, repository=Repository(model=Patient)):
         super().__init__(repository, fields=PATIENT_FIELDS)
 
-    def create(self, data: dict, type_user=None):
+    def create(self, data: dict, type_user=None,par=None,tea=None):
         if type_user is None:
             raise ValueError('type_user must not be null')
         patient = self.repository.model()
@@ -170,7 +170,8 @@ class PatientService(Service):
         patient.is_supervised = False
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
         print(data)
-        patient.parent_id = data.get('parent')
+        patient.parent_id = data.get('parent') if data.get('parent') is not None else par
+        patient.teacher_id=tea
 
         patient.save()
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)

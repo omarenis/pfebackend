@@ -66,7 +66,7 @@ class PatientViewSet(ViewSet):
         try:
             filter_dictionary = {}
             if request.user.type_user == 'teacher':
-                filter_dictionary['form__teacher_id'] = request.user.id
+                filter_dictionary['teacher_id'] = request.user.profile_id
             elif request.user.type_user == 'school':
                 filter_dictionary['form__teacher__schoolteacherids__school_id'] = request.user.id
             elif request.user.type_user == 'parent':
@@ -102,13 +102,16 @@ class PatientViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-        if request.user.type_user == 'parent':
-            data['parent_id'] = request.user.id
-        if request.user.type_user == 'teacher':
-            data['parent_id'] = request.data.get('parent')
-            data['teacher_id'] = request.user.id
         try:
-            patient_object = self.service.create(data=data, type_user=request.user.type_user)
+            if request.user.type_user == 'parent':
+                
+                patient_object = self.service.create(data=data, type_user=request.user.type_user,par=request.user.profile_id)
+            if request.user.type_user == 'teacher':
+                patient_object = self.service.create(data=data, type_user=request.user.type_user,par=request.data.get('parent'),tea=request.user.profile_id)
+                
+                
+            
+            
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
             return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
