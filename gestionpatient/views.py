@@ -95,7 +95,7 @@ class PatientViewSet(ViewSet):
         patient_data = self.service.retrieve(_id=pk)
         if isinstance(patient_data, Exception):
             return Response(data={'error': str(patient_data)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-        medical_teacher_data = None
+
         return Response({**self.serializer_class(patient_data).data,
                          'school': patient_data.form_set.first().teacher.schoolteacherids.school.name},
                         status=HTTP_200_OK)
@@ -103,15 +103,8 @@ class PatientViewSet(ViewSet):
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
         try:
-            if request.user.type_user == 'parent':
-                
-                patient_object = self.service.create(data=data, type_user=request.user.type_user,par=request.user.profile_id)
-            if request.user.type_user == 'teacher':
-                patient_object = self.service.create(data=data, type_user=request.user.type_user,par=request.data.get('parent'),tea=request.user.profile_id)
-                
-                
-            
-            
+            data[request.user.type_user] = request.user.profile_id
+            patient_object = self.service.create(data=data, type_user=request.user.type_user)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
             return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
@@ -122,10 +115,18 @@ class PatientViewSet(ViewSet):
             return Response(data={'error': str(deleted)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(status=HTTP_204_NO_CONTENT)
 
+    def update(self, request, pk=None, *args, **kwargs):
+        request.data['type_user'] = self.request.user.type_user
+
+        if self.request.user.type_user == "teacher":
+            request.data['teacher'] = self.request.user.id
+
+        return super().update(request=request, pk=pk, *args, **kwargs)
+
 
 class RenderVousViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor == False:
+        if not self.request.user.profile.is_super_doctor:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=ConsultationSerializer, service=ConsultationService(), **kwargs):
@@ -143,8 +144,8 @@ class SuperviseViewSet(ViewSet):
 
 class DiagnosticViewSet(ViewSet):
     def get_permissions(self):
-                if self.request.user.profile.is_super_doctor == False:
-                     return [IsAuthenticated()]
+        if self.request.user.profile.is_super_doctor == False:
+            return [IsAuthenticated()]
 
     def __init__(self, serializer_class=DiagnosticSerializer, service=DiagnosticService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)

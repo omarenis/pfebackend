@@ -6,6 +6,7 @@ from common.services import calculate_score
 from gestionpatient.models import Patient
 from gestionusers.models import User
 
+
 def return_serialized_data_or_error_response(_object, serializer_class, response_code) -> Response:
     try:
         return Response(data=serializer_class(_object).data, status=response_code)
@@ -100,11 +101,13 @@ class ViewSet(ModelViewSet):
         if _object is None:
             return Response(data={'error': 'object not found'}, status=HTTP_404_NOT_FOUND)
 
+        _object = self.service.put(_object.id, data=request.data)
+
         serializer = self.serializer_class(_object, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return return_serialized_data_or_error_response(_object=_object, serializer_class=self.serializer_class,
-                                                    response_code=HTTP_201_CREATED)
+                                                            response_code=HTTP_201_CREATED)
         else:
             return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
 

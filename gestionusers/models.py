@@ -52,13 +52,16 @@ class LocalisationSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class UserSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'
-
-
 class PersonProfileSerializer(ModelSerializer):
     class Meta:
         model = PersonProfile
         fields = '__all__'
+
+
+class UserSerializer(ModelSerializer):
+    profile = PersonProfileSerializer()
+    localisation = LocalisationSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id', 'name', 'profile', 'login_number', 'type_user', 'telephone', 'localisation']

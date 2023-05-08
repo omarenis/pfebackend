@@ -114,6 +114,7 @@ def get_score(gender, data, birthdate, class_name, type_user):
 
 def save_or_update_instance_form(instance, field, _class, values: dict):
     if hasattr(instance, field):
+        print(getattr(instance, field))
         _object = getattr(instance, field)
         if _object is not None:
             for key, value in values.items():
@@ -145,7 +146,7 @@ def save_or_edit_patient(patient, data, type_user):
             type_user=type_user)
         if score > max_score:
             max_score = score
-
+        print(data[field.get('name')])
         save_or_update_instance_form(instance=patient, field=field.get('name'), _class=field.get('_class'),
                                      values={**data[field.get('name')], 'score': score, 'patient': patient})
 
@@ -162,21 +163,20 @@ class PatientService(Service):
     def __init__(self, repository=Repository(model=Patient)):
         super().__init__(repository, fields=PATIENT_FIELDS)
 
-    def create(self, data: dict, type_user=None,par=None,tea=None):
+    def create(self, data: dict, type_user=None):
         if type_user is None:
             raise ValueError('type_user must not be null')
         patient = self.repository.model()
         patient.name = data.get('name')
         patient.is_supervised = False
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
-        print(data)
-        patient.parent_id = data.get('parent') if data.get('parent') is not None else par
-        patient.teacher_id=tea
-
+        patient.parent_id = data.get('parent') if data.get('parent') is not None else None
+        patient.teacher_id = data.get('teacher') if data.get('teacher') is not None else None
         patient.save()
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)
 
-    def put(self, _id: int, data: dict, type_user=None):
+    def put(self, _id: int, data: dict):
+        type_user = data.pop('type_user')
         patient = self.get_by({'id': _id})
         if patient is None:
             raise Patient.DoesNotExist(f'patient does not exists with the following {_id}')

@@ -37,7 +37,8 @@ class Service(object):
         for i in data:
             if self.fields.get(i) is not None and self.fields.get(i).get('type') == 'text':
                 filter_params[f'{i}__contains'] = data[i]
-            filter_params[i] = data[i]
+            else:
+                filter_params[i] = data[i]
         return self.repository.filter_by(data=filter_params)
 
 
