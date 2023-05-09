@@ -4,6 +4,8 @@ from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, Fo
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
+from gestionusers.models import PersonProfileSerializer
+
 app_label = 'gestionpatient'
 person_profile_model = 'gestionusers.PersonProfile'
 
@@ -59,9 +61,10 @@ class SuperviseSerializer(ModelSerializer):
 
 
 class PatientSerializer(ModelSerializer):
+    parent = PersonProfileSerializer()
     class Meta:
         model = Patient
-        fields = '__all__'
+        fields = ['id', 'name', '']
 
 
 class DiagnosticSerializer(ModelSerializer):
