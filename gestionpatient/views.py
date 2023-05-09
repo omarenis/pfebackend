@@ -68,7 +68,7 @@ class PatientViewSet(ViewSet):
             if request.user.type_user == 'teacher':
                 filter_dictionary['teacher_id'] = request.user.profile_id
             elif request.user.type_user == 'school':
-                filter_dictionary['form__teacher__schoolteacherids__school_id'] = request.user.id
+                filter_dictionary['teacher__school__id'] = request.user.id
             elif request.user.type_user == 'parent':
                 filter_dictionary['parent_id'] = request.user.profile_id
             elif not request.user.profile.is_super_doctor:

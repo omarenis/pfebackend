@@ -33,11 +33,15 @@ PROFILE = {
 class UserService(Service):
     def __init__(self, repository=Repository(model=User)):
         super().__init__(repository, fields=USER_FIELDS)
-
+        self.localisation_service = LocalisationService()
     def create(self, data: dict):
         data['username'] = data.get('login_number')
+        localisation = self.localisation_service.filter_by(data.get('localisation')).first()
+        if localisation is None:
+            localisation = self.localisation_service.create(data=data.get('localisation'))
+
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
-            raise ValueError('family_name must be not null')
+            raise ValueError('profile must be not null')
 
         profile = data.pop('profile') if data.get('profile') is not None else None
 
@@ -45,7 +49,7 @@ class UserService(Service):
             profile['is_super_doctor'] = None
 
         user = User(**data)
-
+        user.localisation = localisation
         if data.get('type_user') == 'teacher':
             if profile.get('school') is None:
                 raise ValueError('school must be not null')
