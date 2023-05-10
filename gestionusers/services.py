@@ -18,7 +18,8 @@ USER_FIELDS = {
     'telephone': {'type': 'email', 'required': True},
     'password': {'type': 'password', 'required': True},
     'type_user': {'type': 'text', 'required': True},
-    'profile': {'type': 'one_to_one_field', 'required': True}
+    'profile': {'type': 'one_to_one_field', 'required': True},
+    'localisation': {'type': 'foreign_key', 'required': False}
 }
 
 PROFILE = {

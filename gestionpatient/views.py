@@ -4,8 +4,9 @@ from django.db.models import QuerySet
 from django.urls import path
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, \
-    HTTP_204_NO_CONTENT
+    HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
 
 from common.views import ViewSet, extract_data_with_validation
 from formparent.services import AnxityTroubleParentService, BehaviorTroubleParentService, \
@@ -14,8 +15,9 @@ from formparent.services import AnxityTroubleParentService, BehaviorTroubleParen
 
 from formteacher.services import BehaviorTroubleTeacherService, \
     HyperActivityTroubleTeacherService, InattentionTroubleTeacherService, FormAbrTeacherService
+from gestionusers.models import User, UserSerializer
 from gestionusers.services import UserService
-from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer
+from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient
 from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
 
 
@@ -149,6 +151,19 @@ class DiagnosticViewSet(ViewSet):
 
     def __init__(self, serializer_class=DiagnosticSerializer, service=DiagnosticService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+
+
+@api_view(['GET'])
+def find_patients_by_parent(request, *args, **kwargs):
+    try:
+        parent = User.objects.get(type_user='parent', login_number=request.query_params.get('login_number'))
+        patients = Patient.objects.filter(parent_in=parent.profile.id).all()
+        return Response({
+            **UserSerializer(parent).data,
+            'patients': [PatientSerializer(patient).data for patient in patients] if patients != [] else []
+        })
+    except User.DoesNotExist:
+        return Response(data={'message': 'parent not found'}, status=HTTP_404_NOT_FOUND)
 
 
 patients, patient = PatientViewSet.get_urls()
