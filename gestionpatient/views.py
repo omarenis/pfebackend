@@ -1,13 +1,12 @@
 import enum
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.urls import path
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, \
     HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
-
 from common.views import ViewSet, extract_data_with_validation
 from formparent.services import AnxityTroubleParentService, BehaviorTroubleParentService, \
     HyperActivityTroubleParentService, LearningTroubleParentService, FormAbrParentService, \
@@ -65,6 +64,8 @@ class PatientViewSet(ViewSet):
         return [IsAuthenticated()]
 
     def list(self, request, *args, **kwargs):
+        patients = Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(
+            Q(score_teacher__gte=70) | Q(score_parent__gte=70))
         try:
             filter_dictionary = {}
             if request.user.type_user == 'teacher':
@@ -80,8 +81,8 @@ class PatientViewSet(ViewSet):
                 filter_dictionary[i] = request.query_params.get(i)
 
             output = []
-            pts = self.service.list().distinct() if list(
-                request.GET.keys()) == [] and filter_dictionary == {} else self.service.filter_by(filter_dictionary)
+            pts = patients.distinct() if list(
+                request.GET.keys()) == [] and filter_dictionary == {} else patients.filter(**filter_dictionary)
             if isinstance(pts, QuerySet):
                 for i in pts.distinct():
                     output.append(self.serializer_class(i).data)

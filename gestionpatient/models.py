@@ -1,6 +1,6 @@
 import django.utils.timezone as timezone
 from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, ForeignKey, Model, \
-    OneToOneField, TextField, FloatField ,SET_NULL
+    OneToOneField, TextField, FloatField, SET_NULL
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
@@ -62,6 +62,7 @@ class SuperviseSerializer(ModelSerializer):
 
 class PatientSerializer(ModelSerializer):
     parent = PersonProfileSerializer()
+
     class Meta:
         model = Patient
         fields = ['id', 'name', '']
