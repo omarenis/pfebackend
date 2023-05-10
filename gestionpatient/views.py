@@ -173,6 +173,7 @@ consultations, consultation = RenderVousViewSet.get_urls()
 diagnostics, diagnostic = DiagnosticViewSet.get_urls()
 
 urlpatterns = [
+    path('find', find_patients_by_parent),
     path('', patients), path('/<int:pk>', patient),
     path('/supervises', supervises),
     path('/supervises/<int:pk>', supervise),
