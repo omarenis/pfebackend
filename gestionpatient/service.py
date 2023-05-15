@@ -6,6 +6,7 @@ from formparent.models import BehaviorTroubleParent, LearningTroubleParent, Soma
 from formteacher.models import BehaviorTroubleTeacher, HyperActivityTroubleTeacher, InattentionTroubleTeacher, \
     FormAbrTeacher
 from gestionusers.models import PersonProfile, User
+from gestionusers.services import UserService
 from .matrices import matrix
 from .models import Consultation, Diagnostic, Patient, Supervise
 from datetime import date
@@ -159,6 +160,7 @@ def save_or_edit_patient(patient, data, type_user):
     return patient
 
 
+us=UserService()
 class PatientService(Service):
     def __init__(self, repository=Repository(model=Patient)):
         super().__init__(repository, fields=PATIENT_FIELDS)
@@ -166,11 +168,22 @@ class PatientService(Service):
     def create(self, data: dict, type_user=None):
         if type_user is None:
             raise ValueError('type_user must not be null')
+        if data.get('parent') is not None :
+            par=us.get_by({'login_number': data.get('parent')})
+        else:
+            par is None
+        
+        if par is None:
+            par=us.create({'login_number': data.get('parent'),'name':data.get('parent'),'username':data.get('parent'),'type_user':'parent',
+            'is_active':False,'localisation':{'state':'','delegation':'','zip_code':'',},'profile':{'family_name':'Inactive'}})
+
+
         patient = self.repository.model()
         patient.name = data.get('name')
+        patient.family_name = data.get('family_name')
         patient.is_supervised = False
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
-        patient.parent_id = data.get('parent') if data.get('parent') is not None else None
+        patient.parent_id = par.id
         patient.teacher_id = data.get('teacher') if data.get('teacher') is not None else None
         patient.save()
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)

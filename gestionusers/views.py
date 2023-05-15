@@ -42,10 +42,7 @@ def login_controller(request, *args, **kwargs):
             "userId": user.id,
             "type_user": user.type_user,
             "name": user.name,
-            "is_super_doctor":user.profile.is_super_doctor if user.profile is not None else None,
-            "super_doctor_id":user.profile.super_doctor_id if user.profile is not None else None , 
-            "family_name": user.profile.family_name if user.profile is not None else None,
-            "is_superuser": user.is_superuser,
+            "active":user.is_active,
             "profile":serializer.data
         })
     except Exception as exception:
@@ -70,18 +67,18 @@ def signup_controller(request, *args, **kwargs):
         data[i] = request.data.get(i)
     data['localisation_id'] = localisation.id
     user = user_service.filter_by({'login_number': request.data.get('login_number')}).first()
-    data['is_active'] = True
     if user is not None:
         if user.is_active:
-            return Response(data={'created': True}, status=HTTP_401_UNAUTHORIZED)
-        user_service.put(_id=user.id, data=data)
+            return Response(data={'account with such login_number already created': True}, status=HTTP_401_UNAUTHORIZED)
+           
+        user_service.changestate(_id=user.id, data=request.data)
     else:
         user = signup(data)
     if isinstance(user, Exception):
         return Response(data={"error": str(user)}, status=500)
     else:
         return Response(data={
-            "created": True,
+            "created successfully": True,
         }, status=HTTP_201_CREATED)
 
 

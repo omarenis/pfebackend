@@ -4,16 +4,19 @@ from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, Fo
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
-from gestionusers.models import PersonProfileSerializer
+from formparent.models import *
+from formteacher.models import FormAbrSerializer
+from gestionusers.models import UserSerializer
 
 app_label = 'gestionpatient'
-person_profile_model = 'gestionusers.PersonProfile'
+user_model='gestionusers.User'
 
 
 class Patient(Model):
-    teacher = ForeignKey(to=person_profile_model, on_delete=SET_NULL, null=True, related_name='patient_teacher')
-    parent = ForeignKey(to='gestionusers.PersonProfile', on_delete=CASCADE, null=False, related_name='patient_parent')
+    teacher = ForeignKey(to=user_model, on_delete=SET_NULL, null=True, related_name='patient_teacher')
+    parent = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='patient_parent')
     name: TextField = TextField(null=False)
+    family_name:TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
     gender: TextField = TextField(null=False, default='M')
     sick: BooleanField = BooleanField(default=None, null=True)
@@ -28,7 +31,7 @@ class Patient(Model):
 
 class Supervise(Model):
     patient: OneToOneField = OneToOneField(to='Patient', on_delete=CASCADE, null=False)
-    doctor: ForeignKey = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=False)
+    doctor: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False)
     accepted: BooleanField = BooleanField(null=False, default=False)
 
     class Meta:
@@ -36,8 +39,8 @@ class Supervise(Model):
 
 
 class Consultation(Model):
-    doctor: ForeignKey = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=False, related_name='doctor_id')
-    parent: ForeignKey = ForeignKey(to=person_profile_model, on_delete=CASCADE, null=False, related_name='parent_id')
+    doctor: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='doctor_id')
+    parent: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='parent_id')
     date: DateTimeField = DateTimeField(null=False, default=timezone.now)
     accepted: BooleanField = BooleanField(null=False, default=False)
 
@@ -61,11 +64,12 @@ class SuperviseSerializer(ModelSerializer):
 
 
 class PatientSerializer(ModelSerializer):
-    parent = PersonProfileSerializer()
-
+    parent = UserSerializer()
+    
+   
     class Meta:
         model = Patient
-        fields = ['id', 'name', '']
+        fields = '__all__'
 
 
 class DiagnosticSerializer(ModelSerializer):

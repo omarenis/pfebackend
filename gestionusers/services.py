@@ -31,15 +31,22 @@ PROFILE = {
 }
 
 
+
+class LocalisationService(Service):
+    def __init__(self, repository=Repository(model=Localisation)):
+        super().__init__(repository, fields=LOCALISATION_FIELDS)
+
 class UserService(Service):
     def __init__(self, repository=Repository(model=User)):
         super().__init__(repository, fields=USER_FIELDS)
         self.localisation_service = LocalisationService()
     def create(self, data: dict):
         data['username'] = data.get('login_number')
-        localisation = self.localisation_service.filter_by(data.get('localisation')).first()
+
+        localisation_data = data.pop('localisation')
+        localisation = self.localisation_service.filter_by(localisation_data).first()
         if localisation is None:
-            localisation = self.localisation_service.create(data=data.get('localisation'))
+            localisation = self.localisation_service.create(data=localisation_data)
 
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('profile must be not null')
@@ -71,6 +78,25 @@ class UserService(Service):
         user.set_password(data.get("password"))
         user.save()
         return user
+    def changestate(self, _id: int, data: dict):
+        user = self.repository.retrieve(_id=_id)
+
+        
+        fam=data.get('profile').get('family_name')
+        user.profile = PersonProfile(**fam)
+
+        user.localisation.state=data.get('localisation').get('state')
+        user.localisation.delegation=data.get('localisation').get('delegation')
+        user.localisation.zip_code=data.get('localisation').get('zip_code')
+        
+
+
+        user.set_password(data.get('password'))
+        user.is_active=True
+        user.save()
+        return user
+
+
 
 
 user_service = UserService()
@@ -105,6 +131,4 @@ def signup(data: dict):
     return user_service.create(data)
 
 
-class LocalisationService(Service):
-    def __init__(self, repository=Repository(model=Localisation)):
-        super().__init__(repository, fields=LOCALISATION_FIELDS)
+
