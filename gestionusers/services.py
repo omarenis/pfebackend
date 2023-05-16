@@ -83,8 +83,9 @@ class UserService(Service):
 
         
         fam=data.get('profile').get('family_name')
-        user.profile = PersonProfile(**fam)
-
+        user.profile.family_name = fam
+        print(fam)
+        print(user.profile)
         user.localisation.state=data.get('localisation').get('state')
         user.localisation.delegation=data.get('localisation').get('delegation')
         user.localisation.zip_code=data.get('localisation').get('zip_code')

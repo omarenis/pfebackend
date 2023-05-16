@@ -1,4 +1,5 @@
 from django.urls import path
+from django.db.models import QuerySet
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -6,7 +7,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet as RestViewSet
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, \
-    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
+    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN,HTTP_500_INTERNAL_SERVER_ERROR
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
 from gestionusers.models import LocalisationSerializer, UserSerializer,PersonProfileSerializer,User
@@ -112,7 +113,25 @@ class UserViewSet(ViewSet):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
         self.localisation_service = LocalisationService()
         self.permission_classes = self.get_permissions()
+    def list(self, request):
+        try:
+            output = []
 
+            if request.user.type_user == 'admin':
+                users = self.service.list()
+            elif request.user.type_user == 'school':
+                users = self.service.filter_by({'profile__school__id': request.user.id})
+            elif hasattr(request.user, 'profile') and request.user.profile.is_super_doctor:
+                users = self.service.filter_by({'profile__super_doctor__id': request.user.profile_id})
+            else:
+                users = []
+
+            for user in users:
+                output.append(self.serializer_class(user).data)
+
+            return Response(data=output, status=HTTP_200_OK)
+        except Exception as exception:
+            return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
 users_list, user_retrieve_update_delete = UserViewSet.get_urls()
 urlpatterns = [

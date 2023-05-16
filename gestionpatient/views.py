@@ -164,9 +164,8 @@ user_service = UserService()
 pat_service=PatientService()
 
 @api_view(['GET'])
-def find(request):
-    login_number = request.data.get('login_number')
-    parent = user_service.get_by({'login_number': login_number})
+def find(request,pk=None):
+    parent = user_service.get_by({'login_number': pk})
     if parent:
         patients = pat_service.filter_by({'parent_id': parent.id})
         parent_serializer = UserSerializer(parent)
@@ -213,7 +212,7 @@ consultations, consultation = RenderVousViewSet.get_urls()
 diagnostics, diagnostic = DiagnosticViewSet.get_urls()
 
 urlpatterns = [
-    path('/find', find),
+    path('/find/<pk>', find),
     path('/scores/<int:pk>', patscore),
     path('', patients), path('/<int:pk>', patient),
     path('/supervises', supervises),
