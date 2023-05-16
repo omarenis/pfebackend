@@ -66,12 +66,11 @@ def signup_controller(request, *args, **kwargs):
         localisation = localisation_service.create(data=request.data.get('localisation'))
     for i in user_service.fields:
         data[i] = request.data.get(i)
-    data['localisation_id'] = localisation.id
+    data['localisation_id'] = localisation
     user = user_service.filter_by({'login_number': request.data.get('login_number')}).first()
     if user is not None:
         if user.is_active:
             return Response(data={'account with such login_number already created': True}, status=HTTP_401_UNAUTHORIZED)
-           
         user_service.changestate(_id=user.id, data=request.data)
     else:
         user = signup(data)

@@ -80,22 +80,30 @@ class UserService(Service):
         return user
     def changestate(self, _id: int, data: dict):
         user = self.repository.retrieve(_id=_id)
+        localisation_data = data.pop('localisation')
+        localisation = self.localisation_service.filter_by(localisation_data).first()
+        if localisation is None:
+            localisation = self.localisation_service.create(data=localisation_data)
 
-        
-        fam=data.get('profile').get('family_name')
-        user.profile.family_name = fam
-        print(fam)
-        print(user.profile)
-        user.localisation.state=data.get('localisation').get('state')
-        user.localisation.delegation=data.get('localisation').get('delegation')
-        user.localisation.zip_code=data.get('localisation').get('zip_code')
-        
+        profile_data = data.get('profile')
+        profile = user.profile
+        if profile is None:
+            profile = PersonProfile.objects.create(**profile_data)
+        else:
+            for key, value in profile_data.items():
+                setattr(profile, key, value)
+            profile.save()
 
+        user.localisation = localisation
+        user.profile = profile
 
         user.set_password(data.get('password'))
-        user.is_active=True
+        user.is_active = True
         user.save()
+
         return user
+
+
 
 
 
