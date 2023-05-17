@@ -168,25 +168,41 @@ class PatientService(Service):
     def create(self, data: dict, type_user=None):
         if type_user is None:
             raise ValueError('type_user must not be null')
-        if data.get('parent') is not None :
-            par=us.get_by({'login_number': data.get('parent')})
-        else:
-            par is None
-        
-        if par is None:
-            par=us.create({'login_number': data.get('parent'),'name':data.get('parent'),'username':data.get('parent'),'type_user':'parent',
-            'is_active':False,'localisation':{'state':'','delegation':'','zip_code':'',},'profile':{'family_name':'Inactive'}})
 
+        parent_id = data.get('parent')
+        parent = None
+        print('fhfhfhfh', data.get('parent'))
+
+        if parent_id is not None:
+            parent = us.get_by({'login_number': parent_id})
+        if parent is None:
+            # Create an inactive parent account
+            parent = us.create({
+                'login_number': parent_id,
+                'username': parent_id,  # Use login_number as the value for username
+                'name': parent_id,
+                'type_user': 'parent',
+                'is_active': False,
+                'localisation': {
+                    'state': '',
+                    'delegation': '',
+                    'zip_code': '',
+                },
+                'profile': {
+                    'family_name': 'Inactive',
+                }
+            })
 
         patient = self.repository.model()
         patient.name = data.get('name')
         patient.family_name = data.get('family_name')
         patient.is_supervised = False
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
-        patient.parent_id = par.id
+        patient.parent_id = parent.id
         patient.teacher_id = data.get('teacher') if data.get('teacher') is not None else None
         patient.save()
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)
+
 
     def put(self, _id: int, data: dict):
         type_user = data.pop('type_user')

@@ -113,7 +113,25 @@ class PatientViewSet(ViewSet):
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
         try:
-            data[request.user.type_user] = request.user.id
+            parent_id = None
+            teacher_id = None
+
+            if request.user.type_user == 'parent':
+                parent_id = request.user.id
+            elif request.user.type_user == 'teacher':
+                parent_cin = data.get('parent')
+                if parent_cin is not None:
+                    parent = user_service.get_by({'login_number': parent_cin})
+                    if parent is not None:
+                        parent_id = parent.id
+                    else:
+                        parent_id = None
+
+                teacher_id = request.user.id
+
+            data['parent'] = parent_id
+            data['teacher'] = teacher_id
+
             patient_object = self.service.create(data=data, type_user=request.user.type_user)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
