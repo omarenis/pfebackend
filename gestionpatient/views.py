@@ -14,7 +14,7 @@ from formparent.models import AnxityTroubleParent,FormAbrParent,BehaviorTroubleP
     FormAbrParentSerializer,AnxityTroubleParentSerializer,BehaviorTroubleParentSerializer,SomatisationTroubleParentSerializer,LearningTroubleParentSerializer,HyperActivityTroubleParentSerializer
 from formteacher.models import FormAbrTeacher,BehaviorTroubleTeacher,InattentionTroubleTeacher,HyperActivityTroubleTeacher,HyperActivityTroubleTeacherSerializer,InattentionTroubleTeacherSerializer,BehaviorTroubleTeacherSerializer,FormAbrSerializer
 
-from gestionusers.models import User, UserSerializer
+from gestionusers.models import User, UserSerializer,PersonProfile,Localisation
 from gestionusers.services import UserService
 from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient
 from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
@@ -125,7 +125,11 @@ class PatientViewSet(ViewSet):
                     if parent is not None:
                         parent_id = parent.id
                     else:
-                        parent_id = None
+                        pr=PersonProfile(family_name='inactive')
+                        pr.save()
+                        parent=User(login_number=parent_cin,username=parent_cin,name=parent_cin,profile=pr,is_active=False)
+                        parent.save()
+                        parent_id = parent.id
 
                 teacher_id = request.user.id
 

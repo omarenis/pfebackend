@@ -169,36 +169,13 @@ class PatientService(Service):
         if type_user is None:
             raise ValueError('type_user must not be null')
 
-        parent_id = data.get('parent')
-        parent = None
-        print('fhfhfhfh', data.get('parent'))
-
-        if parent_id is not None:
-            parent = us.get_by({'login_number': parent_id})
-        if parent is None:
-            # Create an inactive parent account
-            parent = us.create({
-                'login_number': parent_id,
-                'username': parent_id,  # Use login_number as the value for username
-                'name': parent_id,
-                'type_user': 'parent',
-                'is_active': False,
-                'localisation': {
-                    'state': '',
-                    'delegation': '',
-                    'zip_code': '',
-                },
-                'profile': {
-                    'family_name': 'Inactive',
-                }
-            })
 
         patient = self.repository.model()
         patient.name = data.get('name')
         patient.family_name = data.get('family_name')
         patient.is_supervised = False
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
-        patient.parent_id = parent.id
+        patient.parent_id = data.get('parent')
         patient.teacher_id = data.get('teacher') if data.get('teacher') is not None else None
         patient.save()
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)

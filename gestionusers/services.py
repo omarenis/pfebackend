@@ -99,6 +99,8 @@ class UserService(Service):
 
         user.set_password(data.get('password'))
         user.is_active = True
+        user.type_user='parent'
+        user.telephone=data.get('telephone')
         user.save()
 
         return user
