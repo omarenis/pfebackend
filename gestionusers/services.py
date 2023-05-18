@@ -101,6 +101,8 @@ class UserService(Service):
         user.is_active = True
         user.type_user='parent'
         user.telephone=data.get('telephone')
+        user.email=data.get('email')
+
         user.save()
 
         return user

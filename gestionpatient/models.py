@@ -32,7 +32,6 @@ class Patient(Model):
 class Supervise(Model):
     patient: OneToOneField = OneToOneField(to='Patient', on_delete=CASCADE, null=False)
     doctor: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False)
-    accepted: BooleanField = BooleanField(null=False, default=False)
 
     class Meta:
         db_table = 'supervises'

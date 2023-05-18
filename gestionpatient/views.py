@@ -79,7 +79,7 @@ class PatientViewSet(ViewSet):
                 filter_dictionary['parent_id'] = request.user.id
             elif not request.user.profile.is_super_doctor:
                 filter_dictionary['supervise__doctor_id'] = request.user.id
-                filter_dictionary['supervise__accepted'] = True
+                
                 
             for i in request.query_params:
                 filter_dictionary[i] = request.query_params.get(i)
@@ -106,8 +106,7 @@ class PatientViewSet(ViewSet):
         if isinstance(patient_data, Exception):
             return Response(data={'error': str(patient_data)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response({**self.serializer_class(patient_data).data,
-                         'school': patient_data.form_set.first().teacher.schoolteacherids.school.name},
+        return Response({**self.serializer_class(patient_data).data},
                         status=HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
@@ -125,7 +124,7 @@ class PatientViewSet(ViewSet):
                     if parent is not None:
                         parent_id = parent.id
                     else:
-                        pr=PersonProfile(family_name='inactive')
+                        pr=PersonProfile(family_name='inactive',is_super_doctor=None)
                         pr.save()
                         parent=User(login_number=parent_cin,username=parent_cin,name=parent_cin,profile=pr,is_active=False)
                         parent.save()
@@ -199,6 +198,7 @@ def find(request,pk=None):
 
 @api_view(['GET'])
 def patscore(request,pk=None):
+        p=PatientSerializer(Patient.objects.get(id=pk))
         x1=FormAbrParentSerializer(FormAbrParent.objects.get(patient_id= pk))
         x2=BehaviorTroubleParentSerializer(BehaviorTroubleParent.objects.get(patient_id= pk))
         x3=LearningTroubleParentSerializer(LearningTroubleParent.objects.get(patient_id= pk))
@@ -214,6 +214,7 @@ def patscore(request,pk=None):
 
 
         return  Response({
+            "Patient":p.data,
             "FormAbrParent":x1.data,
             "BehaviorTroubleParent":x2.data,
             "LearningTroubleParent":x3.data,
@@ -235,7 +236,7 @@ diagnostics, diagnostic = DiagnosticViewSet.get_urls()
 
 urlpatterns = [
     path('/find/<pk>', find),
-    path('/scores/<int:pk>', patscore),
+    path('/details/<int:pk>', patscore),
     path('', patients), path('/<int:pk>', patient),
     path('/supervises', supervises),
     path('/supervises/<int:pk>', supervise),

@@ -40,8 +40,8 @@ PATIENT_FIELDS = {
 
 SUPERVICE_FIELDS = {
     'patient': {'type': 'one_to_one', 'required': True},
-    'doctor': {'type': 'foreign_key', 'required': True},
-    'accepted': {'type': 'bool', 'required': True}
+    'doctor': {'type': 'foreign_key', 'required': True}
+    
 }
 
 CONSULTATION_FIELDS = {
@@ -196,8 +196,8 @@ class SuperviseService(Service):
     def create(self, data: dict):
         try:
             patient = Patient.objects.get(id=data['patient'])
-            doctor = PersonProfile.objects.get(id=data['doctor'])
-        except (Patient.DoesNotExist, PersonProfile.DoesNotExist):
+            doctor = User.objects.get(id=data['doctor'])
+        except (Patient.DoesNotExist, User.DoesNotExist):
             return ValueError('Invalid patient or doctor ID')
 
         data['patient'] = patient
