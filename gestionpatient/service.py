@@ -46,9 +46,8 @@ SUPERVICE_FIELDS = {
 
 CONSULTATION_FIELDS = {
     'doctor': {'type': 'foreign_key', 'required': True},
-    'parent': {'type': 'foreign_key', 'required': True},
+    'patient': {'type': 'one_to_one', 'required': True},
     'date': {'type': 'int', 'required': True},
-    'accepted': {'type': 'bool', 'required': True}
 }
 DIAGNOSTIC_FIELDS = {
     'patient': {'type': 'foreign_key', 'required': True},
@@ -221,6 +220,31 @@ class SuperviseService(Service):
 class ConsultationService(Service):
     def __init__(self, repository=Repository(model=Consultation)):
         super().__init__(repository, fields=CONSULTATION_FIELDS)
+    def create(self, data: dict):
+        try:
+            patient = Patient.objects.get(id=data['patient'])
+            doctor = User.objects.get(id=data['doctor'])
+        except (Patient.DoesNotExist, User.DoesNotExist):
+            return ValueError('Invalid patient or doctor ID')
+
+        data['patient'] = patient
+        data['doctor'] = doctor
+
+        consultation = super().create(data)
+
+        if isinstance(consultation, Exception):
+            return consultation
+        try:
+            
+            patient.is_consulted = True
+            patient.save()
+        except Exception as exception:
+            return exception, patient
+
+        
+
+        return consultation
+
 
 
 class DiagnosticService(Service):

@@ -16,7 +16,7 @@ from formteacher.models import FormAbrTeacher,BehaviorTroubleTeacher,Inattention
 
 from gestionusers.models import User, UserSerializer,PersonProfile,Localisation
 from gestionusers.services import UserService
-from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient
+from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient,Consultation
 from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
 
 
@@ -74,7 +74,7 @@ class PatientViewSet(ViewSet):
             if request.user.type_user == 'teacher':
                 filter_dictionary['teacher_id'] = request.user.id
             elif request.user.type_user == 'school':
-                filter_dictionary['teacher__school__id'] = request.user.id
+                filter_dictionary['teacher__profile__school__id'] = request.user.id
             elif request.user.type_user == 'parent':
                 filter_dictionary['parent_id'] = request.user.id
             elif not request.user.profile.is_super_doctor:
@@ -162,15 +162,40 @@ class RenderVousViewSet(ViewSet):
 
     def __init__(self, serializer_class=ConsultationSerializer, service=ConsultationService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+    
+    
+    def create(self, request, *args, **kwargs):
+        data = extract_data_with_validation(request=request, fields=self.fields)
+        try:
+            data['doctor']=request.user.id
+            supervise_object = self.service.create(data=data)
+            return Response(data=self.serializer_class(supervise_object).data, status=HTTP_201_CREATED)
+        except Exception as exception:
+            return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def list(self, request, *args, **kwargs):
+        user = request.user
+
+        if  user.type_user=='doctor' and user.profile.is_super_doctor==False:  
+            
+            consultations = Consultation.objects.filter(doctor=user.id)
+        elif user.type_user == 'parent':  
+            consultations = Consultation.objects.filter(patient__parent_id=user.id)
+        else:
+            return Response(data={'error': 'Invalid user type'}, status=HTTP_400_BAD_REQUEST)
+
+        serializer = ConsultationSerializer(consultations, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
 
 
 class SuperviseViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor is True:
+        if self.request.user.profile.is_super_doctor == True:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+    
 
 
 class DiagnosticViewSet(ViewSet):
@@ -224,7 +249,7 @@ def patscore(request,pk=None):
 
             "BehaviorTroubleTeacher":x7.data,
             "InattentionTroubleTeacher":x8.data,
-            "InattentionTroubleTeacher":x9.data,
+            "HyperActivityTroubleTeacher":x9.data,
             "FormAbrTeacher":x10.data
         })
 

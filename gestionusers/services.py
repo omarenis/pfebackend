@@ -15,7 +15,8 @@ USER_FIELDS = {
     'name': {'type': 'text', 'required': True},
     'login_number': {'type': 'text', 'required': True},
     'email': {'type': 'email', 'required': False},
-    'telephone': {'type': 'email', 'required': True},
+    'telephone': {'type': 'text', 'required': True},
+    'telephone2': {'type': 'text', 'required': False},
     'password': {'type': 'password', 'required': True},
     'type_user': {'type': 'text', 'required': True},
     'profile': {'type': 'one_to_one_field', 'required': True},
@@ -100,7 +101,9 @@ class UserService(Service):
         user.set_password(data.get('password'))
         user.is_active = True
         user.type_user='parent'
+        user.name=data.get('name')
         user.telephone=data.get('telephone')
+        user.telephone2=data.get('telephone2') if data.get('telephone2') is not None else None
         user.email=data.get('email')
 
         user.save()

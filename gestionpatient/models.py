@@ -23,7 +23,7 @@ class Patient(Model):
     score_parent = FloatField(default=0, null=False)
     score_teacher = FloatField(default=0, null=False)
     is_supervised = BooleanField(default=False, null=False)
-
+    is_consulted = BooleanField(default=False, null=False)
     class Meta:
         db_table = 'patients'
         unique_together = (('parent', 'name', 'birthdate'),)
@@ -39,9 +39,9 @@ class Supervise(Model):
 
 class Consultation(Model):
     doctor: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='doctor_id')
-    parent: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='parent_id')
+    patient: OneToOneField = OneToOneField(to='Patient', on_delete=CASCADE, null=False)
     date: DateTimeField = DateTimeField(null=False, default=timezone.now)
-    accepted: BooleanField = BooleanField(null=False, default=False)
+    
 
     class Meta:
         db_table = 'consultations'
@@ -56,10 +56,6 @@ class Diagnostic(Model):
         db_table = 'diagnostics'
 
 
-class SuperviseSerializer(ModelSerializer):
-    class Meta:
-        model = Supervise
-        fields = "__all__"
 
 
 class PatientSerializer(ModelSerializer):
@@ -71,6 +67,13 @@ class PatientSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class SuperviseSerializer(ModelSerializer):
+    patient=PatientSerializer()
+    doctor=UserSerializer()
+    class Meta:
+        model = Supervise
+        fields = "__all__"
+
 class DiagnosticSerializer(ModelSerializer):
     class Meta:
         model = Diagnostic
@@ -78,6 +81,8 @@ class DiagnosticSerializer(ModelSerializer):
 
 
 class ConsultationSerializer(ModelSerializer):
+    patient=PatientSerializer()
+    doctor=UserSerializer()
     class Meta:
-        model = Diagnostic
+        model = Consultation
         fields = '__all__'

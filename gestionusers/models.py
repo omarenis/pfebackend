@@ -11,7 +11,18 @@ from rest_framework.serializers import ModelSerializer, Serializer
 app_label = 'gestionusers'
 
 
-# create the user manager and the person manager
+class governorate(Model):
+    governorate:TextField = TextField(null=False)
+    class Meta:
+        db_table = 'governorate'
+   
+
+class delegation(Model):
+    delegation:TextField = TextField(null=False)
+    governorate = ForeignKey(to=governorate, on_delete=CASCADE, null=False)
+    class Meta:
+        db_table = 'delegation'
+
 
 class Localisation(Model):
     state = CharField(max_length=100, verbose_name='state')
@@ -26,6 +37,7 @@ class User(AbstractUser):
     name = TextField(null=False)
     login_number = CharField(null=False, unique=True, max_length=9, db_column='login_number')
     telephone = TextField(null=False)
+    telephone2=TextField(null=True,default=None)
     address = TextField(null=True, default=None)
     type_user = TextField(null=False, db_column='type_user')
     localisation = ForeignKey(null=True, to='Localisation', on_delete=SET_NULL)
