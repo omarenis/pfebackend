@@ -10,22 +10,24 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_40
     HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN,HTTP_500_INTERNAL_SERVER_ERROR
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
-from gestionusers.models import LocalisationSerializer, UserSerializer,PersonProfileSerializer,User
+from gestionusers.models import LocalisationSerializer, UserSerializer,PersonProfileSerializer,User,delegation,governorate,delegationSerializer,governorateSerializer
 from gestionusers.services import LocalisationService, UserService, signup, login
 
 localisation_service = LocalisationService()
 user_service = UserService()
 
 @api_view(['GET'])
-def find(request):
-    login_number = request.data.get('login_number')
-    user = user_service.get_by({'login_number': login_number})
-    if user:
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-    else:
-        return Response({'message': 'User not found'}, status=HTTP_404_NOT_FOUND)
+def delegationlist(request,pk=None):
+    
+    d=delegation.objects.filter(governorate=pk)
+    serializer = delegationSerializer(d, many=True)
+    return Response(serializer.data)
 
+@api_view(['GET'])
+def govlist(request):
+    governorates = governorate.objects.all()
+    serializer = governorateSerializer(governorates, many=True)
+    return Response(serializer.data)
 
 
 
@@ -139,5 +141,6 @@ urlpatterns = [
     path('/login', login_controller),
     path('/signup', signup_controller),
     path('/logout', logout),
-    path('/find',find)
+    path('/delegation/<int:pk>',delegationlist),
+    path('/gov',govlist)
 ]

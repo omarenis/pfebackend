@@ -77,3 +77,13 @@ class UserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'profile', 'login_number', 'type_user', 'telephone', 'localisation']
+
+class governorateSerializer(ModelSerializer):
+    class Meta:
+        model = governorate
+        fields = '__all__'
+class delegationSerializer(ModelSerializer):
+    
+    class Meta:
+        model = delegation
+        fields = ['delegation']
