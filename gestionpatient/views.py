@@ -253,6 +253,34 @@ def patscore(request,pk=None):
             "FormAbrTeacher":x10.data
         })
 
+@api_view(['GET'])
+def dashboard(request):
+    data = {
+    "total": Patient.objects.count(),
+    "males": Patient.objects.filter(gender="M").count(),
+    "females": Patient.objects.filter(gender="F").count(),
+    "supervised": Patient.objects.filter(is_supervised=True).count(),
+    "supervisedmales": Patient.objects.filter(is_supervised=True , gender="M").count(),
+    "supervisedfemales": Patient.objects.filter(is_supervised=True , gender="F").count(),
+    "consulted": Patient.objects.filter(is_consulted=True).count(),
+    "sick":Patient.objects.filter(is_consulted=True).count(),
+}
+    return Response(data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 patients, patient = PatientViewSet.get_urls()
 supervises, supervise = SuperviseViewSet.get_urls()
@@ -262,6 +290,7 @@ diagnostics, diagnostic = DiagnosticViewSet.get_urls()
 urlpatterns = [
     path('/find/<pk>', find),
     path('/details/<int:pk>', patscore),
+    path('/dashboard',dashboard),
     path('', patients), path('/<int:pk>', patient),
     path('/supervises', supervises),
     path('/supervises/<int:pk>', supervise),

@@ -18,8 +18,8 @@ user_service = UserService()
 
 @api_view(['GET'])
 def delegationlist(request,pk=None):
-    
-    d=delegation.objects.filter(governorate=pk)
+    g=governorate.objects.get(governorate=pk)
+    d=delegation.objects.filter(governorate=g.id)
     serializer = delegationSerializer(d, many=True)
     return Response(serializer.data)
 
@@ -141,6 +141,6 @@ urlpatterns = [
     path('/login', login_controller),
     path('/signup', signup_controller),
     path('/logout', logout),
-    path('/delegation/<int:pk>',delegationlist),
+    path('/delegation/<pk>',delegationlist),
     path('/gov',govlist)
 ]

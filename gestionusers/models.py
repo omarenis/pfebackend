@@ -76,7 +76,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'profile', 'login_number', 'type_user', 'telephone', 'localisation']
+        fields = ['id', 'name', 'login_number', 'type_user', 'telephone','telephone2','email' ,'localisation', 'profile']
 
 class governorateSerializer(ModelSerializer):
     class Meta:
