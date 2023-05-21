@@ -213,7 +213,7 @@ pat_service=PatientService()
 def find(request,pk=None):
     parent = user_service.get_by({'login_number': pk})
     if parent:
-        patients = pat_service.filter_by({'parent_id': parent.id})
+        patients = pat_service.filter_by({'parent_id': parent.id,'score_teacher':0})
         parent_serializer = UserSerializer(parent)
         patients_serializer = PatientSerializer(patients, many=True)
         return Response({'parent': parent_serializer.data, 'patients': patients_serializer.data})
@@ -263,8 +263,12 @@ def dashboard(request):
     "supervisedmales": Patient.objects.filter(is_supervised=True , gender="M").count(),
     "supervisedfemales": Patient.objects.filter(is_supervised=True , gender="F").count(),
     "consulted": Patient.objects.filter(is_consulted=True).count(),
-    "sick":Patient.objects.filter(is_consulted=True).count(),
-}
+
+    ">70":Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(Q(score_teacher__gte=70) | Q(score_parent__gte=70)).count(),
+    "waiting for parent":Patient.objects.filter(score_teacher__gt=0, score_parent=0).count(),
+    "waiting for teacher":Patient.objects.filter(score_teacher=0, score_parent__gt=0).count(),
+
+}   
     return Response(data)
 
 

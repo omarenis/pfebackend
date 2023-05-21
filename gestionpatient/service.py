@@ -173,6 +173,7 @@ class PatientService(Service):
         patient.name = data.get('name')
         patient.family_name = data.get('family_name')
         patient.is_supervised = False
+        patient.gender=data.get('gender')
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
         patient.parent_id = data.get('parent')
         patient.teacher_id = data.get('teacher') if data.get('teacher') is not None else None

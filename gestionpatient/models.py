@@ -18,7 +18,7 @@ class Patient(Model):
     name: TextField = TextField(null=False)
     family_name:TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
-    gender: TextField = TextField(null=False, default='M')
+    gender: TextField = TextField(null=False)
     sick: BooleanField = BooleanField(default=None, null=True)
     score_parent = FloatField(default=0, null=False)
     score_teacher = FloatField(default=0, null=False)
