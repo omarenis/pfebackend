@@ -228,32 +228,24 @@ def find(request, pk=None):
 
 @api_view(['GET'])
 def patscore(request, pk=None):
-    p = PatientSerializer(Patient.objects.get(id=pk))
-    x1 = FormAbrParentSerializer(FormAbrParent.objects.get(patient_id=pk))
-    x2 = BehaviorTroubleParentSerializer(BehaviorTroubleParent.objects.get(patient_id=pk))
-    x3 = LearningTroubleParentSerializer(LearningTroubleParent.objects.get(patient_id=pk))
-    x4 = SomatisationTroubleParentSerializer(SomatisationTroubleParent.objects.get(patient_id=pk))
-    x5 = HyperActivityTroubleParentSerializer(HyperActivityTroubleParent.objects.get(patient_id=pk))
-    x6 = AnxityTroubleParentSerializer(AnxityTroubleParent.objects.get(patient_id=pk))
-
-    x7 = BehaviorTroubleTeacherSerializer(BehaviorTroubleTeacher.objects.get(patient_id=pk))
-    x8 = HyperActivityTroubleTeacherSerializer(HyperActivityTroubleTeacher.objects.get(patient_id=pk))
-    x9 = InattentionTroubleTeacherSerializer(InattentionTroubleTeacher.objects.get(patient_id=pk))
-    x10 = FormAbrSerializer(FormAbrTeacher.objects.get(patient_id=pk))
-
     return Response({
-        "Patient": p.data,
-        "FormAbrParent": x1.data,
-        "BehaviorTroubleParent": x2.data,
-        "LearningTroubleParent": x3.data,
-        "SomatisationTroubleParent": x4.data,
-        "HyperActivityTroubleParent": x5.data,
-        "AnxityTroubleParent": x6.data,
+        "Patient": PatientSerializer(Patient.objects.get(id=pk)).data,
+        "FormAbrParent": FormAbrParentSerializer(FormAbrParent.objects.get(patient_id=pk)).data,
+        "BehaviorTroubleParent": BehaviorTroubleParentSerializer(BehaviorTroubleParent.objects.get(patient_id=pk)).data,
+        "LearningTroubleParent": LearningTroubleParentSerializer(LearningTroubleParent.objects.get(patient_id=pk)).data,
+        "SomatisationTroubleParent": SomatisationTroubleParentSerializer(
+            SomatisationTroubleParent.objects.get(patient_id=pk)).data,
+        "HyperActivityTroubleParent": HyperActivityTroubleParentSerializer(
+            HyperActivityTroubleParent.objects.get(patient_id=pk)).data,
+        "AnxityTroubleParent": AnxityTroubleParentSerializer(AnxityTroubleParent.objects.get(patient_id=pk)).data,
 
-        "BehaviorTroubleTeacher": x7.data,
-        "InattentionTroubleTeacher": x8.data,
-        "HyperActivityTroubleTeacher": x9.data,
-        "FormAbrTeacher": x10.data
+        "BehaviorTroubleTeacher": BehaviorTroubleTeacherSerializer(
+            BehaviorTroubleTeacher.objects.get(patient_id=pk)).data,
+        "InattentionTroubleTeacher": HyperActivityTroubleTeacherSerializer(
+            HyperActivityTroubleTeacher.objects.get(patient_id=pk)).data,
+        "HyperActivityTroubleTeacher": InattentionTroubleTeacherSerializer(
+            InattentionTroubleTeacher.objects.get(patient_id=pk)).data,
+        "FormAbrTeacher": FormAbrSerializer(FormAbrTeacher.objects.get(patient_id=pk)).data
     })
 
 
