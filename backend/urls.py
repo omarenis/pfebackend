@@ -52,5 +52,7 @@ urlpatterns = [
     path('api/patients', include('gestionpatient.views')),
     path('api/patient', include('formparent.views')),
     path('api/patient', include('formteacher.views')),
+    path('api/aut',include('formTSA.views')),
+    path('api/autisme',include('autisme.views')),
     # path('api/messages', include('chat.views'))
 ]

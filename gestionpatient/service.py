@@ -103,7 +103,7 @@ def get_fields(type_user):
 
 
 def get_age(birthdate):
-    print(date.today())
+    
     return (date.today() - birthdate).total_seconds() // (3600 * 24 * 365)
 
 
@@ -184,6 +184,7 @@ class PatientService(Service):
     def put(self, _id: int, data: dict):
         type_user = data.pop('type_user')
         patient = self.get_by({'id': _id})
+        data["gender"]=patient.gender
         if patient is None:
             raise Patient.DoesNotExist(f'patient does not exists with the following {_id}')
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)

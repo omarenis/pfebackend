@@ -53,3 +53,21 @@ def calculate_score(data):
             value += 3
 
     return value
+
+
+def autismelvl1(data):
+    value = 0
+    for i in data:
+        if data.get(i) == 'yes':
+            value += 1
+    return value
+
+
+def autismelvl2(data):
+    value = 0
+    for i in data:
+        if data.get(i) == 'tries and stops':
+            value += 1
+        elif data.get(i) == 'tries and complete':
+            value += 2
+    return value

@@ -25,7 +25,7 @@ class Patient(Model):
     is_supervised = BooleanField(default=False, null=False)
     is_consulted = BooleanField(default=False, null=False)
     class Meta:
-        db_table = 'patients'
+        db_table = 'TDAH_patients'
         unique_together = (('parent', 'name', 'birthdate'),)
 
 

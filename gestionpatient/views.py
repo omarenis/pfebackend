@@ -1,6 +1,6 @@
 import enum
 
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet, Q,F
 from django.urls import path
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -17,8 +17,8 @@ from formteacher.models import FormAbrTeacher,BehaviorTroubleTeacher,Inattention
 from gestionusers.models import User, UserSerializer,PersonProfile,Localisation
 from gestionusers.services import UserService
 from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient,Consultation
-from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
-
+from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService ,get_age
+from datetime import date , timedelta
 
 class Quantify(enum.Enum):
     never = 0
@@ -147,12 +147,16 @@ class PatientViewSet(ViewSet):
         return Response(status=HTTP_204_NO_CONTENT)
 
     def update(self, request, pk=None, *args, **kwargs):
+        
         request.data['type_user'] = self.request.user.type_user
 
         if self.request.user.type_user == "teacher":
             request.data['teacher'] = self.request.user.id
 
-        return super().update(request=request, pk=pk, *args, **kwargs)
+        p=self.service.put(data=request.data,_id=pk, *args, **kwargs)
+        p.teacher_id = self.request.user.id  if self.request.user.type_user == "teacher" else None
+        p.save()
+        return Response(self.serializer_class(p).data)
 
 
 class RenderVousViewSet(ViewSet):
@@ -248,13 +252,48 @@ def patscore(request,pk=None):
             "AnxityTroubleParent":x6.data,
 
             "BehaviorTroubleTeacher":x7.data,
-            "InattentionTroubleTeacher":x8.data,
-            "HyperActivityTroubleTeacher":x9.data,
+            "HyperActivityTroubleTeacher":x8.data,
+            "InattentionTroubleTeacher":x9.data,
             "FormAbrTeacher":x10.data
         })
 
 @api_view(['GET'])
 def dashboard(request):
+    
+    a = Patient.objects.annotate(
+
+    birthdate_age=date.today() - F('birthdate'))
+
+
+    tr1=a.filter(birthdate_age__gte=timedelta(days=3*365), birthdate_age__lte=timedelta(days=5*365) )
+    tr2=a.filter(birthdate_age__gte=timedelta(days=6*365), birthdate_age__lte=timedelta(days=8*365) )
+    tr3=a.filter(birthdate_age__gte=timedelta(days=9*365), birthdate_age__lte=timedelta(days=11*365) )
+    tr4=a.filter(birthdate_age__gte=timedelta(days=12*365), birthdate_age__lte=timedelta(days=14*365) )
+    tr5=a.filter(birthdate_age__gte=timedelta(days=15*365), birthdate_age__lte=timedelta(days=17*365) )
+
+
+
+    notsus = Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0, score_teacher__lt=70, score_parent__lt=70)
+
+    sus=Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(Q(score_teacher__gt=70) | Q(score_parent__gt=70))
+    sus_qs = sus.values_list('id', flat=True)  
+    s1= tr1.filter(id__in=sus_qs).count()  
+    s2= tr2.filter(id__in=sus_qs).count()  
+    s3= tr3.filter(id__in=sus_qs).count()  
+    s4= tr4.filter(id__in=sus_qs).count()  
+    s5= tr5.filter(id__in=sus_qs).count()  
+    
+
+
+    notsus_qs = notsus.values_list('id', flat=True)  
+    n1= tr1.filter(id__in=notsus_qs).count()  
+    n2= tr2.filter(id__in=notsus_qs).count()  
+    n3= tr3.filter(id__in=notsus_qs).count()  
+    n4= tr4.filter(id__in=notsus_qs).count()  
+    n5= tr5.filter(id__in=notsus_qs).count()  
+
+    sick=[s1,s2,s3,s4,s5]
+    notsick=[n1,n2,n3,n4,n5]
     data = {
     "total": Patient.objects.count(),
     "males": Patient.objects.filter(gender="M").count(),
@@ -263,27 +302,17 @@ def dashboard(request):
     "supervisedmales": Patient.objects.filter(is_supervised=True , gender="M").count(),
     "supervisedfemales": Patient.objects.filter(is_supervised=True , gender="F").count(),
     "consulted": Patient.objects.filter(is_consulted=True).count(),
-
-    ">70":Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(Q(score_teacher__gte=70) | Q(score_parent__gte=70)).count(),
+    "suspect":sus.count(),
+    "notsuspect":notsus.count(),
     "waiting for parent":Patient.objects.filter(score_teacher__gt=0, score_parent=0).count(),
     "waiting for teacher":Patient.objects.filter(score_teacher=0, score_parent__gt=0).count(),
 
+
+    "l":[notsick,sick]
+
+
 }   
     return Response(data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 patients, patient = PatientViewSet.get_urls()
