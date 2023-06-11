@@ -9,14 +9,18 @@ from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREAT
     HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
 from common.views import ViewSet, extract_data_with_validation
 
+from formparent.models import AnxityTroubleParent, FormAbrParent, BehaviorTroubleParent, SomatisationTroubleParent, \
+    LearningTroubleParent, HyperActivityTroubleParent, \
+    FormAbrParentSerializer, AnxityTroubleParentSerializer, BehaviorTroubleParentSerializer, \
+    SomatisationTroubleParentSerializer, LearningTroubleParentSerializer, HyperActivityTroubleParentSerializer
+from formteacher.models import FormAbrTeacher, BehaviorTroubleTeacher, InattentionTroubleTeacher, \
+    HyperActivityTroubleTeacher, HyperActivityTroubleTeacherSerializer, InattentionTroubleTeacherSerializer, \
+    BehaviorTroubleTeacherSerializer, FormAbrSerializer
 
-from formparent.models import AnxityTroubleParent,FormAbrParent,BehaviorTroubleParent,SomatisationTroubleParent,LearningTroubleParent,HyperActivityTroubleParent,\
-    FormAbrParentSerializer,AnxityTroubleParentSerializer,BehaviorTroubleParentSerializer,SomatisationTroubleParentSerializer,LearningTroubleParentSerializer,HyperActivityTroubleParentSerializer
-from formteacher.models import FormAbrTeacher,BehaviorTroubleTeacher,InattentionTroubleTeacher,HyperActivityTroubleTeacher,HyperActivityTroubleTeacherSerializer,InattentionTroubleTeacherSerializer,BehaviorTroubleTeacherSerializer,FormAbrSerializer
-
-from gestionusers.models import User, UserSerializer,PersonProfile,Localisation
+from gestionusers.models import User, UserSerializer, PersonProfile, Localisation
 from gestionusers.services import UserService
-from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient,Consultation
+from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient, \
+    Consultation
 from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
 
 
@@ -79,17 +83,17 @@ class PatientViewSet(ViewSet):
                 filter_dictionary['parent_id'] = request.user.id
             elif not request.user.profile.is_super_doctor:
                 filter_dictionary['supervise__doctor_id'] = request.user.id
-                
-                
+
             for i in request.query_params:
                 filter_dictionary[i] = request.query_params.get(i)
 
             output = []
             if patients is not None:
-                pts = patients.distinct() if list(request.GET.keys()) == [] and filter_dictionary == {} else patients.filter(**filter_dictionary)
+                pts = patients.distinct() if list(
+                    request.GET.keys()) == [] and filter_dictionary == {} else patients.filter(**filter_dictionary)
             else:
                 pts = Patient.objects.filter(**filter_dictionary)
-                
+
             if isinstance(pts, QuerySet):
                 for i in pts.distinct():
                     output.append(self.serializer_class(i).data)
@@ -124,9 +128,10 @@ class PatientViewSet(ViewSet):
                     if parent is not None:
                         parent_id = parent.id
                     else:
-                        pr=PersonProfile(family_name='inactive',is_super_doctor=None)
+                        pr = PersonProfile(family_name='inactive', is_super_doctor=None)
                         pr.save()
-                        parent=User(login_number=parent_cin,username=parent_cin,name=parent_cin,profile=pr,is_active=False)
+                        parent = User(login_number=parent_cin, username=parent_cin, name=parent_cin, profile=pr,
+                                      is_active=False)
                         parent.save()
                         parent_id = parent.id
 
@@ -162,24 +167,23 @@ class RenderVousViewSet(ViewSet):
 
     def __init__(self, serializer_class=ConsultationSerializer, service=ConsultationService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
-    
-    
+
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
         try:
-            data['doctor']=request.user.id
+            data['doctor'] = request.user.id
             supervise_object = self.service.create(data=data)
             return Response(data=self.serializer_class(supervise_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
             return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
     def list(self, request, *args, **kwargs):
         user = request.user
 
-        if  user.type_user=='doctor' and user.profile.is_super_doctor==False:  
-            
+        if user.type_user == 'doctor' and user.profile.is_super_doctor == False:
+
             consultations = Consultation.objects.filter(doctor=user.id)
-        elif user.type_user == 'parent':  
+        elif user.type_user == 'parent':
             consultations = Consultation.objects.filter(patient__parent_id=user.id)
         else:
             return Response(data={'error': 'Invalid user type'}, status=HTTP_400_BAD_REQUEST)
@@ -190,30 +194,31 @@ class RenderVousViewSet(ViewSet):
 
 class SuperviseViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor == True:
+        if self.request.user.profile.is_super_doctor:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
-    
 
 
 class DiagnosticViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor == False:
+        if not self.request.user.profile.is_super_doctor:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=DiagnosticSerializer, service=DiagnosticService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
+
 user_service = UserService()
-pat_service=PatientService()
+pat_service = PatientService()
+
 
 @api_view(['GET'])
-def find(request,pk=None):
+def find(request, pk=None):
     parent = user_service.get_by({'login_number': pk})
     if parent:
-        patients = pat_service.filter_by({'parent_id': parent.id,'score_teacher':0})
+        patients = pat_service.filter_by({'parent_id': parent.id, 'score_teacher': 0})
         parent_serializer = UserSerializer(parent)
         patients_serializer = PatientSerializer(patients, many=True)
         return Response({'parent': parent_serializer.data, 'patients': patients_serializer.data})
@@ -222,68 +227,54 @@ def find(request,pk=None):
 
 
 @api_view(['GET'])
-def patscore(request,pk=None):
-        p=PatientSerializer(Patient.objects.get(id=pk))
-        x1=FormAbrParentSerializer(FormAbrParent.objects.get(patient_id= pk))
-        x2=BehaviorTroubleParentSerializer(BehaviorTroubleParent.objects.get(patient_id= pk))
-        x3=LearningTroubleParentSerializer(LearningTroubleParent.objects.get(patient_id= pk))
-        x4=SomatisationTroubleParentSerializer(SomatisationTroubleParent.objects.get(patient_id= pk))
-        x5=HyperActivityTroubleParentSerializer(HyperActivityTroubleParent.objects.get(patient_id= pk))
-        x6=AnxityTroubleParentSerializer(AnxityTroubleParent.objects.get(patient_id= pk))
+def patscore(request, pk=None):
+    p = PatientSerializer(Patient.objects.get(id=pk))
+    x1 = FormAbrParentSerializer(FormAbrParent.objects.get(patient_id=pk))
+    x2 = BehaviorTroubleParentSerializer(BehaviorTroubleParent.objects.get(patient_id=pk))
+    x3 = LearningTroubleParentSerializer(LearningTroubleParent.objects.get(patient_id=pk))
+    x4 = SomatisationTroubleParentSerializer(SomatisationTroubleParent.objects.get(patient_id=pk))
+    x5 = HyperActivityTroubleParentSerializer(HyperActivityTroubleParent.objects.get(patient_id=pk))
+    x6 = AnxityTroubleParentSerializer(AnxityTroubleParent.objects.get(patient_id=pk))
 
+    x7 = BehaviorTroubleTeacherSerializer(BehaviorTroubleTeacher.objects.get(patient_id=pk))
+    x8 = HyperActivityTroubleTeacherSerializer(HyperActivityTroubleTeacher.objects.get(patient_id=pk))
+    x9 = InattentionTroubleTeacherSerializer(InattentionTroubleTeacher.objects.get(patient_id=pk))
+    x10 = FormAbrSerializer(FormAbrTeacher.objects.get(patient_id=pk))
 
-        x7=BehaviorTroubleTeacherSerializer(BehaviorTroubleTeacher.objects.get(patient_id= pk))
-        x8=HyperActivityTroubleTeacherSerializer(HyperActivityTroubleTeacher.objects.get(patient_id= pk))
-        x9=InattentionTroubleTeacherSerializer(InattentionTroubleTeacher.objects.get(patient_id= pk))
-        x10=FormAbrSerializer(FormAbrTeacher.objects.get(patient_id= pk))
+    return Response({
+        "Patient": p.data,
+        "FormAbrParent": x1.data,
+        "BehaviorTroubleParent": x2.data,
+        "LearningTroubleParent": x3.data,
+        "SomatisationTroubleParent": x4.data,
+        "HyperActivityTroubleParent": x5.data,
+        "AnxityTroubleParent": x6.data,
 
+        "BehaviorTroubleTeacher": x7.data,
+        "InattentionTroubleTeacher": x8.data,
+        "HyperActivityTroubleTeacher": x9.data,
+        "FormAbrTeacher": x10.data
+    })
 
-        return  Response({
-            "Patient":p.data,
-            "FormAbrParent":x1.data,
-            "BehaviorTroubleParent":x2.data,
-            "LearningTroubleParent":x3.data,
-            "SomatisationTroubleParent":x4.data,
-            "HyperActivityTroubleParent":x5.data,
-            "AnxityTroubleParent":x6.data,
-
-            "BehaviorTroubleTeacher":x7.data,
-            "InattentionTroubleTeacher":x8.data,
-            "HyperActivityTroubleTeacher":x9.data,
-            "FormAbrTeacher":x10.data
-        })
 
 @api_view(['GET'])
 def dashboard(request):
     data = {
-    "total": Patient.objects.count(),
-    "males": Patient.objects.filter(gender="M").count(),
-    "females": Patient.objects.filter(gender="F").count(),
-    "supervised": Patient.objects.filter(is_supervised=True).count(),
-    "supervisedmales": Patient.objects.filter(is_supervised=True , gender="M").count(),
-    "supervisedfemales": Patient.objects.filter(is_supervised=True , gender="F").count(),
-    "consulted": Patient.objects.filter(is_consulted=True).count(),
+        "total": Patient.objects.count(),
+        "males": Patient.objects.filter(gender="M").count(),
+        "females": Patient.objects.filter(gender="F").count(),
+        "supervised": Patient.objects.filter(is_supervised=True).count(),
+        "supervisedmales": Patient.objects.filter(is_supervised=True, gender="M").count(),
+        "supervisedfemales": Patient.objects.filter(is_supervised=True, gender="F").count(),
+        "consulted": Patient.objects.filter(is_consulted=True).count(),
 
-    ">70":Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(Q(score_teacher__gte=70) | Q(score_parent__gte=70)).count(),
-    "waiting for parent":Patient.objects.filter(score_teacher__gt=0, score_parent=0).count(),
-    "waiting for teacher":Patient.objects.filter(score_teacher=0, score_parent__gt=0).count(),
+        ">70": Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(
+            Q(score_teacher__gte=70) | Q(score_parent__gte=70)).count(),
+        "waiting for parent": Patient.objects.filter(score_teacher__gt=0, score_parent=0).count(),
+        "waiting for teacher": Patient.objects.filter(score_teacher=0, score_parent__gt=0).count(),
 
-}   
+    }
     return Response(data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 patients, patient = PatientViewSet.get_urls()
@@ -294,7 +285,7 @@ diagnostics, diagnostic = DiagnosticViewSet.get_urls()
 urlpatterns = [
     path('/find/<pk>', find),
     path('/details/<int:pk>', patscore),
-    path('/dashboard',dashboard),
+    path('/dashboard', dashboard),
     path('', patients), path('/<int:pk>', patient),
     path('/supervises', supervises),
     path('/supervises/<int:pk>', supervise),
