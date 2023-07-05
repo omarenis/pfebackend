@@ -1,14 +1,38 @@
 from django.urls import path
-
-from common.models import text_field
 from common.views import ViewSet
-from formparent.models import BehaviorTroubleParentSerializer, LearningTroubleParentSerializer, \
-    SomatisationTroubleParentSerializer, HyperActivityTroubleParentSerializer, AnxityTroubleParentSerializer, \
-    FormAbrParentSerializer
-
-from formparent.services import BehaviorTroubleParentService, LearningTroubleParentService, \
+from tdah.models import BehaviorTroubleTeacherSerializer, HyperActivityTroubleTeacherSerializer, \
+    InattentionTroubleTeacherSerializer, FormAbrSerializer, BehaviorTroubleParentSerializer, \
+    LearningTroubleParentSerializer, SomatisationTroubleParentSerializer, HyperActivityTroubleParentSerializer, \
+    AnxityTroubleParentSerializer, FormAbrParentSerializer
+from tdah.services import BehaviorTroubleTeacherService, HyperActivityTroubleTeacherService, \
+    InattentionTroubleTeacherService, FormAbrTeacherService, BehaviorTroubleParentService, LearningTroubleParentService, \
     SomatisationTroubleParentService, HyperActivityTroubleParentService, AnxityTroubleParentService, \
     FormAbrParentService
+
+
+# Create your views here.
+
+class BehaviorTroubleTeacherViewSet(ViewSet):
+    def __init__(self, serializer_class=BehaviorTroubleTeacherSerializer, service=BehaviorTroubleTeacherService(),
+                 **kwargs):
+        super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+
+
+class HyperActivityTroubleTeacherViewSet(ViewSet):
+    def __init__(self, serializer_class=HyperActivityTroubleTeacherSerializer,
+                 service=HyperActivityTroubleTeacherService(), **kwargs):
+        super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+
+
+class InattentionTroubleTeacherViewSet(ViewSet):
+    def __init__(self, serializer_class=InattentionTroubleTeacherSerializer,
+                 service=InattentionTroubleTeacherService(), **kwargs):
+        super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+
+
+class FormAbrTeacherViewSet(ViewSet):
+    def __init__(self, serializer_class=FormAbrSerializer, service=FormAbrTeacherService(), **kwargs):
+        super().__init__(serializer_class, service, **kwargs)
 
 
 class BehaviorTroubleParentViewSet(ViewSet):
@@ -59,7 +83,24 @@ anxity_trouble_parent_list, anxity_trouble_parent_object = AnxityTroubleParentVi
 
 form_abr_parent_list, form_abr_parent_object = FormAbrParentViewSet.get_urls()
 
+
+behavior_trouble_teacher_list, behavior_trouble_teacher_object = BehaviorTroubleTeacherViewSet.get_urls()
+
+hyperactivity_trouble_teacher_list, hyperactivity_trouble_teacher_object = HyperActivityTroubleTeacherViewSet.get_urls()
+
+inattention_trouble_teacher_list, inattention_trouble_teacher_object = InattentionTroubleTeacherViewSet.get_urls()
+
+form_abr_teacher_list, form_abr_teacher_object = FormAbrTeacherViewSet.get_urls()
+
 urlpatterns = [
+    path('behavior_trouble_teacher_list', behavior_trouble_teacher_list),
+    path('behavior_trouble_teacher_list/<int:id>', behavior_trouble_teacher_object),
+    path('hyperactivity_trouble_teacher_list', hyperactivity_trouble_teacher_list),
+    path('hyperactivity_trouble_teacher_list/<int:id>', hyperactivity_trouble_teacher_object),
+    path('inattention_trouble_teacher_list', inattention_trouble_teacher_list),
+    path('inattention_trouble_teacher_list/<int:id>', inattention_trouble_teacher_object),
+    path('form_abr', form_abr_teacher_list),
+    path('form_abr/<int:id>', form_abr_teacher_object),
     path('behavior_trouble_parent_list', behavior_trouble_parent_list),
     path('behavior_trouble_parent_list/<int:id>', behavior_trouble_parent_object),
 

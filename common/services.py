@@ -55,19 +55,10 @@ def calculate_score(data):
     return value
 
 
-def autismelvl1(data):
+def autismelvl1(data, instance):
     value = 0
     for i in data:
+        setattr(instance, i, data[i])
         if data.get(i) == 'yes':
             value += 1
-    return value
-
-
-def autismelvl2(data):
-    value = 0
-    for i in data:
-        if data.get(i) == 'tries and stops':
-            value += 1
-        elif data.get(i) == 'tries and complete':
-            value += 2
-    return value
+    return value, instance

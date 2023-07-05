@@ -1,12 +1,10 @@
 from common.repositories import Repository
 from common.services import Service, calculate_score
-from formparent.models import BehaviorTroubleParent, LearningTroubleParent, SomatisationTroubleParent, \
-    HyperActivityTroubleParent, AnxityTroubleParent, FormAbrParent
-
-from formteacher.models import BehaviorTroubleTeacher, HyperActivityTroubleTeacher, InattentionTroubleTeacher, \
-    FormAbrTeacher
 from gestionusers.models import PersonProfile, User
 from gestionusers.services import UserService
+from tdah.models import BehaviorTroubleParent, LearningTroubleParent, SomatisationTroubleParent, \
+    HyperActivityTroubleParent, AnxityTroubleParent, FormAbrParent, BehaviorTroubleTeacher, HyperActivityTroubleTeacher, \
+    InattentionTroubleTeacher, FormAbrTeacher
 from .matrices import matrix
 from .models import Consultation, Diagnostic, Patient, Supervise
 from datetime import date
@@ -41,7 +39,7 @@ PATIENT_FIELDS = {
 SUPERVICE_FIELDS = {
     'patient': {'type': 'one_to_one', 'required': True},
     'doctor': {'type': 'foreign_key', 'required': True}
-    
+
 }
 
 CONSULTATION_FIELDS = {
@@ -103,7 +101,6 @@ def get_fields(type_user):
 
 
 def get_age(birthdate):
-    
     return (date.today() - birthdate).total_seconds() // (3600 * 24 * 365)
 
 
@@ -159,7 +156,9 @@ def save_or_edit_patient(patient, data, type_user):
     return patient
 
 
-us=UserService()
+us = UserService()
+
+
 class PatientService(Service):
     def __init__(self, repository=Repository(model=Patient)):
         super().__init__(repository, fields=PATIENT_FIELDS)
@@ -168,23 +167,21 @@ class PatientService(Service):
         if type_user is None:
             raise ValueError('type_user must not be null')
 
-
         patient = self.repository.model()
         patient.name = data.get('name')
         patient.family_name = data.get('family_name')
         patient.is_supervised = False
-        patient.gender=data.get('gender')
+        patient.gender = data.get('gender')
         patient.birthdate = date.fromisoformat(data.get('birthdate'))
         patient.parent_id = data.get('parent')
         patient.teacher_id = data.get('teacher') if data.get('teacher') is not None else None
         patient.save()
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)
 
-
     def put(self, _id: int, data: dict):
         type_user = data.pop('type_user')
         patient = self.get_by({'id': _id})
-        data["gender"]=patient.gender
+        data["gender"] = patient.gender
         if patient is None:
             raise Patient.DoesNotExist(f'patient does not exists with the following {_id}')
         return save_or_edit_patient(patient=patient, data=data, type_user=type_user)
@@ -222,6 +219,7 @@ class SuperviseService(Service):
 class ConsultationService(Service):
     def __init__(self, repository=Repository(model=Consultation)):
         super().__init__(repository, fields=CONSULTATION_FIELDS)
+
     def create(self, data: dict):
         try:
             patient = Patient.objects.get(id=data['patient'])
@@ -237,16 +235,13 @@ class ConsultationService(Service):
         if isinstance(consultation, Exception):
             return consultation
         try:
-            
+
             patient.is_consulted = True
             patient.save()
         except Exception as exception:
             return exception, patient
 
-        
-
         return consultation
-
 
 
 class DiagnosticService(Service):
