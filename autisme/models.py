@@ -20,6 +20,7 @@ class Autiste(Model):
     is_supervised = BooleanField(default=False, null=False)
     sick = BooleanField(default=False, null=False)
     mentalage = FloatField(null=True)
+    saved = BooleanField(null=False, default=False)
 
     class Meta:
         db_table = 'autistes'

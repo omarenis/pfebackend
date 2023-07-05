@@ -6,6 +6,7 @@ from django.db import transaction
 URL = "http://localhost:5000/"
 
 LOCALISATION_FIELDS = {
+    'country': {'type': 'text', 'required': True},
     'state': {'type': 'text', 'required': True},
     'delegation': {'type': 'text', 'required': True},
     'zip_code': {'type': 'text', 'required': True}
@@ -32,15 +33,16 @@ PROFILE = {
 }
 
 
-
 class LocalisationService(Service):
     def __init__(self, repository=Repository(model=Localisation)):
         super().__init__(repository, fields=LOCALISATION_FIELDS)
+
 
 class UserService(Service):
     def __init__(self, repository=Repository(model=User)):
         super().__init__(repository, fields=USER_FIELDS)
         self.localisation_service = LocalisationService()
+
     def create(self, data: dict):
         data['username'] = data.get('login_number')
 
@@ -79,6 +81,7 @@ class UserService(Service):
         user.set_password(data.get("password"))
         user.save()
         return user
+
     def changestate(self, _id: int, data: dict):
         user = self.repository.retrieve(_id=_id)
         localisation_data = data.pop('localisation')
@@ -100,19 +103,15 @@ class UserService(Service):
 
         user.set_password(data.get('password'))
         user.is_active = True
-        user.type_user='parent'
-        user.name=data.get('name')
-        user.telephone=data.get('telephone')
-        user.telephone2=data.get('telephone2') if data.get('telephone2') is not None else None
-        user.email=data.get('email')
+        user.type_user = 'parent'
+        user.name = data.get('name')
+        user.telephone = data.get('telephone')
+        user.telephone2 = data.get('telephone2') if data.get('telephone2') is not None else None
+        user.email = data.get('email')
 
         user.save()
 
         return user
-
-
-
-
 
 
 user_service = UserService()
@@ -145,6 +144,3 @@ def signup(data: dict):
     data['localisation_id'] = localisation_id
     data['type_user'] = 'parent'
     return user_service.create(data)
-
-
-

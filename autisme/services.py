@@ -19,7 +19,8 @@ AUTISTE_FIELDS = {
     'parent': {'type': 'foreign_key', 'required': True},
     'score_mother': {'type': 'number', 'required': False},
     'score_father': {'type': 'number', 'required': False},
-    "level1": {'type': 'form', 'required': False}
+    "level1": {'type': 'form', 'required': False},
+    'saved': {'type': 'boolean', 'required': False}
 }
 
 level1_fields = {
@@ -47,7 +48,6 @@ level1_fields = {
     "parent": {"type": "foreign_key", "required": True},
     "patient": {"type": "foreign_key", "required": True}
 }
-
 
 SUPERVICE_FIELDS = {
     'patient': {'type': 'one_to_one', 'required': True},
@@ -91,6 +91,7 @@ class AutisteService(Service):
             aut.score_father, leveel1 = autismelvl1(data['level1'], leveel1)
         if aut.score_father > 8 or aut.score_mother > 8:
             aut.sick = True
+        aut.saved = True
         aut.save()
         leveel1.save()
         return aut
@@ -99,6 +100,18 @@ class AutisteService(Service):
 class Level1service(Service):
     def __init__(self, repository=Level1repository()):
         super().__init__(repository, fields=level1_fields)
+
+    def create(self, data: dict):
+        score, instance = autismelvl1(data, self.repository.model())
+        autiste = data['patient']
+        if data.get('type_parent') == 'father':
+            autiste.score_father = score
+        else:
+            autiste.score_mother = score
+        instance.save()
+        autiste.saved = True
+        autiste.save()
+        return instance
 
 
 class SuperviseService(Service):

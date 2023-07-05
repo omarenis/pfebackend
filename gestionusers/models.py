@@ -1,7 +1,3 @@
-import string
-from random import choices
-from typing import Union
-
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
 from django.db.models import CASCADE, CharField, EmailField, ForeignKey, Model, OneToOneField, SET_NULL, TextField, \
@@ -15,7 +11,7 @@ class governorate(Model):
     governorate:TextField = TextField(null=False)
     class Meta:
         db_table = 'governorate'
-   
+
 
 class delegation(Model):
     delegation:TextField = TextField(null=False)
@@ -25,12 +21,13 @@ class delegation(Model):
 
 
 class Localisation(Model):
+    country = CharField(max_length=255)
     state = CharField(max_length=100, verbose_name='state')
     delegation = CharField(max_length=100, verbose_name='delegation')
     zip_code = CharField(max_length=4, verbose_name='zip_code')
 
     class Meta:
-        unique_together = (('state', 'delegation', 'zip_code'),)
+        unique_together = (('country', 'state', 'delegation', 'zip_code'),)
 
 
 class User(AbstractUser):
@@ -83,7 +80,7 @@ class governorateSerializer(ModelSerializer):
         model = governorate
         fields = '__all__'
 class delegationSerializer(ModelSerializer):
-    
+
     class Meta:
         model = delegation
         fields = ['delegation']
