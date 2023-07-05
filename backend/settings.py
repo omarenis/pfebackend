@@ -68,8 +68,8 @@ INSTALLED_APPS = [
     'common',
     'gestionusers',
     'gestionpatient',
-    'formparent',
-    'formteacher',
+    'autisme',
+    'tdah',
 ]
 
 MIDDLEWARE = [

@@ -35,4 +35,5 @@ class Repository(object):
         return self.model.objects.get(pk=_id).delete()
 
     def filter_by(self, data: dict):
+        print(data)
         return self.model.objects.filter(**data)

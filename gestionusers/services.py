@@ -15,10 +15,12 @@ USER_FIELDS = {
     'name': {'type': 'text', 'required': True},
     'login_number': {'type': 'text', 'required': True},
     'email': {'type': 'email', 'required': False},
-    'telephone': {'type': 'email', 'required': True},
+    'telephone': {'type': 'text', 'required': True},
+    'telephone2': {'type': 'text', 'required': False},
     'password': {'type': 'password', 'required': True},
     'type_user': {'type': 'text', 'required': True},
-    'profile': {'type': 'one_to_one_field', 'required': True}
+    'profile': {'type': 'one_to_one_field', 'required': True},
+    'localisation': {'type': 'foreign_key', 'required': False}
 }
 
 PROFILE = {
@@ -30,24 +32,33 @@ PROFILE = {
 }
 
 
+
+class LocalisationService(Service):
+    def __init__(self, repository=Repository(model=Localisation)):
+        super().__init__(repository, fields=LOCALISATION_FIELDS)
+
 class UserService(Service):
     def __init__(self, repository=Repository(model=User)):
         super().__init__(repository, fields=USER_FIELDS)
-
+        self.localisation_service = LocalisationService()
     def create(self, data: dict):
         data['username'] = data.get('login_number')
+
+        localisation_data = data.pop('localisation')
+        localisation = self.localisation_service.filter_by(localisation_data).first()
+        if localisation is None:
+            localisation = self.localisation_service.create(data=localisation_data)
+
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
-            raise ValueError('family_name must be not null')
+            raise ValueError('profile must be not null')
 
-        # Initialize the profile dictionary to an empty dictionary if it is None
-        profile = data.pop('profile') if data.get('profile') is not None else {}
+        profile = data.pop('profile') if data.get('profile') is not None else None
 
-        # Set the is_super_doctor attribute to None if the user type is not a doctor
-        if data.get('type_user') != 'doctor':
+        if profile is not None and data.get('type_user') != 'doctor':
             profile['is_super_doctor'] = None
 
         user = User(**data)
-
+        user.localisation = localisation
         if data.get('type_user') == 'teacher':
             if profile.get('school') is None:
                 raise ValueError('school must be not null')
@@ -68,6 +79,40 @@ class UserService(Service):
         user.set_password(data.get("password"))
         user.save()
         return user
+    def changestate(self, _id: int, data: dict):
+        user = self.repository.retrieve(_id=_id)
+        localisation_data = data.pop('localisation')
+        localisation = self.localisation_service.filter_by(localisation_data).first()
+        if localisation is None:
+            localisation = self.localisation_service.create(data=localisation_data)
+
+        profile_data = data.get('profile')
+        profile = user.profile
+        if profile is None:
+            profile = PersonProfile.objects.create(**profile_data)
+        else:
+            for key, value in profile_data.items():
+                setattr(profile, key, value)
+            profile.save()
+
+        user.localisation = localisation
+        user.profile = profile
+
+        user.set_password(data.get('password'))
+        user.is_active = True
+        user.type_user='parent'
+        user.name=data.get('name')
+        user.telephone=data.get('telephone')
+        user.telephone2=data.get('telephone2') if data.get('telephone2') is not None else None
+        user.email=data.get('email')
+
+        user.save()
+
+        return user
+
+
+
+
 
 
 user_service = UserService()
@@ -102,6 +147,4 @@ def signup(data: dict):
     return user_service.create(data)
 
 
-class LocalisationService(Service):
-    def __init__(self, repository=Repository(model=Localisation)):
-        super().__init__(repository, fields=LOCALISATION_FIELDS)
+

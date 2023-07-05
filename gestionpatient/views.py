@@ -1,22 +1,26 @@
 import enum
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q, F
 from django.urls import path
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, \
-    HTTP_204_NO_CONTENT
-
+    HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
 from common.views import ViewSet, extract_data_with_validation
-from formparent.services import AnxityTroubleParentService, BehaviorTroubleParentService, \
-    HyperActivityTroubleParentService, LearningTroubleParentService, FormAbrParentService, \
-    SomatisationTroubleParentService
 
-from formteacher.services import BehaviorTroubleTeacherService, \
-    HyperActivityTroubleTeacherService, InattentionTroubleTeacherService, FormAbrTeacherService
+from gestionusers.models import User, UserSerializer, PersonProfile, Localisation
 from gestionusers.services import UserService
-from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer
-from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService
+from tdah.models import FormAbrParentSerializer, BehaviorTroubleParentSerializer, LearningTroubleParentSerializer, \
+    SomatisationTroubleParentSerializer, HyperActivityTroubleParentSerializer, AnxityTroubleParentSerializer, \
+    BehaviorTroubleTeacherSerializer, HyperActivityTroubleTeacherSerializer, InattentionTroubleTeacherSerializer, \
+    FormAbrSerializer, FormAbrParent, BehaviorTroubleParent, LearningTroubleParent, SomatisationTroubleParent, \
+    HyperActivityTroubleParent, AnxityTroubleParent, BehaviorTroubleTeacher, HyperActivityTroubleTeacher, \
+    InattentionTroubleTeacher, FormAbrTeacher
+from .models import DiagnosticSerializer, ConsultationSerializer, PatientSerializer, SuperviseSerializer, Patient, \
+    Consultation
+from .service import ConsultationService, DiagnosticService, PatientService, SuperviseService, get_age
+from datetime import date, timedelta
 
 
 class Quantify(enum.Enum):
@@ -65,21 +69,30 @@ class PatientViewSet(ViewSet):
     def list(self, request, *args, **kwargs):
         try:
             filter_dictionary = {}
+            patients = None
+            if request.user.profile.is_super_doctor:
+                patients = Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(
+                    Q(score_teacher__gte=70) | Q(score_parent__gte=70))
+
             if request.user.type_user == 'teacher':
-                filter_dictionary['form__teacher_id'] = request.user.id
+                filter_dictionary['teacher_id'] = request.user.id
             elif request.user.type_user == 'school':
-                filter_dictionary['form__teacher__schoolteacherids__school_id'] = request.user.id
+                filter_dictionary['teacher__profile__school__id'] = request.user.id
             elif request.user.type_user == 'parent':
-                filter_dictionary['parent_id'] = request.user.profile_id
+                filter_dictionary['parent_id'] = request.user.id
             elif not request.user.profile.is_super_doctor:
-                filter_dictionary['supervise__doctor_id'] = request.user.profile_id
-                filter_dictionary['supervise__accepted'] = True
+                filter_dictionary['supervise__doctor_id'] = request.user.id
+
             for i in request.query_params:
                 filter_dictionary[i] = request.query_params.get(i)
 
             output = []
-            pts = self.service.list().distinct() if list(
-                request.GET.keys()) == [] and filter_dictionary == {} else self.service.filter_by(filter_dictionary)
+            if patients is not None:
+                pts = patients.distinct() if list(
+                    request.GET.keys()) == [] and filter_dictionary == {} else patients.filter(**filter_dictionary)
+            else:
+                pts = Patient.objects.filter(**filter_dictionary)
+
             if isinstance(pts, QuerySet):
                 for i in pts.distinct():
                     output.append(self.serializer_class(i).data)
@@ -95,19 +108,37 @@ class PatientViewSet(ViewSet):
         patient_data = self.service.retrieve(_id=pk)
         if isinstance(patient_data, Exception):
             return Response(data={'error': str(patient_data)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
-        medical_teacher_data = None
-        return Response({**self.serializer_class(patient_data).data,
-                         'school': patient_data.form_set.first().teacher.schoolteacherids.school.name},
+
+        return Response({**self.serializer_class(patient_data).data},
                         status=HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
         data = extract_data_with_validation(request=request, fields=self.fields)
-        if request.user.type_user == 'parent':
-            data['parent_id'] = request.user.id
-        if request.user.type_user == 'teacher':
-            data['parent_id'] = request.data.get('parent')
-            data['teacher_id'] = request.user.id
         try:
+            parent_id = None
+            teacher_id = None
+
+            if request.user.type_user == 'parent':
+                parent_id = request.user.id
+            elif request.user.type_user == 'teacher':
+                parent_cin = data.get('parent')
+                if parent_cin is not None:
+                    parent = user_service.get_by({'login_number': parent_cin})
+                    if parent is not None:
+                        parent_id = parent.id
+                    else:
+                        pr = PersonProfile(family_name='inactive', is_super_doctor=None)
+                        pr.save()
+                        parent = User(login_number=parent_cin, username=parent_cin, name=parent_cin, profile=pr,
+                                      is_active=False)
+                        parent.save()
+                        parent_id = parent.id
+
+                teacher_id = request.user.id
+
+            data['parent'] = parent_id
+            data['teacher'] = teacher_id
+
             patient_object = self.service.create(data=data, type_user=request.user.type_user)
             return Response(data=self.serializer_class(patient_object).data, status=HTTP_201_CREATED)
         except Exception as exception:
@@ -119,19 +150,54 @@ class PatientViewSet(ViewSet):
             return Response(data={'error': str(deleted)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
         return Response(status=HTTP_204_NO_CONTENT)
 
+    def update(self, request, pk=None, *args, **kwargs):
+
+        request.data['type_user'] = self.request.user.type_user
+
+        if self.request.user.type_user == "teacher":
+            request.data['teacher'] = self.request.user.id
+
+        p = self.service.put(data=request.data, _id=pk, *args, **kwargs)
+        p.teacher_id = self.request.user.id if self.request.user.type_user == "teacher" else None
+        p.save()
+        return Response(self.serializer_class(p).data)
+
 
 class RenderVousViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor == False:
+        if not self.request.user.profile.is_super_doctor:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=ConsultationSerializer, service=ConsultationService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
 
+    def create(self, request, *args, **kwargs):
+        data = extract_data_with_validation(request=request, fields=self.fields)
+        try:
+            data['doctor'] = request.user.id
+            supervise_object = self.service.create(data=data)
+            return Response(data=self.serializer_class(supervise_object).data, status=HTTP_201_CREATED)
+        except Exception as exception:
+            return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def list(self, request, *args, **kwargs):
+        user = request.user
+
+        if user.type_user == 'doctor' and user.profile.is_super_doctor == False:
+
+            consultations = Consultation.objects.filter(doctor=user.id)
+        elif user.type_user == 'parent':
+            consultations = Consultation.objects.filter(patient__parent_id=user.id)
+        else:
+            return Response(data={'error': 'Invalid user type'}, status=HTTP_400_BAD_REQUEST)
+
+        serializer = ConsultationSerializer(consultations, many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
+
 
 class SuperviseViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor is True:
+        if self.request.user.profile.is_super_doctor == True:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
@@ -140,11 +206,109 @@ class SuperviseViewSet(ViewSet):
 
 class DiagnosticViewSet(ViewSet):
     def get_permissions(self):
-                if self.request.user.profile.is_super_doctor == False:
-                     return [IsAuthenticated()]
+        if self.request.user.profile.is_super_doctor == False:
+            return [IsAuthenticated()]
 
     def __init__(self, serializer_class=DiagnosticSerializer, service=DiagnosticService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
+
+
+user_service = UserService()
+pat_service = PatientService()
+
+
+@api_view(['GET'])
+def find(request, pk=None):
+    parent = user_service.get_by({'login_number': pk})
+    if parent:
+        patients = pat_service.filter_by({'parent_id': parent.id, 'score_teacher': 0})
+        parent_serializer = UserSerializer(parent)
+        patients_serializer = PatientSerializer(patients, many=True)
+        return Response({'parent': parent_serializer.data, 'patients': patients_serializer.data})
+    else:
+        return Response({'message': 'Parent not found'}, status=HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def patscore(request, pk=None):
+    p = PatientSerializer(Patient.objects.get(id=pk))
+    x1 = FormAbrParentSerializer(FormAbrParent.objects.get(patient_id=pk))
+    x2 = BehaviorTroubleParentSerializer(BehaviorTroubleParent.objects.get(patient_id=pk))
+    x3 = LearningTroubleParentSerializer(LearningTroubleParent.objects.get(patient_id=pk))
+    x4 = SomatisationTroubleParentSerializer(SomatisationTroubleParent.objects.get(patient_id=pk))
+    x5 = HyperActivityTroubleParentSerializer(HyperActivityTroubleParent.objects.get(patient_id=pk))
+    x6 = AnxityTroubleParentSerializer(AnxityTroubleParent.objects.get(patient_id=pk))
+
+    x7 = BehaviorTroubleTeacherSerializer(BehaviorTroubleTeacher.objects.get(patient_id=pk))
+    x8 = HyperActivityTroubleTeacherSerializer(HyperActivityTroubleTeacher.objects.get(patient_id=pk))
+    x9 = InattentionTroubleTeacherSerializer(InattentionTroubleTeacher.objects.get(patient_id=pk))
+    x10 = FormAbrSerializer(FormAbrTeacher.objects.get(patient_id=pk))
+
+    return Response({
+        "Patient": p.data,
+        "FormAbrParent": x1.data,
+        "BehaviorTroubleParent": x2.data,
+        "LearningTroubleParent": x3.data,
+        "SomatisationTroubleParent": x4.data,
+        "HyperActivityTroubleParent": x5.data,
+        "AnxityTroubleParent": x6.data,
+
+        "BehaviorTroubleTeacher": x7.data,
+        "HyperActivityTroubleTeacher": x8.data,
+        "InattentionTroubleTeacher": x9.data,
+        "FormAbrTeacher": x10.data
+    })
+
+
+@api_view(['GET'])
+def dashboard(request):
+    a = Patient.objects.annotate(
+
+        birthdate_age=date.today() - F('birthdate'))
+
+    tr1 = a.filter(birthdate_age__gte=timedelta(days=3 * 365), birthdate_age__lte=timedelta(days=5 * 365))
+    tr2 = a.filter(birthdate_age__gte=timedelta(days=6 * 365), birthdate_age__lte=timedelta(days=8 * 365))
+    tr3 = a.filter(birthdate_age__gte=timedelta(days=9 * 365), birthdate_age__lte=timedelta(days=11 * 365))
+    tr4 = a.filter(birthdate_age__gte=timedelta(days=12 * 365), birthdate_age__lte=timedelta(days=14 * 365))
+    tr5 = a.filter(birthdate_age__gte=timedelta(days=15 * 365), birthdate_age__lte=timedelta(days=17 * 365))
+
+    notsus = Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0, score_teacher__lt=70, score_parent__lt=70)
+
+    sus = Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(
+        Q(score_teacher__gt=70) | Q(score_parent__gt=70))
+    sus_qs = sus.values_list('id', flat=True)
+    s1 = tr1.filter(id__in=sus_qs).count()
+    s2 = tr2.filter(id__in=sus_qs).count()
+    s3 = tr3.filter(id__in=sus_qs).count()
+    s4 = tr4.filter(id__in=sus_qs).count()
+    s5 = tr5.filter(id__in=sus_qs).count()
+
+    notsus_qs = notsus.values_list('id', flat=True)
+    n1 = tr1.filter(id__in=notsus_qs).count()
+    n2 = tr2.filter(id__in=notsus_qs).count()
+    n3 = tr3.filter(id__in=notsus_qs).count()
+    n4 = tr4.filter(id__in=notsus_qs).count()
+    n5 = tr5.filter(id__in=notsus_qs).count()
+
+    sick = [s1, s2, s3, s4, s5]
+    notsick = [n1, n2, n3, n4, n5]
+    data = {
+        "total": Patient.objects.count(),
+        "males": Patient.objects.filter(gender="M").count(),
+        "females": Patient.objects.filter(gender="F").count(),
+        "supervised": Patient.objects.filter(is_supervised=True).count(),
+        "supervisedmales": Patient.objects.filter(is_supervised=True, gender="M").count(),
+        "supervisedfemales": Patient.objects.filter(is_supervised=True, gender="F").count(),
+        "consulted": Patient.objects.filter(is_consulted=True).count(),
+        "suspect": sus.count(),
+        "notsuspect": notsus.count(),
+        "waiting for parent": Patient.objects.filter(score_teacher__gt=0, score_parent=0).count(),
+        "waiting for teacher": Patient.objects.filter(score_teacher=0, score_parent__gt=0).count(),
+
+        "l": [notsick, sick]
+
+    }
+    return Response(data)
 
 
 patients, patient = PatientViewSet.get_urls()
@@ -153,6 +317,9 @@ consultations, consultation = RenderVousViewSet.get_urls()
 diagnostics, diagnostic = DiagnosticViewSet.get_urls()
 
 urlpatterns = [
+    path('/find/<pk>', find),
+    path('/details/<int:pk>', patscore),
+    path('/dashboard', dashboard),
     path('', patients), path('/<int:pk>', patient),
     path('/supervises', supervises),
     path('/supervises/<int:pk>', supervise),

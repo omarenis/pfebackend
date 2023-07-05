@@ -1,4 +1,5 @@
 from django.urls import path
+from django.db.models import QuerySet
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
@@ -6,14 +7,28 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet as RestViewSet
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, \
-    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
+    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN,HTTP_500_INTERNAL_SERVER_ERROR
 from rest_framework_simplejwt.tokens import RefreshToken
 from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
-from gestionusers.models import LocalisationSerializer, UserSerializer
+from gestionusers.models import LocalisationSerializer, UserSerializer,PersonProfileSerializer,User,delegation,governorate,delegationSerializer,governorateSerializer
 from gestionusers.services import LocalisationService, UserService, signup, login
 
 localisation_service = LocalisationService()
 user_service = UserService()
+
+@api_view(['GET'])
+def delegationlist(request,pk=None):
+    g=governorate.objects.get(governorate=pk)
+    d=delegation.objects.filter(governorate=g.id)
+    serializer = delegationSerializer(d, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def govlist(request):
+    governorates = governorate.objects.all()
+    serializer = governorateSerializer(governorates, many=True)
+    return Response(serializer.data)
+
 
 
 @permission_classes([AllowAny])
@@ -23,16 +38,15 @@ def login_controller(request, *args, **kwargs):
     try:
         user = login(login_number=request.data.get('login_number'), password=request.data.get('password'))
         token = RefreshToken.for_user(user=user)
+        serializer = PersonProfileSerializer(user.profile)
         return Response(data={
             "access": str(token.access_token),
             "refresh": str(token),
             "userId": user.id,
             "type_user": user.type_user,
             "name": user.name,
-            "is_super_doctor":user.profile.is_super_doctor if user.profile is not None else None,
-            "super_doctor_id":user.profile.super_doctor_id if user.profile is not None else None , 
-            "family_name": user.profile.family_name if user.profile is not None else None,
-            "is_superuser": user.is_superuser
+            "active":user.is_active,
+            "profile":serializer.data
         })
     except Exception as exception:
         if isinstance(exception, PermissionError):
@@ -54,20 +68,19 @@ def signup_controller(request, *args, **kwargs):
         localisation = localisation_service.create(data=request.data.get('localisation'))
     for i in user_service.fields:
         data[i] = request.data.get(i)
-    data['localisation_id'] = localisation.id
+    data['localisation_id'] = localisation
     user = user_service.filter_by({'login_number': request.data.get('login_number')}).first()
-    data['is_active'] = True
     if user is not None:
         if user.is_active:
-            return Response(data={'created': True}, status=HTTP_401_UNAUTHORIZED)
-        user_service.put(_id=user.id, data=data)
+            return Response(data={'account with such login_number already created': True}, status=HTTP_401_UNAUTHORIZED)
+        user_service.changestate(_id=user.id, data=request.data)
     else:
         user = signup(data)
     if isinstance(user, Exception):
         return Response(data={"error": str(user)}, status=500)
     else:
         return Response(data={
-            "created": True,
+            "created successfully": True,
         }, status=HTTP_201_CREATED)
 
 
@@ -96,12 +109,30 @@ def logout(request, *args, **kwargs):
 class UserViewSet(ViewSet):
     def get_permissions(self):
         return [IsAuthenticated()]
-
+        
     def __init__(self, serializer_class=UserSerializer, service=UserService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
         self.localisation_service = LocalisationService()
         self.permission_classes = self.get_permissions()
+    def list(self, request):
+        try:
+            output = []
 
+            if request.user.type_user == 'admin':
+                users = self.service.list()
+            elif request.user.type_user == 'school':
+                users = self.service.filter_by({'profile__school__id': request.user.id})
+            elif hasattr(request.user, 'profile') and request.user.profile.is_super_doctor:
+                users = self.service.filter_by({'profile__super_doctor__id': request.user.profile_id})
+            else:
+                users = []
+
+            for user in users:
+                output.append(self.serializer_class(user).data)
+
+            return Response(data=output, status=HTTP_200_OK)
+        except Exception as exception:
+            return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
 users_list, user_retrieve_update_delete = UserViewSet.get_urls()
 urlpatterns = [
@@ -110,4 +141,6 @@ urlpatterns = [
     path('/login', login_controller),
     path('/signup', signup_controller),
     path('/logout', logout),
+    path('/delegation/<pk>',delegationlist),
+    path('/gov',govlist)
 ]
