@@ -91,7 +91,7 @@ class AutisteService(Service):
             aut.score_father, leveel1 = autismelvl1(data['level1'], leveel1)
         if aut.score_father > 8 or aut.score_mother > 8:
             aut.sick = True
-        aut.saved = True
+        aut.saved = aut.score_father != 0 and aut.score_mother != 0
         aut.save()
         leveel1.save()
         return aut
@@ -109,7 +109,7 @@ class Level1service(Service):
         else:
             autiste.score_mother = score
         instance.save()
-        autiste.saved = True
+        autiste.saved = autiste.score_father != 0 and autiste.score_mother != 0
         autiste.save()
         return instance
 
