@@ -1,7 +1,7 @@
 from django.urls import path
 
-from autisme.models import AutisteSerializer, Level1serializer, Autiste
-from autisme.services import AutisteService, Level1service
+from autisme.models import AutisteSerializer, Level1serializer, Autiste, SuperviseSerializer
+from autisme.services import AutisteService, Level1service, SuperviseService
 from common.views import ViewSet
 
 
@@ -24,6 +24,12 @@ class Level1viewset(ViewSet):
         request.data['parent'] = request.user
         request.data['patient'] = Autiste.objects.get(id=int(request.data.get('patient')))
         return super().create(request, *args)
+
+
+class SuperviseViewSet(ViewSet):
+
+    def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
+        super().__init__(serializer_class, service, **kwargs)
 
 
 autistes, autiste = AutisteViewSet.get_urls()

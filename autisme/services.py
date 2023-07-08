@@ -6,10 +6,10 @@ from gestionusers.models import User
 from gestionusers.services import UserService
 from .models import Consultation, Autiste, Supervise, Level1
 from .repositories import Level1repository
+from datetime import date
 
 URL = "http://localhost:5000/"
 APPLICATION_TYPE = "application/json"
-from datetime import date
 
 AUTISTE_FIELDS = {
     'name': {'type': 'text', 'required': True},
@@ -92,8 +92,8 @@ class AutisteService(Service):
         if aut.score_father > 8 or aut.score_mother > 8:
             aut.sick = True
         aut.saved = aut.score_father != 0 and aut.score_mother != 0
-        aut.save()
-        leveel1.save()
+        aut.save(using='autisme')
+        leveel1.save(using='autisme')
         return aut
 
 
@@ -108,9 +108,9 @@ class Level1service(Service):
             autiste.score_father = score
         else:
             autiste.score_mother = score
-        instance.save()
+        instance.save(using='autisme')
         autiste.saved = autiste.score_father != 0 and autiste.score_mother != 0
-        autiste.save()
+        autiste.save(using='autisme')
         return instance
 
 

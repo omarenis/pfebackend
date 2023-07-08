@@ -3,17 +3,18 @@ from django.db.models import Model
 
 
 class Repository(object):
-    def __init__(self, model: Model or AbstractUser):
+    def __init__(self, model: Model or AbstractUser, database='default'):
         self.model = model
+        self.database = database
 
     def list(self):
-        return self.model.objects.all()
+        return self.model.objects.using(self.database).all()
 
     def retrieve(self, _id: int):
-        return self.model.objects.get(id=_id)
+        return self.model.objects.using(self.database).get(id=_id)
 
     def put(self, _id: int, data: dict):
-        _object = self.model.objects.get(id=_id)
+        _object = self.model.objects.using(self.database).get(id=_id)
         if _object is None:
             return Exception('object not found')
         else:
@@ -25,15 +26,15 @@ class Repository(object):
                 _object.set_password(data.get('password'))
             else:
                 raise AttributeError("password only allowed for abstract users or their childs class")
-            _object.save()
+            _object.save(using=self.database)
         return _object
 
     def create(self, data: dict):
-        return self.model.objects.create(**data)
+        return self.model.objects.using(self.database).create(**data)
 
     def delete(self, _id):
-        return self.model.objects.get(pk=_id).delete()
+        return self.model.objects.using(self.database).get(pk=_id).delete()
 
     def filter_by(self, data: dict):
         print(data)
-        return self.model.objects.filter(**data)
+        return self.model.objectsusing(self.database).filter(**data)

@@ -4,7 +4,7 @@ from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, Fo
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
-from gestionusers.models import UserSerializer, User
+from gestionusers.models import UserSerializer
 
 user_model = 'gestionusers.User'
 
@@ -30,7 +30,7 @@ class Autiste(Model):
 class Level1(Model):
     patient = ForeignKey(to='Autiste', on_delete=SET_NULL, null=True)
     type_parent = CharField(null=False, max_length=10, choices=(('mother', 'mother'), ('father', 'father')))
-    parent = ForeignKey(to=User, on_delete=CASCADE, null=False)
+    parent = ForeignKey(to=user_model, on_delete=CASCADE, null=False)
     looks_at_pointed_item = TextField(null=False, db_column='looks_at_pointed_item')
     possibly_deaf = TextField(null=False, db_column='possibly_deaf')
     pretending_playing = TextField(null=False, db_column='pretending_playing')
