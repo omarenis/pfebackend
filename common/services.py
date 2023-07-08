@@ -7,7 +7,7 @@ class Service(object):
         self.repository = repository
         self.fields = fields
 
-    def list(self): 
+    def list(self):
         return self.repository.list()
 
     def retrieve(self, _id: int):

@@ -1,7 +1,6 @@
 from common.repositories import Repository
 from common.services import Service
 from .models import Localisation, User, PersonProfile
-from django.db import transaction
 
 URL = "http://localhost:5000/"
 

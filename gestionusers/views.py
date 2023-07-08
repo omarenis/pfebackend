@@ -1,34 +1,35 @@
 from django.urls import path
-from django.db.models import QuerySet
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet as RestViewSet
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, \
-    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN,HTTP_500_INTERNAL_SERVER_ERROR
+    HTTP_200_OK, HTTP_403_FORBIDDEN, HTTP_500_INTERNAL_SERVER_ERROR
 from rest_framework_simplejwt.tokens import RefreshToken
-from common.views import ViewSet, extract_serialized_objects_response, return_serialized_data_or_error_response
-from gestionusers.models import LocalisationSerializer, UserSerializer,PersonProfileSerializer,User,delegation,governorate,delegationSerializer,governorateSerializer
+
+from common.views import ViewSet
 from gestionusers.services import LocalisationService, UserService, signup, login
+from .models import Delegation
+from .serializers import LocalisationSerializer, UserSerializer, PersonProfileSerializer, Governorate, \
+    DelegationSerializer, GovernorateSerializer
 
 localisation_service = LocalisationService()
 user_service = UserService()
 
+
 @api_view(['GET'])
-def delegationlist(request,pk=None):
-    g=governorate.objects.get(governorate=pk)
-    d=delegation.objects.filter(governorate=g.id)
-    serializer = delegationSerializer(d, many=True)
+def delegationlist(request, pk=None):
+    g = Governorate.objects.get(governorate=pk)
+    d = Delegation.objects.filter(governorate=g.id)
+    serializer = DelegationSerializer(d, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 def govlist(request):
-    governorates = governorate.objects.all()
-    serializer = governorateSerializer(governorates, many=True)
+    governorates = Governorate.objects.all()
+    serializer = GovernorateSerializer(governorates, many=True)
     return Response(serializer.data)
-
 
 
 @permission_classes([AllowAny])
@@ -45,8 +46,8 @@ def login_controller(request, *args, **kwargs):
             "userId": user.id,
             "type_user": user.type_user,
             "name": user.name,
-            "active":user.is_active,
-            "profile":serializer.data
+            "active": user.is_active,
+            "profile": serializer.data
         })
     except Exception as exception:
         if isinstance(exception, PermissionError):
@@ -109,30 +110,34 @@ def logout(request, *args, **kwargs):
 class UserViewSet(ViewSet):
     def get_permissions(self):
         return [IsAuthenticated()]
-        
+
     def __init__(self, serializer_class=UserSerializer, service=UserService(), **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
         self.localisation_service = LocalisationService()
         self.permission_classes = self.get_permissions()
+
     def list(self, request):
         try:
             output = []
-
+            filter_by = {}
+            for i in request.query_params:
+                filter_by[i] = request.query_params.get(i)
             if request.user.type_user == 'admin':
-                users = self.service.list()
+                users = self.service.list() if filter_by == {} else self.service.filter_by(filter_by)
             elif request.user.type_user == 'school':
-                users = self.service.filter_by({'profile__school__id': request.user.id})
-            elif hasattr(request.user, 'profile') and request.user.profile != None and request.user.profile.is_super_doctor:
-                users = self.service.filter_by({'profile__super_doctor__id': request.user.profile_id})
-            else:
-                users = []
-
+                filter_by['profile__school__id'] = request.user.id
+            elif hasattr(request.user,
+                         'profile') and request.user.profile is not None and request.user.profile.is_super_doctor:
+                filter_by['profile__super_doctor__id'] = request.user.profile_id
+            users = self.service.list() if filter_by == {} else self.service.filter_by(filter_by)
+            print(users)
             for user in users:
                 output.append(self.serializer_class(user).data)
 
             return Response(data=output, status=HTTP_200_OK)
         except Exception as exception:
             return Response(data={'error': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 users_list, user_retrieve_update_delete = UserViewSet.get_urls()
 urlpatterns = [
@@ -141,6 +146,6 @@ urlpatterns = [
     path('/login', login_controller),
     path('/signup', signup_controller),
     path('/logout', logout),
-    path('/delegation/<pk>',delegationlist),
-    path('/gov',govlist)
+    path('/delegation/<pk>', delegationlist),
+    path('/gov', govlist)
 ]

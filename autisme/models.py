@@ -4,7 +4,7 @@ from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, Fo
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
 
-from gestionusers.models import UserSerializer
+from gestionusers.serializers import UserSerializer
 
 user_model = 'gestionusers.User'
 

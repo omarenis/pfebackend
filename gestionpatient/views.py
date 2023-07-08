@@ -9,7 +9,8 @@ from rest_framework.status import HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREAT
     HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND
 from common.views import ViewSet, extract_data_with_validation
 
-from gestionusers.models import User, UserSerializer, PersonProfile, Localisation
+from gestionusers.serializers import User, UserSerializer
+from gestionusers.models import PersonProfile, Localisation
 from gestionusers.services import UserService
 from tdah.models import FormAbrParentSerializer, BehaviorTroubleParentSerializer, LearningTroubleParentSerializer, \
     SomatisationTroubleParentSerializer, HyperActivityTroubleParentSerializer, AnxityTroubleParentSerializer, \
@@ -197,7 +198,7 @@ class RenderVousViewSet(ViewSet):
 
 class SuperviseViewSet(ViewSet):
     def get_permissions(self):
-        if self.request.user.profile.is_super_doctor == True:
+        if self.request.user.profile.is_super_doctor:
             return [IsAuthenticated()]
 
     def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
@@ -277,11 +278,8 @@ def dashboard(request):
     sus = Patient.objects.filter(score_teacher__gt=0, score_parent__gt=0).filter(
         Q(score_teacher__gt=70) | Q(score_parent__gt=70))
     sus_qs = sus.values_list('id', flat=True)
-    s1 = tr1.filter(id__in=sus_qs).count()
-    s2 = tr2.filter(id__in=sus_qs).count()
-    s3 = tr3.filter(id__in=sus_qs).count()
-    s4 = tr4.filter(id__in=sus_qs).count()
-    s5 = tr5.filter(id__in=sus_qs).count()
+    s1, s2, s3, s4, s5 = tr1.filter(id__in=sus_qs).count(), tr2.filter(id__in=sus_qs).count(), \
+        tr3.filter(id__in=sus_qs).count(), tr4.filter(id__in=sus_qs).count(), tr5.filter(id__in=sus_qs).count()
 
     notsus_qs = notsus.values_list('id', flat=True)
     n1 = tr1.filter(id__in=notsus_qs).count()

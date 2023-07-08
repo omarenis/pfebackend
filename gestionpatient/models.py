@@ -3,7 +3,7 @@ from django.db.models import BooleanField, CASCADE, DateField, DateTimeField, Fo
     OneToOneField, TextField, FloatField, SET_NULL
 from django.db.models import Model
 from rest_framework.serializers import ModelSerializer
-from gestionusers.models import UserSerializer
+from gestionusers.serializers import UserSerializer
 
 app_label = 'gestionpatient'
 user_model = 'gestionusers.User'

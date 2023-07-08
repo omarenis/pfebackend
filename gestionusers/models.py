@@ -7,15 +7,17 @@ from rest_framework.serializers import ModelSerializer, Serializer
 app_label = 'gestionusers'
 
 
-class governorate(Model):
-    governorate:TextField = TextField(null=False)
+class Governorate(Model):
+    governorate: TextField = TextField(null=False)
+
     class Meta:
         db_table = 'governorate'
 
 
-class delegation(Model):
-    delegation:TextField = TextField(null=False)
-    governorate = ForeignKey(to=governorate, on_delete=CASCADE, null=False)
+class Delegation(Model):
+    delegation: TextField = TextField(null=False)
+    governorate = ForeignKey(to=Governorate, on_delete=CASCADE, null=False)
+
     class Meta:
         db_table = 'delegation'
 
@@ -34,7 +36,7 @@ class User(AbstractUser):
     name = TextField(null=False)
     login_number = CharField(null=False, unique=True, max_length=9, db_column='login_number')
     telephone = TextField(null=False)
-    telephone2=TextField(null=True,default=None)
+    telephone2 = TextField(null=True, default=None)
     address = TextField(null=True, default=None)
     type_user = TextField(null=False, db_column='type_user')
     localisation = ForeignKey(null=True, to='Localisation', on_delete=SET_NULL)
@@ -53,34 +55,3 @@ class PersonProfile(Model):
 
     class Meta:
         db_table = 'person_profiles'
-
-
-class LocalisationSerializer(ModelSerializer):
-    class Meta:
-        model = Localisation
-        fields = '__all__'
-
-
-class PersonProfileSerializer(ModelSerializer):
-    class Meta:
-        model = PersonProfile
-        fields = '__all__'
-
-
-class UserSerializer(ModelSerializer):
-    profile = PersonProfileSerializer()
-    localisation = LocalisationSerializer()
-
-    class Meta:
-        model = User
-        fields = ['id', 'name', 'login_number', 'type_user', 'telephone','telephone2','email' ,'localisation', 'profile']
-
-class governorateSerializer(ModelSerializer):
-    class Meta:
-        model = governorate
-        fields = '__all__'
-class delegationSerializer(ModelSerializer):
-
-    class Meta:
-        model = delegation
-        fields = ['delegation']

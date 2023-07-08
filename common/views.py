@@ -33,7 +33,9 @@ def extract_data_with_validation(request, fields: dict) -> dict or Exception:
 
 def extract_get_data(request):
     output = {}
+    print(request.GET)
     for i in request.GET:
+        print(i)
         try:
             output[i] = int(request.GET.get(i)) if request.GET.get(i).find('.') == -1 else float(request.GET.get(i))
         except Exception as exception:
@@ -114,8 +116,6 @@ class ViewSet(ModelViewSet):
                                                             response_code=HTTP_201_CREATED)
         else:
             return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
-
-
 
     def delete(self, request, pk=None, *args, **kwargs):
         if pk is None:

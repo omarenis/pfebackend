@@ -92,8 +92,8 @@ class AutisteService(Service):
         if aut.score_father > 8 or aut.score_mother > 8:
             aut.sick = True
         aut.saved = aut.score_father != 0 and aut.score_mother != 0
-        aut.save(using='autisme')
-        leveel1.save(using='autisme')
+        aut.save()
+        leveel1.save()
         return aut
 
 
@@ -108,9 +108,9 @@ class Level1service(Service):
             autiste.score_father = score
         else:
             autiste.score_mother = score
-        instance.save(using='autisme')
+        instance.save()
         autiste.saved = autiste.score_father != 0 and autiste.score_mother != 0
-        autiste.save(using='autisme')
+        autiste.save()
         return instance
 
 
@@ -121,7 +121,7 @@ class SuperviseService(Service):
     def create(self, data: dict):
         try:
             patient = Autiste.objects.get(id=data['patient'])
-            doctor = User.objects.get(id=data['doctor'])
+            doctor = User.objects.using('default').get(id=data['doctor'])
         except (Autiste.DoesNotExist, User.DoesNotExist):
             return ValueError('Invalid patient or doctor ID')
 
@@ -150,7 +150,7 @@ class ConsultationService(Service):
     def create(self, data: dict):
         try:
             patient = Autiste.objects.get(id=data['patient'])
-            doctor = User.objects.get(id=data['doctor'])
+            doctor = User.objects.using('default').get(id=data['doctor'])
         except (Autiste.DoesNotExist, User.DoesNotExist):
             return ValueError('Invalid patient or doctor ID')
 
