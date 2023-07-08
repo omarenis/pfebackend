@@ -6,7 +6,7 @@ from django.db import transaction
 URL = "http://localhost:5000/"
 
 LOCALISATION_FIELDS = {
-    'country': {'type': 'text', 'required': True},
+    'country': {'type': "tunisia", 'required': True},
     'state': {'type': 'text', 'required': True},
     'delegation': {'type': 'text', 'required': True},
     'zip_code': {'type': 'text', 'required': True}
