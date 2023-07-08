@@ -122,7 +122,7 @@ class UserViewSet(ViewSet):
                 users = self.service.list()
             elif request.user.type_user == 'school':
                 users = self.service.filter_by({'profile__school__id': request.user.id})
-            elif hasattr(request.user, 'profile') and request.user.profile.is_super_doctor:
+            elif hasattr(request.user, 'profile') and request.user.profile != None and request.user.profile.is_super_doctor:
                 users = self.service.filter_by({'profile__super_doctor__id': request.user.profile_id})
             else:
                 users = []

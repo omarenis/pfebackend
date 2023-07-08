@@ -6,7 +6,6 @@ from common.views import ViewSet
 
 
 class AutisteViewSet(ViewSet):
-
     def __init__(self, serializer_class=AutisteSerializer, service=AutisteService(), **kwargs):
         super().__init__(serializer_class, service, **kwargs)
 
@@ -19,7 +18,7 @@ class Level1viewset(ViewSet):
     def __init__(self, serializer_class=Level1serializer, service=Level1service(),
                  **kwargs):
         super().__init__(serializer_class=serializer_class, service=service, **kwargs)
-
+        
     def create(self, request, *args, **kwargs):
         request.data['parent'] = request.user
         request.data['patient'] = Autiste.objects.get(id=int(request.data.get('patient')))
