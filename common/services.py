@@ -59,6 +59,6 @@ def autismelvl1(data, instance):
     value = 0
     for i in data:
         setattr(instance, i, data[i])
-        if data.get(i) == 'yes':
+        if data.get(i) == 'sucess':
             value += 1
     return value, instance
