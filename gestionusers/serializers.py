@@ -1,5 +1,5 @@
-from rest_framework.serializers import Serializer, CharField, BooleanField, RelatedField
-from gestionusers.models import User, Governorate
+from rest_framework.serializers import Serializer, CharField, BooleanField, RelatedField, ModelSerializer
+from gestionusers.models import User, Governorate, PersonProfile
 
 
 class LocalisationSerializer(Serializer):
@@ -9,11 +9,10 @@ class LocalisationSerializer(Serializer):
     zip_code = CharField(max_length=4)
 
 
-class PersonProfileSerializer(Serializer):
-    family_name = CharField()
-    school = RelatedField(queryset=User.objects.using('default').all())
-    is_super_doctor = BooleanField(default=False)
-    speciality = CharField()
+class PersonProfileSerializer(ModelSerializer):
+    class Meta:
+        model = PersonProfile
+        fields = '__all__'
 
 
 class UserSerializer(Serializer):
