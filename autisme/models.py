@@ -9,8 +9,8 @@ from gestionusers.serializers import UserSerializer
 user_model = 'gestionusers.User'
 
 
-class Autiste(Model):
-    parent = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='autiste_parent')
+class Autistic(Model):
+    parent = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='Autistic_parent')
     name: TextField = TextField(null=False)
     family_name: TextField = TextField(null=False)
     birthdate: DateField = DateField(null=False)
@@ -21,14 +21,15 @@ class Autiste(Model):
     sick = BooleanField(default=False, null=False)
     mentalage = FloatField(null=True)
     saved = BooleanField(null=False, default=False)
+    supervisor = ForeignKey(to='gestionusers.PersonProfile', on_delete=SET_NULL, null=True)
 
     class Meta:
-        db_table = 'autistes'
+        db_table = 'Autistics'
         unique_together = (('parent_id', 'name', 'birthdate'),)
 
 
 class Level1(Model):
-    patient = ForeignKey(to='Autiste', on_delete=SET_NULL, null=True)
+    patient = ForeignKey(to='Autistic', on_delete=SET_NULL, null=True)
     type_parent = CharField(null=False, max_length=10, choices=(('mother', 'mother'), ('father', 'father')))
     parent = ForeignKey(to=user_model, on_delete=CASCADE, null=False)
     looks_at_pointed_item = TextField(null=False, db_column='looks_at_pointed_item')
@@ -56,42 +57,25 @@ class Level1(Model):
         db_table = 'level1'
 
 
-class Supervise(Model):
-    subject: OneToOneField = OneToOneField(to='Autiste', on_delete=CASCADE, null=False)
-    doctor: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='id_doctor')
-
-    class Meta:
-        db_table = 'supervises_autisme'
-
-
 class Consultation(Model):
-    doctor: ForeignKey = ForeignKey(to=user_model, on_delete=CASCADE, null=False, related_name='doctor_idd')
-    subject: OneToOneField = OneToOneField(to='Autiste', on_delete=CASCADE, null=False, related_name='autiste_id')
+    subject: OneToOneField = OneToOneField(to='Autistic', on_delete=CASCADE, null=False, related_name='Autistic_id')
     date: DateTimeField = DateTimeField(null=False, default=timezone.now)
+    patient = ForeignKey(to='Autistic', on_delete=CASCADE)
 
     class Meta:
         db_table = 'consultations_autisme'
 
 
-class AutisteSerializer(ModelSerializer):
+class AutisticSerializer(ModelSerializer):
     parent = UserSerializer()
 
     class Meta:
-        model = Autiste
+        model = Autistic
         fields = '__all__'
 
 
-class SuperviseSerializer(ModelSerializer):
-    patient = AutisteSerializer()
-    doctor = UserSerializer()
-
-    class Meta:
-        model = Supervise
-        fields = "__all__"
-
-
 class ConsultationSerializer(ModelSerializer):
-    patient = AutisteSerializer()
+    patient = AutisticSerializer()
     doctor = UserSerializer()
 
     class Meta:

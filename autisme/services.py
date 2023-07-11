@@ -2,16 +2,16 @@ from common.models import text_field
 from common.repositories import Repository
 from common.services import Service, autismelvl1
 
-from gestionusers.models import User
+from gestionusers.models import User, PersonProfile
 from gestionusers.services import UserService
-from .models import Consultation, Autiste, Supervise, Level1
+from .models import Consultation, Autistic, Level1
 from .repositories import Level1repository
 from datetime import date
 
 URL = "http://localhost:5000/"
 APPLICATION_TYPE = "application/json"
 
-AUTISTE_FIELDS = {
+Autistic_FIELDS = {
     'name': {'type': 'text', 'required': True},
     'family_name': {'type': 'text', 'required': True},
     'birthdate': {'type': 'date', 'required': True},
@@ -20,7 +20,8 @@ AUTISTE_FIELDS = {
     'score_mother': {'type': 'number', 'required': False},
     'score_father': {'type': 'number', 'required': False},
     "level1": {'type': 'form', 'required': False},
-    'saved': {'type': 'boolean', 'required': False}
+    'saved': {'type': 'boolean', 'required': False},
+    'supervisor': {'type': 'foreign_key', 'required': False, 'classMap': PersonProfile}
 }
 
 level1_fields = {
@@ -45,18 +46,12 @@ level1_fields = {
     "check_parent_reaction": text_field,
     "loves_dynamic_activities": text_field,
     "type_parent": {'type': 'text', 'required': True},
-    "parent": {"type": "foreign_key", "required": True},
-    "patient": {"type": "foreign_key", "required": True}
+    "parent": {"type": "foreign_key", "required": True, 'classMap': User},
+    "patient": {"type": "foreign_key", "required": True, 'classMap': Autistic}
 }
 
-SUPERVICE_FIELDS = {
-    'patient': {'type': 'one_to_one', 'required': True},
-    'doctor': {'type': 'foreign_key', 'required': True}
-
-}
 
 CONSULTATION_FIELDS = {
-    'doctor': {'type': 'foreign_key', 'required': True},
     'patient': {'type': 'one_to_one', 'required': True},
     'date': {'type': 'int', 'required': True},
 }
@@ -69,9 +64,9 @@ def get_age(birthdate):
 us = UserService()
 
 
-class AutisteService(Service):
-    def __init__(self, repository=Repository(model=Autiste)):
-        super().__init__(repository, fields=AUTISTE_FIELDS)
+class AutisticService(Service):
+    def __init__(self, repository=Repository(model=Autistic)):
+        super().__init__(repository, fields=Autistic_FIELDS)
 
     def create(self, data: dict):
 
@@ -103,44 +98,15 @@ class Level1service(Service):
 
     def create(self, data: dict):
         score, instance = autismelvl1(data, self.repository.model())
-        autiste = data['patient']
+        autistic = Autistic.objects.get(id=data['patient'])
         if data.get('type_parent') == 'father':
-            autiste.score_father = score
+            autistic.score_father = score
         else:
-            autiste.score_mother = score
+            autistic.score_mother = score
         instance.save()
-        autiste.saved = autiste.score_father != 0 and autiste.score_mother != 0
-        autiste.save()
+        autistic.saved = Autistic.score_father != 0 and Autistic.score_mother != 0
+        autistic.save()
         return instance
-
-
-class SuperviseService(Service):
-    def __init__(self, repository=Repository(model=Supervise)):
-        super().__init__(repository, fields=SUPERVICE_FIELDS)
-
-    def create(self, data: dict):
-        try:
-            patient = Autiste.objects.get(id=data['patient'])
-            doctor = User.objects.using('default').get(id=data['doctor'])
-        except (Autiste.DoesNotExist, User.DoesNotExist):
-            return ValueError('Invalid patient or doctor ID')
-
-        data['patient'] = patient
-        data['doctor'] = doctor
-
-        supervise = super().create(data)
-
-        if isinstance(supervise, Exception):
-            return supervise
-
-        try:
-            patient.accepted = False
-            patient.is_supervised = True
-            patient.save()
-        except Exception as exception:
-            return exception, patient
-
-        return supervise
 
 
 class ConsultationService(Service):
@@ -149,13 +115,11 @@ class ConsultationService(Service):
 
     def create(self, data: dict):
         try:
-            patient = Autiste.objects.get(id=data['patient'])
-            doctor = User.objects.using('default').get(id=data['doctor'])
-        except (Autiste.DoesNotExist, User.DoesNotExist):
+            patient = Autistic.objects.get(id=data['patient'])
+        except Autistic.DoesNotExist:
             return ValueError('Invalid patient or doctor ID')
 
-        data['patient'] = patient
-        data['doctor'] = doctor
+        data['patient'] = patient.id
 
         consultation = super().create(data)
 

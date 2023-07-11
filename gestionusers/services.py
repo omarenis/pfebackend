@@ -52,14 +52,13 @@ class UserService(Service):
 
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('profile must be not null')
-
-        profile = data.pop('profile') if data.get('profile') is not None else None
+        user = User(**data)
+        user.localisation = localisation
+        profile = data.pop('profile')
 
         if profile is not None and data.get('type_user') != 'doctor':
             profile['is_super_doctor'] = None
 
-        user = User(**data)
-        user.localisation = localisation
         if data.get('type_user') == 'teacher':
             if profile.get('school') is None:
                 raise ValueError('school must be not null')

@@ -13,8 +13,8 @@ class Repository(object):
     def retrieve(self, _id: int):
         return self.model.objects.using(self.database).get(id=_id)
 
-    def put(self, _id: int, data: dict):
-        _object = self.model.objects.using(self.database).get(id=_id)
+    def put(self, pk: int, data: dict):
+        _object = self.model.objects.using(self.database).get(id=pk)
         if _object is None:
             return Exception('object not found')
         else:
@@ -24,8 +24,9 @@ class Repository(object):
             if data.get('password') is not None and isinstance(_object, AbstractUser) or \
                     issubclass(_object.__class__, AbstractUser):
                 _object.set_password(data.get('password'))
-            else:
+            elif data.get("password") is not None:
                 raise AttributeError("password only allowed for abstract users or their childs class")
+            print(data)
             _object.save(using=self.database)
         return _object
 

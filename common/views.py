@@ -2,9 +2,7 @@ from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTT
     HTTP_500_INTERNAL_SERVER_ERROR, HTTP_201_CREATED, HTTP_200_OK
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from common.services import calculate_score
-from gestionpatient.models import Patient
-from gestionusers.models import User
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def return_serialized_data_or_error_response(_object, serializer_class, response_code) -> Response:
@@ -89,7 +87,7 @@ class ViewSet(ModelViewSet):
                                                         response_code=HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None, *args, **kwargs):
-        data = self.service.retrieve(_id=pk)
+        data = self.service.retrieve(pk=pk)
         if data is None:
             return Response(data={'error': 'object not found'}, status=HTTP_404_NOT_FOUND)
         else:
@@ -97,25 +95,27 @@ class ViewSet(ModelViewSet):
                                                             response_code=HTTP_200_OK)
 
     def update(self, request, pk=None, *args, **kwargs):
-        if pk is None:
-            return Response(data={'error': 'id must not be null'}, status=HTTP_400_BAD_REQUEST)
+        try:
+            if pk is None:
+                return Response(data={'error': 'id must not be null'}, status=HTTP_400_BAD_REQUEST)
 
-        _object = self.service.retrieve(_id=pk)
-        if _object is None:
-            return Response(data={'error': 'object not found'}, status=HTTP_404_NOT_FOUND)
+            _object = self.service.retrieve(pk=pk)
+            if _object is None:
+                return Response(data={'error': 'object not found'}, status=HTTP_404_NOT_FOUND)
 
-        # Remove the password field from the update data if it is not explicitly provided
-        update_data = {
-            key: value for key, value in request.data.items() if key != 'password'
-        }
+            # Remove the password field from the update data if it is not explicitly provided
 
-        serializer = self.serializer_class(_object, data=update_data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return return_serialized_data_or_error_response(_object=_object, serializer_class=self.serializer_class,
-                                                            response_code=HTTP_201_CREATED)
-        else:
-            return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+            _object = self.service.put(pk=pk, data=request.data)
+            serializer = self.serializer_class(_object)
+            if serializer.is_valid():
+                return return_serialized_data_or_error_response(_object=_object, serializer_class=self.serializer_class,
+                                                                response_code=HTTP_201_CREATED)
+            else:
+                return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
+        except Exception as exception:
+            if isinstance(exception, ObjectDoesNotExist):
+                return Response(data={'message': str(exception)}, status=HTTP_404_NOT_FOUND)
+            return Response(data={'message': str(exception)}, status=HTTP_500_INTERNAL_SERVER_ERROR)
 
     def delete(self, request, pk=None, *args, **kwargs):
         if pk is None:
