@@ -31,9 +31,7 @@ def extract_data_with_validation(request, fields: dict) -> dict or Exception:
 
 def extract_get_data(request):
     output = {}
-    print(request.GET)
     for i in request.GET:
-        print(i)
         try:
             output[i] = int(request.GET.get(i)) if request.GET.get(i).find('.') == -1 else float(request.GET.get(i))
         except Exception as exception:
@@ -63,9 +61,15 @@ class ViewSet(ModelViewSet):
         self.fields = self.service.fields
 
     def list(self, request, *args, **kwargs):
-        _objects = self.service.filter_by(extract_get_data(request=request)) if request.GET is not None \
-            else self.service.list()
-        return extract_serialized_objects_response(_objects, self.serializer_class)
+        try:
+            _objects = self.service.filter_by(extract_get_data(request=request)) if request.GET is not None \
+                else self.service.list()
+            return extract_serialized_objects_response(_objects, self.serializer_class)
+        except (Exception, ObjectDoesNotExist) as exception:
+            return Response(data={'message': str(exception)},
+                            status=HTTP_404_NOT_FOUND if isinstance(exception,
+                                                                    ObjectDoesNotExist
+                                                                    ) else HTTP_500_INTERNAL_SERVER_ERROR)
 
     def create(self, request, *args, **kwargs):
         data = request.data

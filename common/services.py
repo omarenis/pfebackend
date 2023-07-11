@@ -3,6 +3,7 @@ import json
 from .repositories import Repository
 from django.core.exceptions import ObjectDoesNotExist
 
+
 class Service(object):
 
     def verify_required_data(self, data: dict):
@@ -30,14 +31,14 @@ class Service(object):
             if self.fields.get(i) is None:
                 raise AttributeError(f'{i} is not an attribute on the model')
             else:
-                    if self.fields.get(i).get('type') == 'foreign_key':
-                        model = self.fields.get(i).get('classMap')
-                        try:
-                            raw[i] = model.objects.get(id=data[i])
-                        except model.DoesNotExist:
-                            raise ObjectDoesNotExist(f'{i} with id = {data[i]} does not exist')
-                    else:
-                        raw[i] = data[i]
+                if self.fields.get(i).get('type') == 'foreign_key':
+                    model = self.fields.get(i).get('classMap')
+                    try:
+                        raw[i] = model.objects.get(id=data[i])
+                    except model.DoesNotExist:
+                        raise ObjectDoesNotExist(f'{i} with id = {data[i]} does not exist')
+                else:
+                    raw[i] = data[i]
         return raw
 
     def __init__(self, repository: Repository, fields: dict):
@@ -64,9 +65,17 @@ class Service(object):
     def filter_by(self, data: dict):
         filter_params = {}
         for i in data:
-            if self.fields.get(i) is not None and self.fields.get(i).get('type') == 'text':
+            if self.fields.get(i) is None:
+                continue
+            elif self.fields.get(i).get('type') == 'text':
                 filter_params[f'{i}__contains'] = data[i]
+            elif self.fields.get(i).get('type') == 'foreign_key':
+                try:
+                    filter_params[f'{i}_id'] = self.fields.get(i).get('classMap').objects.get(id=data[i]).id
+                except self.fields.get(i).get('classMap').DoesNotExist:
+                    raise ObjectDoesNotExist(f'{i} with id = {data[i]} does not exist')
             filter_params[i] = data[i]
+
         return self.repository.filter_by(data=filter_params)
 
     def import_data(self, data: list):
