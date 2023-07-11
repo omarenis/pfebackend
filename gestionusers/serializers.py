@@ -1,4 +1,4 @@
-from rest_framework.serializers import Serializer, CharField, BooleanField, RelatedField, ModelSerializer
+from rest_framework.serializers import Serializer, CharField, BooleanField, RelatedField, ModelSerializer, IntegerField
 from gestionusers.models import User, Governorate, PersonProfile
 
 
@@ -16,6 +16,7 @@ class PersonProfileSerializer(ModelSerializer):
 
 
 class UserSerializer(Serializer):
+    id = IntegerField()
     name = CharField()
     login_number = CharField()
     telephone = CharField()
