@@ -1,7 +1,7 @@
 from common.models import text_field
 from common.repositories import Repository
 from common.services import Service, autismelvl1
-
+from django.core.exceptions import ObjectDoesNotExist
 from gestionusers.models import User, PersonProfile
 from gestionusers.services import UserService
 from .models import Consultation, Autistic, Level1
@@ -52,8 +52,9 @@ level1_fields = {
 
 
 CONSULTATION_FIELDS = {
-    'patient': {'type': 'one_to_one', 'required': True},
+    'patient': {'type': 'foreign_key', 'required': True, 'classMap': Autistic },
     'date': {'type': 'int', 'required': True},
+    'subject': {'type': 'text', 'required': False}
 }
 
 
@@ -117,11 +118,10 @@ class ConsultationService(Service):
         try:
             patient = Autistic.objects.get(id=data['patient'])
         except Autistic.DoesNotExist:
-            return ValueError('Invalid patient or doctor ID')
+            raise ObjectDoesNotExist('Invalid patient or doctor ID')
 
-        data['patient'] = patient.id
-
-        consultation = super().create(data)
+        data['patient'] = patient
+        consultation = self.repository.create(data)
 
         if isinstance(consultation, Exception):
             return consultation

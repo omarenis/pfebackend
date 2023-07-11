@@ -11,7 +11,8 @@ class Service(object):
             if data.get(i) is None and self.fields[i].get('required') is True:
                 raise ValueError(f'{i} must not be null')
             if self.fields.get(i).get('type') == 'foreign_key' and data.get(i) is not None:
-                data[f'{i}_id'] = data.pop(i)
+                print(data)
+                data[i] = self.fields.get(i).get('classMap').objects.get(id=data[i])
             elif self.fields[i].get('type') == 'slug':
                 if self.fields[i].get('field_to_slug') is None:
                     raise ValueError('field to slug must be not None')
@@ -52,7 +53,8 @@ class Service(object):
         return self.repository.retrieve(_id=pk)
 
     def create(self, data: dict):
-        self.verify_required_data(data)
+        print(data)
+        data = self.verify_required_data(data)
         return self.repository.create(data)
 
     def put(self, pk: int, data: dict):
@@ -80,22 +82,22 @@ class Service(object):
 
     def import_data(self, data: list):
         for row in data:
-            instanceData = {}
+            instance_data = {}
             for i in self.fields:
                 if self.fields[i].get('type') == 'file':
-                    instanceData[i] = SimpleUploadedFile(name=str(URI(str(row[i])).path).split('/')[-1],
+                    instance_data[i] = SimpleUploadedFile(name=str(URI(str(row[i])).path).split('/')[-1],
                                                          content=urlopen(url=str(data.get(i))).read())
                 elif self.fields[i].get('type') == 'date' or self.fields[i].get('type') == 'datetime':
-                    instanceData[i] = datetime.datetime.fromisoformat(data[i])
+                    instance_data[i] = datetime.datetime.fromisoformat(data[i])
                 elif self.fields[i].get('type') == 'foreign_key':
                     try:
-                        instanceData[f'{i}__id'] = int(data.pop(i))
+                        instance_data[f'{i}__id'] = int(data.pop(i))
                     except ValueError:
                         instance, _ = self.fields.get(i).get('classMap').objects.get_or_create(
                             **json.loads(str(row.pop(i))))
                 else:
-                    instanceData[i] = str(row[i])
-            self.create(instanceData)
+                    instance_data[i] = str(row[i])
+            self.create(instance_data)
 
     def export_data(self):
         output = {}

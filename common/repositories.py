@@ -8,13 +8,19 @@ class Repository(object):
         self.database = database
 
     def list(self):
-        return self.model.objects.using(self.database).all()
+        return self.model.objects.all()
 
-    def retrieve(self, _id: int):
-        return self.model.objects.using(self.database).get(id=_id)
+    def retrieve_by_id(self, pk: int):
+        return self.model.objects.get(id=pk)
+
+    def retrieve(self, data):
+        try:
+            return self.model.objects.get(**data)
+        except self.model.DoesNotExist:
+            raise self.model.DoesNotExist('item does not exists with the specified data')
 
     def put(self, pk: int, data: dict):
-        _object = self.model.objects.using(self.database).get(id=pk)
+        _object = self.model.objects.get(id=pk)
         if _object is None:
             return Exception('object not found')
         else:
@@ -24,17 +30,22 @@ class Repository(object):
             if data.get('password') is not None and isinstance(_object, AbstractUser) or \
                     issubclass(_object.__class__, AbstractUser):
                 _object.set_password(data.get('password'))
-            elif data.get("password") is not None:
-                raise AttributeError("password only allowed for abstract users or their childs class")
-            print(data)
-            _object.save(using=self.database)
+            _object.save()
         return _object
 
     def create(self, data: dict):
-        return self.model.objects.using(self.database).create(**data)
+        return self.model.objects.create(**data)
 
-    def delete(self, _id):
-        return self.model.objects.using(self.database).get(pk=_id).delete()
+    def delete(self, pk):
+        return self.model.objects.get(pk=pk).delete()
 
-    def filter_by(self, data: dict):
-        return self.model.objects.filter(**data)
+    def filter_by(self, data: dict, start=0, end=None, order_by=None):
+        data = self.model.objects.filter(**data)
+        if order_by is not None and isinstance(order_by, list) and order_by != []:
+            for args in order_by:
+                data = data.order_by(args)
+        if end is not None:
+            data = data[start:]
+        else:
+            data = data[start: end]
+        return data

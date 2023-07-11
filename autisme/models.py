@@ -58,7 +58,7 @@ class Level1(Model):
 
 
 class Consultation(Model):
-    subject: OneToOneField = OneToOneField(to='Autistic', on_delete=CASCADE, null=False, related_name='Autistic_id')
+    subject: TextField = TextField(null=True)
     date: DateTimeField = DateTimeField(null=False, default=timezone.now)
     patient = ForeignKey(to='Autistic', on_delete=CASCADE)
 
@@ -76,7 +76,6 @@ class AutisticSerializer(ModelSerializer):
 
 class ConsultationSerializer(ModelSerializer):
     patient = AutisticSerializer()
-    doctor = UserSerializer()
 
     class Meta:
         model = Consultation
