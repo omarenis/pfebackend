@@ -99,6 +99,7 @@ class Level1service(Service):
 
     def create(self, data: dict):
         autistic = Autistic.objects.get(id=data['patient'])
+        data['patient'] = autistic
         score, instance = autismelvl1(data, self.repository.model())
         if data.get('type_parent') == 'father':
             autistic.score_father = score
