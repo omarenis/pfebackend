@@ -110,12 +110,9 @@ class ViewSet(ModelViewSet):
             # Remove the password field from the update data if it is not explicitly provided
 
             _object = self.service.put(pk=pk, data=request.data)
-            serializer = self.serializer_class(data=_object)
-            if serializer.is_valid():
-                return return_serialized_data_or_error_response(_object=_object, serializer_class=self.serializer_class,
+            serializer = self.serializer_class(_object)
+            return return_serialized_data_or_error_response(_object=_object, serializer_class=self.serializer_class,
                                                                 response_code=HTTP_201_CREATED)
-            else:
-                return Response(data=serializer.errors, status=HTTP_400_BAD_REQUEST)
         except Exception as exception:
             if isinstance(exception, ObjectDoesNotExist):
                 return Response(data={'message': str(exception)}, status=HTTP_404_NOT_FOUND)
