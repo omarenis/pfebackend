@@ -80,7 +80,7 @@ class UserService(Service):
         return user
 
     def changestate(self, _id: int, data: dict):
-        user = self.repository.retrieve(_id=_id)
+        user = self.repository.retrieve_by_id(pk=_id)
         localisation_data = data.pop('localisation')
         localisation = self.localisation_service.filter_by(localisation_data).first()
         if localisation is None:
@@ -115,7 +115,7 @@ user_service = UserService()
 
 
 def login(login_number: str, password: str):
-    user = user_service.get_by({'login_number': login_number})
+    user = user_service.retrieve({'login_number': login_number})
     if user is not None and user.is_active:
         if user.check_password(password):
             return user

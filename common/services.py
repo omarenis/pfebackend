@@ -1,7 +1,12 @@
+import datetime
 import json
 
-from .repositories import Repository
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils.text import slugify
+from uri import URI
+from urllib.request import urlopen
+from .repositories import Repository
 
 
 class Service(object):
@@ -49,8 +54,11 @@ class Service(object):
     def list(self):
         return self.repository.list()
 
-    def retrieve(self, pk: int):
-        return self.repository.retrieve(_id=pk)
+    def retrieve_by_id(self, pk: int):
+        return self.repository.retrieve_by_id(pk=pk)
+
+    def retrieve(self, data: dict):
+        return self.repository.retrieve(data)
 
     def create(self, data: dict):
         print(data)
