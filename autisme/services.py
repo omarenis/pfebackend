@@ -50,9 +50,8 @@ level1_fields = {
     "patient": {"type": "foreign_key", "required": True, 'classMap': Autistic}
 }
 
-
 CONSULTATION_FIELDS = {
-    'patient': {'type': 'foreign_key', 'required': True, 'classMap': Autistic },
+    'patient': {'type': 'foreign_key', 'required': True, 'classMap': Autistic},
     'date': {'type': 'int', 'required': True},
     'subject': {'type': 'text', 'required': False}
 }

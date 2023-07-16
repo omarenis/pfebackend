@@ -3,8 +3,6 @@ from django.urls import path
 from autisme.models import Level1serializer, Autistic, ConsultationSerializer, AutisticSerializer
 from autisme.services import Level1service, ConsultationService, AutisticService
 from common.views import ViewSet
-from gestionpatient.models import SuperviseSerializer
-from gestionpatient.service import SuperviseService
 
 
 class AutisticViewSet(ViewSet):
@@ -32,16 +30,9 @@ class ConsultationViewSet(ViewSet):
         super().__init__(serializer_class, service, **kwargs)
 
 
-class SuperviseViewSet(ViewSet):
-
-    def __init__(self, serializer_class=SuperviseSerializer, service=SuperviseService(), **kwargs):
-        super().__init__(serializer_class, service, **kwargs)
-
-
 autistics, autistic = AutisticViewSet.get_urls()
 level1_set, level1 = Level1ViewSet.get_urls()
 consultations, consultation = ConsultationViewSet.get_urls()
-supervises, supervise = SuperviseViewSet.get_urls()
 
 urlpatterns = [
     path('autistics', autistics),
@@ -50,6 +41,4 @@ urlpatterns = [
     path('level1/<int:pk>', level1),
     path('consultations', consultations),
     path('consultations/<int:pk>', consultation),
-    path('supervises', supervises),
-    path('supervises/<int:pk>', supervise)
 ]
