@@ -44,7 +44,6 @@ class UserService(Service):
 
     def create(self, data: dict):
         data['username'] = data.get('login_number')
-
         localisation_data = data.pop('localisation')
         localisation = self.localisation_service.filter_by(localisation_data).first()
         if localisation is None:
@@ -52,8 +51,7 @@ class UserService(Service):
 
         if data.get('type_user') not in ['admin', 'school'] and data.get('profile') is None:
             raise ValueError('profile must be not null')
-        user = User(**data)
-        user.localisation = localisation
+
         profile = data.pop('profile')
 
         if profile is not None and data.get('type_user') != 'doctor':
@@ -73,10 +71,11 @@ class UserService(Service):
                     raise ValueError('super_doctor must have a super doctor')
                 profile['super_doctor_id'] = profile.pop('super_doctor')
 
-        if profile:
-            user.profile = PersonProfile(**profile)
-            user.profile.save()
+        data['profile'] = PersonProfile(**profile)
+        user = User(**data)
+        user.localisation = localisation
         user.set_password(data.get("password"))
+        user.profile.save()
         user.save()
         return user
 
@@ -141,4 +140,5 @@ def signup(data: dict):
     data['is_active'] = True
     data['localisation_id'] = localisation_id
     data['type_user'] = 'parent'
-    return user_service.create(data)
+    return UserService().create(data=data)
+
