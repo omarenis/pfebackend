@@ -21,7 +21,6 @@ class Level1ViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         request.data['parent'] = request.user
-        request.data['patient'] = Autistic.objects.get(id=int(request.data.get('patient')))
         return super().create(request, *args)
 
 

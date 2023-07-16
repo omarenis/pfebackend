@@ -141,4 +141,3 @@ def signup(data: dict):
     data['localisation_id'] = localisation_id
     data['type_user'] = 'parent'
     return UserService().create(data=data)
-
