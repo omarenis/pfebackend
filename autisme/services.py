@@ -98,8 +98,8 @@ class Level1service(Service):
         super().__init__(repository, fields=level1_fields)
 
     def create(self, data: dict):
-        score, instance = autismelvl1(data, self.repository.model())
         autistic = Autistic.objects.get(id=data['patient'])
+        score, instance = autismelvl1(data, self.repository.model())
         if data.get('type_parent') == 'father':
             autistic.score_father = score
         else:
