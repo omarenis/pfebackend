@@ -143,9 +143,9 @@ users_list, user_retrieve_update_delete = UserViewSet.get_urls()
 urlpatterns = [
     path('', users_list),
     path('/<int:pk>', user_retrieve_update_delete),
-    path('login', login_controller),
-    path('signup', signup_controller),
-    path('logout', logout),
+    path('/login', login_controller),
+    path('/signup', signup_controller),
+    path('/logout', logout),
     path('/delegation/<pk>', delegationlist),
     path('/gov', govlist)
 ]
