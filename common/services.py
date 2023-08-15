@@ -16,7 +16,6 @@ class Service(object):
             if data.get(i) is None and self.fields[i].get('required') is True:
                 raise ValueError(f'{i} must not be null')
             if self.fields.get(i).get('type') == 'foreign_key' and data.get(i) is not None:
-                print(data)
                 data[i] = self.fields.get(i).get('classMap').objects.get(id=data[i])
             elif self.fields[i].get('type') == 'slug':
                 if self.fields[i].get('field_to_slug') is None:
@@ -61,7 +60,6 @@ class Service(object):
         return self.repository.retrieve(data)
 
     def create(self, data: dict):
-        print(data)
         data = self.verify_required_data(data)
         return self.repository.create(data)
 
